@@ -11,6 +11,11 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   
+  <!-- Google Firebase SDKs (Cloud Firestore Ready) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -50,14 +55,21 @@
 
       <!-- Action Items & Officer Profile -->
       <div class="nav-actions">
-        <!-- New Announcement Button -->
-        <button class="btn btn-primary" id="openNewNoticeBtn">
+        <!-- New Announcement Button (Authority restricted) -->
+        <button class="btn btn-primary" id="openNewNoticeBtn" title="Dispatch & Publish Official Circular">
           <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2">
             <line x1="12" y1="5" x2="12" y2="19"></line>
             <line x1="5" y1="12" x2="19" y2="12"></line>
           </svg>
-          <span class="btn-text-full">Issue Circular</span>
+          <span class="btn-text-full" id="newNoticeBtnLabel">Issue Circular</span>
           <span class="btn-text-short">Issue</span>
+        </button>
+
+        <!-- Switch Account / Login Button -->
+        <button class="btn btn-secondary btn-sm" id="openAuthModalBtn" title="Login or Switch User Account">
+          <span class="auth-btn-icon">👥</span>
+          <span class="btn-text-full">Accounts</span>
+          <span class="btn-text-short">Login</span>
         </button>
 
         <!-- Theme Toggle -->
@@ -66,11 +78,11 @@
         </button>
 
         <!-- Officer Credentials (Opens Profile & Governance Modal) -->
-        <div class="officer-card" id="openProfileModalBtn" role="button" tabindex="0" title="Click to view Officer Profile & System Governance">
-          <div class="officer-avatar">MA</div>
+        <div class="officer-card" id="openProfileModalBtn" role="button" tabindex="0" title="Click to view Profile, Bio & System Governance">
+          <div class="officer-avatar" id="navUserAvatar">MA</div>
           <div class="officer-info">
-            <span class="officer-name">Maruti Atpadkar</span>
-            <span class="officer-role">Portal Admin &bull; ATP0925 <span class="profile-gear-icon">⚙️</span></span>
+            <span class="officer-name" id="navUserName">Maruti Atpadkar</span>
+            <span class="officer-role" id="navUserRole">👑 Admin &bull; ATP0925 <span class="profile-gear-icon">⚙️</span></span>
           </div>
         </div>
       </div>
@@ -115,89 +127,192 @@
       </div>
     </section>
 
+    <!-- Portal Primary View Switcher: Official Circulars vs Community Lounge -->
+    <div class="view-mode-tabs-wrap">
+      <button class="view-mode-tab active" id="tabCircularsViewBtn">
+        <span class="tab-icon">📋</span>
+        <span class="tab-title">Official Circulars Board</span>
+        <span class="tab-badge" id="circularsTabBadge">0 Records</span>
+      </button>
+      <button class="view-mode-tab" id="tabCommunityLoungeBtn">
+        <span class="tab-icon">💬</span>
+        <span class="tab-title">Campus Lounge &amp; Files Group</span>
+        <span class="tab-badge green-badge" id="loungeTabBadge">Live Open Channel</span>
+      </button>
+    </div>
+
     <!-- Main Content Area: Centered Primary Feed & Control Desk -->
     <div class="portal-body-grid">
       
       <main class="portal-main-desk">
         
-        <!-- Department Filters Bar -->
-        <section class="control-panel-card">
-          <div class="panel-section-title">
-            <span>Filter by Issuing Department</span>
-            <span class="notices-count-badge" id="noticesCountBadge">0 records</span>
+        <!-- ================================================================
+             VIEW 1: OFFICIAL CIRCULARS BOARD
+             ================================================================ -->
+        <section id="circularsViewSection" class="view-section active">
+          <!-- Department Filters Bar -->
+          <div class="control-panel-card">
+            <div class="panel-section-title">
+              <span>Filter by Issuing Department</span>
+              <span class="notices-count-badge" id="noticesCountBadge">0 records</span>
+            </div>
+            
+            <div class="dept-pills-row" id="departmentPills">
+              <button class="dept-pill-btn active" data-dept="ALL">All Departments</button>
+              <button class="dept-pill-btn" data-dept="Examination Cell">📝 Examination Cell</button>
+              <button class="dept-pill-btn" data-dept="Academic Affairs">📚 Academic Affairs</button>
+              <button class="dept-pill-btn" data-dept="Training & Placement">💼 Training & Placement</button>
+              <button class="dept-pill-btn" data-dept="Dean's Office">🏛️ Dean's Office / Admin</button>
+              <button class="dept-pill-btn" data-dept="Student Welfare">🎉 Student Welfare</button>
+              <button class="dept-pill-btn" data-dept="Sports Directorate">🏆 Sports Directorate</button>
+            </div>
+
+            <!-- Sub-filters: Priority & Audience -->
+            <div class="sub-controls-row">
+              <div class="sub-filter-group">
+                <label class="control-label">Priority:</label>
+                <select id="priorityFilterSelect" class="control-select">
+                  <option value="ALL">All Priorities</option>
+                  <option value="Urgent">🚨 Urgent Only</option>
+                  <option value="High">⚠️ High Priority</option>
+                  <option value="Routine">ℹ️ Routine Announcements</option>
+                </select>
+              </div>
+
+              <div class="sub-filter-group">
+                <label class="control-label">Target Audience:</label>
+                <select id="audienceFilterSelect" class="control-select">
+                  <option value="ALL">All Audiences</option>
+                  <option value="All Students & Faculty">All Students & Faculty</option>
+                  <option value="Undergraduate Students">Undergraduates (UG)</option>
+                  <option value="Postgraduate Students">Postgraduates (PG)</option>
+                  <option value="Final Year Batch">Final Year Batch</option>
+                  <option value="Faculty & Staff">Faculty & Staff</option>
+                </select>
+              </div>
+
+              <div class="filter-actions-group">
+                <button class="btn btn-sm btn-secondary" id="toggleBookmarkedOnlyBtn">
+                  <span>🔖 Saved Circulars</span>
+                </button>
+                <button class="btn btn-sm btn-secondary" id="printBoardBtn" title="Print Active Notice Board">
+                  <span>🖨️ Print Board</span>
+                </button>
+              </div>
+            </div>
           </div>
-          
-          <div class="dept-pills-row" id="departmentPills">
-            <button class="dept-pill-btn active" data-dept="ALL">All Departments</button>
-            <button class="dept-pill-btn" data-dept="Examination Cell">📝 Examination Cell</button>
-            <button class="dept-pill-btn" data-dept="Academic Affairs">📚 Academic Affairs</button>
-            <button class="dept-pill-btn" data-dept="Training & Placement">💼 Training & Placement</button>
-            <button class="dept-pill-btn" data-dept="Dean's Office">🏛️ Dean's Office / Admin</button>
-            <button class="dept-pill-btn" data-dept="Student Welfare">🎉 Student Welfare</button>
-            <button class="dept-pill-btn" data-dept="Sports Directorate">🏆 Sports Directorate</button>
+
+          <!-- Active Search / Filter Banner -->
+          <div class="active-filter-alert" id="activeFilterAlert" style="display: none;">
+            <span id="activeFilterText">Filtered view active</span>
+            <button class="clear-filter-btn" id="clearSearchFilterBtn">&times; Reset Filters</button>
           </div>
 
-          <!-- Sub-filters: Priority & Audience -->
-          <div class="sub-controls-row">
-            <div class="sub-filter-group">
-              <label class="control-label">Priority:</label>
-              <select id="priorityFilterSelect" class="control-select">
-                <option value="ALL">All Priorities</option>
-                <option value="Urgent">🚨 Urgent Only</option>
-                <option value="High">⚠️ High Priority</option>
-                <option value="Routine">ℹ️ Routine Announcements</option>
-              </select>
-            </div>
+          <!-- Official Circulars List Container -->
+          <div class="notices-container" id="noticesContainer">
+            <!-- Rendered dynamically by JavaScript -->
+          </div>
 
-            <div class="sub-filter-group">
-              <label class="control-label">Target Audience:</label>
-              <select id="audienceFilterSelect" class="control-select">
-                <option value="ALL">All Audiences</option>
-                <option value="All Students & Faculty">All Students & Faculty</option>
-                <option value="Undergraduate Students">Undergraduates (UG)</option>
-                <option value="Postgraduate Students">Postgraduates (PG)</option>
-                <option value="Final Year Batch">Final Year Batch</option>
-                <option value="Faculty & Staff">Faculty & Staff</option>
-              </select>
-            </div>
-
-            <div class="filter-actions-group">
-              <button class="btn btn-sm btn-secondary" id="toggleBookmarkedOnlyBtn">
-                <span>🔖 Saved Circulars</span>
-              </button>
-              <button class="btn btn-sm btn-secondary" id="printBoardBtn" title="Print Active Notice Board">
-                <span>🖨️ Print Board</span>
-              </button>
-            </div>
+          <!-- Empty State (Clean zero-data presentation) -->
+          <div class="empty-state-card" id="emptyStateCard" style="display: none;">
+            <div class="empty-crest">🏛️</div>
+            <h3 class="empty-title">No Official Circulars on Record</h3>
+            <p class="empty-text">
+              The Campus Notification Management repository is currently empty and synchronized. 
+              Authorized officers can issue an official academic circular or notification using the button below.
+            </p>
+            <button class="btn btn-primary btn-lg" id="emptyStateCreateBtn">
+              <span>➕ Issue First Official Notification</span>
+            </button>
           </div>
         </section>
 
-        <!-- Active Search / Filter Banner -->
-        <div class="active-filter-alert" id="activeFilterAlert" style="display: none;">
-          <span id="activeFilterText">Filtered view active</span>
-          <button class="clear-filter-btn" id="clearSearchFilterBtn">&times; Reset Filters</button>
-        </div>
+        <!-- ================================================================
+             VIEW 2: CAMPUS COMMUNITY LOUNGE (GROUP CHAT & FILE SHARING)
+             ================================================================ -->
+        <section id="communityLoungeViewSection" class="view-section" style="display: none;">
+          <div class="lounge-header-card">
+            <div class="lounge-header-main">
+              <div class="lounge-channel-badge">
+                <span class="pulse-indicator"></span>
+                <span>CAMPUS ALL-MEMBERS GROUP</span>
+              </div>
+              <h2 class="lounge-title">💬 Campus Community Lounge &amp; Resource Hub</h2>
+              <p class="lounge-subtitle">
+                Open collaborative channel where all students, faculty members, and administrators can converse, discuss academic events, and share study files, PDF circulars, and notes.
+              </p>
+            </div>
+            <div class="lounge-stats-cluster">
+              <div class="lounge-stat-pill">
+                <span class="stat-number" id="loungeMessagesCount">0</span>
+                <span class="stat-lbl">Messages</span>
+              </div>
+              <div class="lounge-stat-pill">
+                <span class="stat-number" id="loungeFilesCount">0</span>
+                <span class="stat-lbl">Files Shared</span>
+              </div>
+            </div>
+          </div>
 
-        <!-- Official Circulars List Container -->
-        <section class="notices-container" id="noticesContainer">
-          <!-- Rendered dynamically by JavaScript -->
+          <!-- Lounge Messages Stream -->
+          <div class="lounge-messages-feed" id="loungeMessagesFeed">
+            <!-- Rendered dynamically -->
+          </div>
+
+          <!-- Lounge Message & File Composer -->
+          <div class="lounge-composer-card">
+            <!-- Selected File Preview Bar (shown when file is picked) -->
+            <div class="file-attachment-preview" id="loungeFilePreviewBox" style="display: none;">
+              <div class="file-preview-info">
+                <span class="file-preview-icon" id="previewFileIcon">📎</span>
+                <div class="file-preview-meta">
+                  <strong class="file-preview-name" id="previewFileName">filename.pdf</strong>
+                  <span class="file-preview-size" id="previewFileSize">1.2 MB</span>
+                </div>
+              </div>
+              <button type="button" class="file-remove-btn" id="removeAttachedFileBtn" title="Remove attachment">&times;</button>
+            </div>
+
+            <form id="loungeMessageForm" class="lounge-form">
+              <div class="lounge-input-row">
+                <textarea 
+                  id="loungeTextInput" 
+                  class="lounge-textarea" 
+                  rows="2" 
+                  placeholder="Share a campus update, ask a question, or discuss with students &amp; faculty... (Press Enter to send)"
+                ></textarea>
+              </div>
+
+              <div class="lounge-composer-toolbar">
+                <!-- Emoji shelf shortcuts -->
+                <div class="emoji-shortcuts-bar">
+                  <span class="emoji-bar-label">Emoji:</span>
+                  <button type="button" class="quick-emoji-btn" data-emoji="👍">👍</button>
+                  <button type="button" class="quick-emoji-btn" data-emoji="🔥">🔥</button>
+                  <button type="button" class="quick-emoji-btn" data-emoji="❤️">❤️</button>
+                  <button type="button" class="quick-emoji-btn" data-emoji="🎉">🎉</button>
+                  <button type="button" class="quick-emoji-btn" data-emoji="📚">📚</button>
+                  <button type="button" class="quick-emoji-btn" data-emoji="💡">💡</button>
+                  <button type="button" class="quick-emoji-btn" data-emoji="📌">📌</button>
+                </div>
+
+                <div class="lounge-action-buttons">
+                  <!-- File Upload Input (Hidden) & Trigger Button -->
+                  <input type="file" id="loungeFileInput" style="display: none;" accept=".pdf,.doc,.docx,.txt,.png,.jpg,.jpeg,.zip,.ppt,.pptx">
+                  <button type="button" class="btn btn-secondary btn-sm" id="triggerLoungeFileBtn" title="Attach Document, PDF or Image">
+                    <span>📎 Share File</span>
+                  </button>
+
+                  <button type="submit" class="btn btn-primary btn-sm" id="loungeSendBtn">
+                    <span>Send 🚀</span>
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
         </section>
-
-        <!-- Empty State (Clean zero-data presentation) -->
-        <div class="empty-state-card" id="emptyStateCard" style="display: none;">
-          <div class="empty-crest">🏛️</div>
-          <h3 class="empty-title">No Official Circulars on Record</h3>
-          <p class="empty-text">
-            The Campus Notification Management repository is currently empty and synchronized. 
-            Authorized officers can issue an official academic circular or notification using the button below.
-          </p>
-          <button class="btn btn-primary btn-lg" id="emptyStateCreateBtn">
-            <span>➕ Issue First Official Notification</span>
-          </button>
-        </div>
 
       </main>
-
     </div>
 
     <!-- Institutional Page Footer -->
@@ -214,9 +329,9 @@
       
       <div class="modal-header">
         <div class="modal-header-text">
-          <span class="modal-dept-badge">AUTHORIZED OFFICER PROFILE</span>
-          <h3 class="modal-title" id="profileHeading">Officer Profile &amp; Governance</h3>
-          <p class="modal-subtitle">Official administrator credentials, system governance &amp; architecture</p>
+          <span class="modal-dept-badge" id="profileModalBadge">AUTHORIZED USER PROFILE</span>
+          <h3 class="modal-title" id="profileHeading">Campus Profile &amp; Governance</h3>
+          <p class="modal-subtitle">Official account credentials, bio, authority management &amp; cloud database</p>
         </div>
         <button class="modal-close-btn" id="closeProfileModalBtn" title="Close modal">&times;</button>
       </div>
@@ -225,22 +340,115 @@
         
         <!-- Officer Identity Hero Card -->
         <div class="profile-hero-card">
-          <div class="profile-large-avatar">MA</div>
+          <div class="profile-large-avatar" id="profileHeroAvatar">MA</div>
           <div class="profile-hero-details">
-            <h4 class="profile-hero-name">Maruti Atpadkar</h4>
-            <p class="profile-hero-role">Lead System Administrator &bull; Portal Coordinator</p>
+            <h4 class="profile-hero-name" id="profileHeroName">Maruti Atpadkar</h4>
+            <p class="profile-hero-role" id="profileHeroRole">Super Administrator &bull; Central Controller</p>
             <div class="profile-badge-row">
-              <span class="meta-badge green-badge">● Active Session</span>
-              <span class="ref-no-badge">ID: ATP0925</span>
-              <span class="meta-badge blue-badge">AY 2025-2026</span>
+              <span class="meta-badge green-badge" id="profileHeroStatusBadge">● Active Session</span>
+              <span class="ref-no-badge" id="profileHeroIdBadge">ID: ATP0925</span>
+              <span class="meta-badge blue-badge" id="profileHeroAuthorityBadge">👑 Super Admin</span>
+            </div>
+            
+            <!-- Instagram Style Bio Card -->
+            <div class="profile-bio-box">
+              <div class="bio-header-line">
+                <span class="bio-label">📝 Profile Bio:</span>
+                <button type="button" class="btn-text-action" id="toggleEditBioBtn">Edit Bio</button>
+              </div>
+              <p class="bio-text" id="profileHeroBioText">Chief System Administrator &amp; Central Notice Dispatch Controller (ATP0925)</p>
+              
+              <!-- Inline Bio Edit Form -->
+              <div class="bio-edit-form" id="bioEditForm" style="display: none;">
+                <textarea id="bioEditTextarea" rows="2" maxlength="160" placeholder="Write your profile bio (e.g. branch, year, interests)..."></textarea>
+                <div class="bio-edit-actions">
+                  <button type="button" class="btn btn-xs btn-secondary" id="cancelBioEditBtn">Cancel</button>
+                  <button type="button" class="btn btn-xs btn-primary" id="saveBioEditBtn">Save Bio</button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
-        <!-- Section 1: System Governance -->
-        <div class="sidebar-panel">
+        <!-- ================================================================
+             SECTION A: ADMIN PERMISSIONS & USER ACCOUNTS DESK
+             (Visible to Super Admin Maruti Atpadkar)
+             ================================================================ -->
+        <div class="sidebar-panel admin-only-panel" id="adminUserManagementPanel">
           <div class="sidebar-panel-header">
             <span class="panel-icon">🛡️</span>
+            <div class="panel-title-with-badge">
+              <h4 class="sidebar-panel-title">Campus User Accounts &amp; Notice Authority Desk</h4>
+              <span class="panel-count-tag" id="pendingApprovalsBadge">0 Pending</span>
+            </div>
+          </div>
+          <p class="sidebar-info-text">
+            <strong>Admin Authority Protocol:</strong> Only <strong>Admin (Maruti Atpadkar)</strong> can issue circulars by default. You can approve new viewer accounts and grant notice-publishing privileges to authorized faculty or students.
+          </p>
+
+          <div class="admin-users-list" id="adminUsersListContainer">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+
+        <!-- ================================================================
+             SECTION B: GOOGLE FIREBASE DATABASE SETTINGS & CLOUD SYNC
+             ================================================================ -->
+        <div class="sidebar-panel">
+          <div class="sidebar-panel-header">
+            <span class="panel-icon">🔥</span>
+            <div class="panel-title-with-badge">
+              <h4 class="sidebar-panel-title">Google Firebase Cloud Database Sync</h4>
+              <span class="meta-badge" id="firebaseStatusBadge">Local / Standby</span>
+            </div>
+          </div>
+          <p class="sidebar-info-text">
+            Connect this system directly to Google Cloud Firestore for real-time multi-device synchronization across campus.
+          </p>
+
+          <div class="firebase-config-card">
+            <div class="firebase-status-row">
+              <span class="fb-status-label">Engine Mode:</span>
+              <strong id="fbActiveEngineText">Browser LocalStorage (Offline Ready)</strong>
+            </div>
+
+            <!-- Firebase Config Collapsible -->
+            <details class="firebase-details-collapsible">
+              <summary class="firebase-summary-btn">⚙️ Configure Firebase Project Credentials</summary>
+              <div class="firebase-form-body">
+                <div class="form-group">
+                  <label for="fbApiKey">Firebase API Key:</label>
+                  <input type="text" id="fbApiKey" placeholder="AIzaSy...">
+                </div>
+                <div class="form-group">
+                  <label for="fbProjectId">Project ID:</label>
+                  <input type="text" id="fbProjectId" placeholder="campus-notify-project">
+                </div>
+                <div class="form-group">
+                  <label for="fbAuthDomain">Auth Domain:</label>
+                  <input type="text" id="fbAuthDomain" placeholder="campus-notify.firebaseapp.com">
+                </div>
+                <div class="form-group">
+                  <label for="fbAppId">App ID:</label>
+                  <input type="text" id="fbAppId" placeholder="1:123456789:web:abcdef...">
+                </div>
+                <div class="firebase-btn-row">
+                  <button type="button" class="btn btn-sm btn-primary" id="saveFirebaseConfigBtn">
+                    <span>🔥 Connect to Firebase Cloud</span>
+                  </button>
+                  <button type="button" class="btn btn-sm btn-secondary" id="syncToFirebaseBtn">
+                    <span>Cloud Sync</span>
+                  </button>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- Section C: System Governance -->
+        <div class="sidebar-panel">
+          <div class="sidebar-panel-header">
+            <span class="panel-icon">🏛️</span>
             <h4 class="sidebar-panel-title">System Governance</h4>
           </div>
           <div class="system-meta-list">
@@ -253,8 +461,8 @@
               <span class="meta-value">2025 – 2026</span>
             </div>
             <div class="meta-row">
-              <span class="meta-name">Dispatch Server:</span>
-              <span class="meta-badge green-badge">Operational (Local)</span>
+              <span class="meta-name">Central Dispatch:</span>
+              <span class="meta-badge green-badge">Operational</span>
             </div>
             <div class="meta-row">
               <span class="meta-name">Java Core:</span>
@@ -263,33 +471,33 @@
           </div>
         </div>
 
-        <!-- Section 2: Dispatch Protocol -->
+        <!-- Section D: Dispatch Protocol -->
         <div class="sidebar-panel">
           <div class="sidebar-panel-header">
             <span class="panel-icon">📜</span>
-            <h4 class="sidebar-panel-title">Dispatch Protocol</h4>
+            <h4 class="sidebar-panel-title">Dispatch &amp; Moderation Protocol</h4>
           </div>
           <ul class="protocol-checklist">
             <li>
-              <span class="chk-icon">📌</span>
-              <span><strong>Reference Number:</strong> Each notice is stamped with an auditable reference code.</span>
+              <span class="chk-icon">👑</span>
+              <span><strong>Admin Notice Authority:</strong> Only Admin or Admin-authorized delegates can publish circulars.</span>
             </li>
             <li>
-              <span class="chk-icon">🚨</span>
-              <span><strong>Urgent Flag:</strong> Reserved for critical deadlines, exam schedules, or emergency closures.</span>
+              <span class="chk-icon">🗑️</span>
+              <span><strong>Central Moderation:</strong> Admin has full authority to delete any comment across the system.</span>
             </li>
             <li>
-              <span class="chk-icon">✅</span>
-              <span><strong>Acknowledgement:</strong> Students and staff can register read confirmation receipts.</span>
+              <span class="chk-icon">❤️</span>
+              <span><strong>Viewers &amp; Reactions:</strong> All campus members can comment, like, and react with emojis.</span>
             </li>
             <li>
-              <span class="chk-icon">🖨️</span>
-              <span><strong>Letterhead Print:</strong> Any notification can be viewed and printed as an official signed circular.</span>
+              <span class="chk-icon">💬</span>
+              <span><strong>Community Lounge:</strong> Open group channel with file sharing (PDF, docs, images).</span>
             </li>
           </ul>
         </div>
 
-        <!-- Section 3: Project Architecture -->
+        <!-- Section E: Project Architecture -->
         <div class="sidebar-panel">
           <div class="sidebar-panel-header">
             <span class="panel-icon">☕</span>
@@ -297,20 +505,20 @@
           </div>
           <p class="sidebar-info-text">
             <strong>CampusNotify Java Mini Project</strong> provides both CLI terminal management (<code class="mono-code">Main.java</code>) 
-            and this responsive web circular dispatch portal.
+            and this responsive web circular dispatch portal with Firebase cloud integration.
           </p>
           <div class="code-badge-bar">
             <span class="code-tag">Java OOP</span>
-            <span class="code-tag">Encapsulation</span>
-            <span class="code-tag">Local Storage</span>
+            <span class="code-tag">Firebase Firestore</span>
+            <span class="code-tag">Role RBAC</span>
             <span class="code-tag">JDK 21 Native</span>
           </div>
         </div>
 
         <!-- Footer / Credits inside Profile -->
         <div class="profile-modal-footer-credits">
-          <p><strong>Campus Notification Management System</strong></p>
-          <p>Designed &amp; Developed by <strong>Maruti Atpadkar (ATP0925)</strong></p>
+          <p><strong>Campus Notification Management System (CNMS)</strong></p>
+          <p>Super Administrator: <strong>Maruti Atpadkar (ATP0925)</strong> &bull; atpadkarmaruti@gmail.com</p>
         </div>
 
       </div>
@@ -483,6 +691,162 @@
           <!-- Populated dynamically -->
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- Modal: Authentication, Multi-Account Switcher & Instagram-style Registration -->
+  <div class="modal-backdrop" id="authModalBackdrop" aria-hidden="true">
+    <div class="modal-dialog modal-md" role="dialog" aria-modal="true" aria-labelledby="authHeading">
+      
+      <div class="modal-header">
+        <div class="modal-header-text">
+          <span class="modal-dept-badge">CNMS ACCESS &amp; IDENTITY DESK</span>
+          <h3 class="modal-title" id="authHeading">Account Access &amp; Multi-Profile</h3>
+          <p class="modal-subtitle">Sign in as Admin, create a student/faculty profile, or switch active accounts</p>
+        </div>
+        <button class="modal-close-btn" id="closeAuthModalBtn" title="Close modal">&times;</button>
+      </div>
+
+      <!-- Auth Tab Switcher -->
+      <div class="auth-tabs-row">
+        <button class="auth-tab-btn active" id="authTabLoginBtn">🔑 Sign In</button>
+        <button class="auth-tab-btn" id="authTabRegisterBtn">✨ Create Account (Instagram Style)</button>
+        <button class="auth-tab-btn" id="authTabSwitchBtn">👥 Switch Account</button>
+      </div>
+
+      <div class="modal-body auth-modal-body">
+        
+        <!-- TAB 1: LOGIN -->
+        <div id="authPaneLogin" class="auth-pane active">
+          <!-- Quick Admin Sign-in Banner -->
+          <div class="admin-quick-login-card">
+            <div class="admin-quick-info">
+              <span class="admin-crown">👑</span>
+              <div>
+                <strong>Super Admin Credentials</strong>
+                <p>Maruti Atpadkar &bull; atpadkarmaruti@gmail.com</p>
+              </div>
+            </div>
+            <button type="button" class="btn btn-sm btn-primary" id="quickLoginAdminBtn">
+              1-Click Admin Login
+            </button>
+          </div>
+
+          <div class="auth-divider">
+            <span>OR LOGIN WITH CREDENTIALS</span>
+          </div>
+
+          <form id="loginForm" class="modal-form">
+            <div class="form-group">
+              <label for="loginIdentifier">Email or Username <span class="req">*</span></label>
+              <input 
+                type="text" 
+                id="loginIdentifier" 
+                placeholder="atpadkarmaruti@gmail.com or username" 
+                required 
+                autocomplete="username"
+              >
+            </div>
+
+            <div class="form-group">
+              <label for="loginPassword">Password <span class="req">*</span></label>
+              <input 
+                type="password" 
+                id="loginPassword" 
+                placeholder="Enter password (e.g. PRATIK@00925)" 
+                required 
+                autocomplete="current-password"
+              >
+            </div>
+
+            <div class="modal-footer" style="padding: 0; margin-top: 18px;">
+              <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">
+                <span>Sign In to Campus Portal 🚀</span>
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- TAB 2: REGISTER (INSTAGRAM STYLE) -->
+        <div id="authPaneRegister" class="auth-pane" style="display: none;">
+          <div class="auth-helper-banner">
+            <span class="helper-icon">🛡️</span>
+            <div>
+              <strong>Multi-Account Device Rule:</strong>
+              <p>You can create multiple accounts on this device. Newly registered accounts require <strong>Admin approval</strong> (by Maruti Atpadkar) before activation.</p>
+            </div>
+          </div>
+
+          <form id="registerForm" class="modal-form">
+            <div class="form-group">
+              <label for="regFullName">Full Name <span class="req">*</span></label>
+              <input 
+                type="text" 
+                id="regFullName" 
+                placeholder="e.g. Pratik Patil" 
+                required
+              >
+            </div>
+
+            <div class="form-group">
+              <label for="regUsername">Username <span class="req">*</span></label>
+              <input 
+                type="text" 
+                id="regUsername" 
+                placeholder="e.g. pratik_09 (letters, numbers, _)" 
+                required 
+                autocomplete="username"
+              >
+            </div>
+
+            <div class="form-group">
+              <label for="regPassword">Password <span class="req">*</span></label>
+              <input 
+                type="password" 
+                id="regPassword" 
+                placeholder="Create a password" 
+                required 
+                autocomplete="new-password"
+              >
+            </div>
+
+            <div class="form-group">
+              <label for="regBio">Profile Bio (Instagram Style) <span class="req">*</span></label>
+              <textarea 
+                id="regBio" 
+                rows="2" 
+                placeholder="e.g. Third Year Computer Engineering | Coding Club Lead | Passionate about Tech" 
+                required
+                maxlength="160"
+              ></textarea>
+              <small class="field-hint">Your bio will appear on your campus profile, circular comments &amp; community messages.</small>
+            </div>
+
+            <div class="modal-footer" style="padding: 0; margin-top: 18px;">
+              <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">
+                <span>Submit Account for Admin Approval</span>
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- TAB 3: SAVED ACCOUNTS ON DEVICE -->
+        <div id="authPaneSwitch" class="auth-pane" style="display: none;">
+          <p class="saved-accounts-lead">
+            Accounts registered on this browser/device. Click <strong>Switch</strong> to change session.
+          </p>
+
+          <div class="saved-accounts-list" id="savedAccountsList">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" id="closeAuthModalFooterBtn">Close</button>
+      </div>
+
     </div>
   </div>
 
