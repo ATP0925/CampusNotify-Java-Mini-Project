@@ -6,7 +6,7 @@
   <meta name="description" content="Official Campus Notification Management System (CNMS) - Academic & Administrative Circular Dispatch Portal">
   <title>CampusNotify | Campus Notification Management System</title>
   
-  <!-- Modern Professional Fonts & Instagram Typography -->
+  <!-- Modern Professional Fonts & Typography -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Grand+Hotel&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -65,11 +65,11 @@
           <span class="btn-text-short">Issue</span>
         </button>
 
-        <!-- Switch Account / Instagram Login Gateway Button -->
-        <button class="btn btn-secondary btn-sm" id="navInstaAuthBtn" title="Open Instagram-Style Login & Register Gateway">
-          <span class="auth-btn-icon">📱</span>
-          <span class="btn-text-full">Instagram Auth</span>
-          <span class="btn-text-short">Login</span>
+        <!-- Switch Account / Authentication Gateway Button -->
+        <button class="btn btn-secondary btn-sm" id="navInstaAuthBtn" title="Open Campus Portal Authentication Gateway">
+          <span class="auth-btn-icon">🔐</span>
+          <span class="btn-text-full">Portal Auth</span>
+          <span class="btn-text-short">Auth</span>
         </button>
 
         <!-- Sign Out Button -->
@@ -97,7 +97,7 @@
   </header>
 
   <!-- ================================================================
-       DEDICATED INSTAGRAM-STYLE AUTHENTICATION & REGISTRATION GATEWAY
+       DEDICATED CAMPUS AUTHENTICATION & REGISTRATION GATEWAY
        ================================================================ -->
   <div id="instagramAuthGateway" class="insta-auth-gateway" style="display: none;">
     <!-- Top Floating Return/Portal Link if user is already logged in -->
@@ -107,7 +107,7 @@
         <span class="insta-sub-tag">INSTITUTIONAL ACCESS PORTAL</span>
       </div>
       <div class="insta-topbar-right">
-        <button type="button" class="btn btn-sm btn-secondary" id="instaReturnToPortalBtn" title="Return to Campus Notification Board">
+        <button type="button" class="btn btn-sm btn-secondary" id="instaReturnToPortalBtn" style="display: none;" title="Return to Campus Notification Board">
           <span>Enter Portal as <strong id="instaActiveUserSnippet">Maruti Atpadkar</strong> 🚀</span>
         </button>
       </div>
@@ -129,36 +129,36 @@
             
             <div class="insta-screen-app-bar">
               <span class="screen-app-title">CampusNotify</span>
-              <span class="screen-app-badge">LIVE CIRCULARS</span>
+              <span class="screen-app-badge">SECURED PORTAL</span>
             </div>
 
-            <!-- Rotating / Sliding Campus Showcase -->
+            <!-- Rotating / Sliding Campus Security Showcase -->
             <div class="insta-screen-slider">
-              <!-- Showcase Slide: Live Cards -->
+              <!-- Showcase Slide 1: Secured Circulars Board -->
               <div class="insta-screen-slide active">
                 <div class="screen-notice-card">
                   <div class="screen-card-header">
-                    <span class="screen-tag red-tag">🚨 URGENT</span>
-                    <span class="screen-ref">CNMS/2026/001</span>
+                    <span class="screen-tag red-tag">🔒 SECURED PORTAL</span>
+                    <span class="screen-ref">RESTRICTED</span>
                   </div>
-                  <h4 class="screen-notice-title">Winter 2026 Examination Schedule Released</h4>
-                  <p class="screen-notice-snippet">Departmental semester examination registration forms must be submitted online before the closing date.</p>
+                  <h4 class="screen-notice-title">Central Circular Board Locked</h4>
+                  <p class="screen-notice-snippet">Official semester examination timetables, departmental schedules, and academic circulars require student or faculty authentication.</p>
                   <div class="screen-card-footer">
-                    <span>❤️ 142 Likes</span>
-                    <span>💬 38 Queries</span>
+                    <span>🔐 256-Bit Cryptography</span>
+                    <span>🏛️ Campus Verified</span>
                   </div>
                 </div>
 
                 <div class="screen-notice-card">
                   <div class="screen-card-header">
-                    <span class="screen-tag blue-tag">📚 ACADEMIC</span>
-                    <span class="screen-ref">CNMS/2026/002</span>
+                    <span class="screen-tag blue-tag">🛡️ ZERO-ACCESS WALL</span>
+                    <span class="screen-ref">PROTECTED</span>
                   </div>
-                  <h4 class="screen-notice-title">Placement Drive &amp; Industry Internships</h4>
-                  <p class="screen-notice-snippet">Registration open for final year students across all branches.</p>
+                  <h4 class="screen-notice-title">Data Privacy &amp; Access Controls</h4>
+                  <p class="screen-notice-snippet">Zero third-party tracking. All accounts require institutional credentials and admin verification before unlocking notices.</p>
                   <div class="screen-card-footer">
-                    <span>❤️ 98 Likes</span>
-                    <span>💬 24 Queries</span>
+                    <span>👑 Admin Governed</span>
+                    <span>🛡️ DPDP 2023</span>
                   </div>
                 </div>
 
@@ -166,39 +166,31 @@
                   <div class="screen-chat-avatar">MA</div>
                   <div class="screen-chat-text">
                     <strong>Maruti Atpadkar (Admin)</strong>
-                    <p>Official circulars verified &amp; synchronized via Google Firebase Cloud.</p>
+                    <p>Official notices and files will be unlocked once your campus profile is verified.</p>
                   </div>
                 </div>
               </div>
 
-              <!-- Showcase Slide 2: Campus Lounge & File Sharing -->
+              <!-- Showcase Slide 2: Campus Lounge & Collaboration -->
               <div class="insta-screen-slide">
                 <div class="screen-notice-card">
                   <div class="screen-card-header">
                     <span class="screen-tag green-tag">💬 CAMPUS LOUNGE</span>
-                    <span class="screen-ref">COMMUNITY</span>
+                    <span class="screen-ref">RESTRICTED</span>
                   </div>
-                  <h4 class="screen-notice-title">Open Discussion &amp; Academic Documents</h4>
-                  <p class="screen-notice-snippet">Students and faculty share lecture summaries, academic notes, and PDF schedules.</p>
+                  <h4 class="screen-notice-title">Academic Discussion &amp; Document Vault</h4>
+                  <p class="screen-notice-snippet">Engage in university discussions, ask academic questions, and exchange PDF documents with verified peers.</p>
                   <div class="screen-card-footer">
-                    <span>📎 14 Files Shared</span>
+                    <span>📎 File Sharing</span>
                     <span>⚡ Real-Time Sync</span>
                   </div>
                 </div>
 
                 <div class="screen-chat-bubble">
-                  <div class="screen-chat-avatar" style="background: linear-gradient(135deg, #10b981, #06b6d4);">ST</div>
-                  <div class="screen-chat-text">
-                    <strong>Priya Sharma (Student)</strong>
-                    <p>Sir, can we submit the project document via the campus lounge?</p>
-                  </div>
-                </div>
-
-                <div class="screen-chat-bubble">
                   <div class="screen-chat-avatar">MA</div>
                   <div class="screen-chat-text">
                     <strong>Maruti Atpadkar (Admin)</strong>
-                    <p>Yes Priya! All file uploads are secured with DPDP Act 2023 compliance.</p>
+                    <p>Welcome to CampusNotify! Create your campus account to begin.</p>
                   </div>
                 </div>
               </div>
@@ -211,12 +203,12 @@
         </div>
       </div>
 
-      <!-- RIGHT SIDE: INSTAGRAM AUTHENTICATION BOXES -->
+      <!-- RIGHT SIDE: AUTHENTICATION BOXES -->
       <div class="insta-auth-forms-wrapper">
         
         <!-- CARD 1: PRIMARY AUTH FORM (LOGIN & SIGNUP MODES) -->
         <div class="insta-card insta-main-card">
-          <!-- Instagram Iconic Branding -->
+          <!-- Campus Iconic Branding -->
           <div class="insta-brand-header">
             <h1 class="insta-logo-text">CampusNotify</h1>
             <p class="insta-brand-subtitle">Official Campus Gateway &bull; Central Notification Portal</p>
@@ -262,7 +254,7 @@
                 <span class="divider-line"></span>
               </div>
 
-              <!-- Quick 1-Click Super Admin Login (Instagram-Style "Log in with Facebook" Replacement) -->
+              <!-- Quick 1-Click Super Admin Login -->
               <button type="button" class="insta-btn-admin-fb" id="instaQuickAdminLoginBtn">
                 <span class="insta-crown-icon">👑</span>
                 <span>Log in as Super Admin (Maruti Atpadkar)</span>
@@ -283,7 +275,7 @@
           </div>
 
           <!-- =========================
-               MODE B: SIGN UP FORM (INSTAGRAM STYLE)
+               MODE B: SIGN UP FORM
                ========================= -->
           <div id="instaSignupFormBox" class="insta-form-box" style="display: none;">
             <p class="insta-signup-lead">
@@ -463,7 +455,7 @@
 
     </div>
 
-    <!-- INSTAGRAM-STYLE INSTITUTIONAL FOOTER -->
+    <!-- INSTITUTIONAL FOOTER -->
     <footer class="insta-footer">
       <div class="insta-footer-links">
         <a href="#" class="policy-link-trigger">About</a>
@@ -743,7 +735,7 @@
               <span class="meta-badge blue-badge" id="profileHeroAuthorityBadge">👑 Super Admin</span>
             </div>
             
-            <!-- Instagram Style Bio Card -->
+            <!-- Official Profile Bio Card -->
             <div class="profile-bio-box">
               <div class="bio-header-line">
                 <span class="bio-label">📝 Profile Bio:</span>
@@ -1087,7 +1079,7 @@
     </div>
   </div>
 
-  <!-- Modal: Authentication, Multi-Account Switcher & Instagram-style Registration -->
+  <!-- Modal: Authentication, Multi-Account Switcher & Registration -->
   <div class="modal-backdrop" id="authModalBackdrop" aria-hidden="true">
     <div class="modal-dialog modal-md" role="dialog" aria-modal="true" aria-labelledby="authHeading">
       
@@ -1103,7 +1095,7 @@
       <!-- Auth Tab Switcher -->
       <div class="auth-tabs-row">
         <button class="auth-tab-btn active" id="authTabLoginBtn">🔑 Sign In</button>
-        <button class="auth-tab-btn" id="authTabRegisterBtn">✨ Create Account (Instagram Style)</button>
+        <button class="auth-tab-btn" id="authTabRegisterBtn">✨ Create Account</button>
         <button class="auth-tab-btn" id="authTabSwitchBtn">👥 Switch Account</button>
       </div>
 
@@ -1160,7 +1152,7 @@
           </form>
         </div>
 
-        <!-- TAB 2: REGISTER (INSTAGRAM STYLE) -->
+        <!-- TAB 2: REGISTER -->
         <div id="authPaneRegister" class="auth-pane" style="display: none;">
           <div class="auth-helper-banner">
             <span class="helper-icon">🛡️</span>
@@ -1204,7 +1196,7 @@
             </div>
 
             <div class="form-group">
-              <label for="regBio">Profile Bio (Instagram Style) <span class="req">*</span></label>
+              <label for="regBio">Profile Bio / Description <span class="req">*</span></label>
               <textarea 
                 id="regBio" 
                 rows="2" 

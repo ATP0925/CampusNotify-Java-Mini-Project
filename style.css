@@ -2894,8 +2894,8 @@ button, input, textarea, select {
 }
 
 /* ==========================================================================
-   DEDICATED INSTAGRAM-STYLE AUTHENTICATION GATEWAY
-   Pixel-perfect Instagram Desktop/Mobile Login & Registration Experience
+   DEDICATED CAMPUS AUTHENTICATION GATEWAY
+   Enterprise Desktop/Mobile Login & Registration Experience
    ========================================================================== */
 .insta-auth-gateway {
   width: 100%;
@@ -3303,7 +3303,7 @@ button, input, textarea, select {
   opacity: 0.75;
 }
 
-/* Primary Instagram Blue Button */
+/* Primary Action Blue Button */
 .insta-btn-primary {
   width: 100%;
   height: 36px;
@@ -3632,7 +3632,7 @@ button, input, textarea, select {
   background-color: rgba(59, 130, 246, 0.1);
 }
 
-/* Instagram Footer */
+/* Institutional Gateway Footer */
 .insta-footer {
   max-width: 935px;
   margin: 20px auto 0;
@@ -3735,10 +3735,10 @@ button, input, textarea, select {
   letter-spacing: 0.05em;
 }
 
-/* Responsive queries for Instagram Gateway */
+/* Responsive queries for Authentication Gateway */
 @media (max-width: 860px) {
   .insta-phone-container {
-    display: none; /* Hide phone mockup on smaller screens just like Instagram */
+    display: none; /* Hide phone mockup on smaller screens */
   }
 
   .insta-auth-container {
@@ -3760,5 +3760,76 @@ button, input, textarea, select {
   .insta-main-card {
     padding: 24px 20px 18px;
   }
+}
+
+/* ==========================================================================
+   AUTHENTICATION GATE & ZERO-ACCESS RESTRICTION SHIELD
+   ========================================================================== */
+.auth-gate-shield-card {
+  background: var(--card-bg);
+  border: 1px solid rgba(59, 130, 246, 0.28);
+  border-radius: var(--radius-lg);
+  padding: 48px 24px;
+  text-align: center;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.25), 0 0 24px rgba(59, 130, 246, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 16px auto;
+  max-width: 620px;
+  animation: fadeIn 0.3s ease;
+}
+
+.gate-shield-icon {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(16, 185, 129, 0.15));
+  border: 2px solid rgba(59, 130, 246, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.2rem;
+  margin-bottom: 20px;
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.25);
+  animation: pulse 2.5s infinite;
+}
+
+.gate-shield-title {
+  font-size: var(--font-lg);
+  font-weight: 800;
+  color: var(--text-main);
+  margin-bottom: 12px;
+  letter-spacing: -0.01em;
+}
+
+.gate-shield-desc {
+  font-size: var(--font-sm);
+  color: var(--text-muted);
+  line-height: 1.6;
+  max-width: 480px;
+  margin: 0 auto 24px;
+}
+
+.gate-action-buttons {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.gate-privacy-badge {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  background: var(--bg-subtle);
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border-color);
 }
 

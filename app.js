@@ -32,8 +32,8 @@ class CampusNotificationManagementSystem {
     this.acknowledgedSet = new Set();
     this.bookmarkSet = new Set();
 
-    // Active User Session
-    this.currentUser = Object.assign({}, DEFAULT_SUPER_ADMIN);
+    // Active User Session (Null by default: strict zero-access authentication gate)
+    this.currentUser = null;
 
     // Active View Mode ('circulars' | 'lounge')
     this.activeView = 'circulars';
@@ -73,11 +73,8 @@ class CampusNotificationManagementSystem {
     this.updateUserSessionUI();
     this.render();
 
-    // Route Initial Gateway Viewport
-    const isSignedOut = localStorage.getItem('cnms_session_signed_out') === 'true';
-    const hasActiveSession = localStorage.getItem('cnms_active_user');
-
-    if (isSignedOut || !hasActiveSession) {
+    // Route Initial Gateway Viewport: Zero access without authenticated session
+    if (!this.isAuthenticated()) {
       this.showInstagramGateway('login');
     } else {
       this.enterCampusPortal();
@@ -108,14 +105,20 @@ class CampusNotificationManagementSystem {
       }
 
       // 2. Load Active User Session
+      const isSignedOut = localStorage.getItem('cnms_session_signed_out') === 'true';
       const storedActiveUser = localStorage.getItem('cnms_active_user');
-      if (storedActiveUser) {
+      if (storedActiveUser && !isSignedOut) {
         const parsedActive = JSON.parse(storedActiveUser);
         // Find fresh copy from users list
         const matched = this.users.find(u => u.id === parsedActive.id || u.email === parsedActive.email);
-        this.currentUser = matched || DEFAULT_SUPER_ADMIN;
+        if (matched && (matched.status === 'APPROVED' || matched.role === 'ADMIN')) {
+          this.currentUser = matched;
+        } else {
+          this.currentUser = null;
+          localStorage.removeItem('cnms_active_user');
+        }
       } else {
-        this.currentUser = DEFAULT_SUPER_ADMIN;
+        this.currentUser = null;
       }
 
       // 3. Load Official Notices
@@ -154,7 +157,7 @@ class CampusNotificationManagementSystem {
     } catch (e) {
       console.warn('Repository state loading exception:', e);
       this.users = [DEFAULT_SUPER_ADMIN];
-      this.currentUser = DEFAULT_SUPER_ADMIN;
+      this.currentUser = null;
       this.notices = [];
       this.loungeMessages = [];
       this.acknowledgedSet.clear();
@@ -165,7 +168,11 @@ class CampusNotificationManagementSystem {
   saveUsers() {
     try {
       localStorage.setItem('cnms_registered_users', JSON.stringify(this.users));
-      localStorage.setItem('cnms_active_user', JSON.stringify(this.currentUser));
+      if (this.currentUser) {
+        localStorage.setItem('cnms_active_user', JSON.stringify(this.currentUser));
+      } else {
+        localStorage.removeItem('cnms_active_user');
+      }
     } catch (e) {
       console.error('Failed saving users to localStorage:', e);
     }
@@ -531,7 +538,7 @@ class CampusNotificationManagementSystem {
       // Toast Notifications
       toastContainer: document.getElementById('toastContainer'),
 
-      // Containers: Main Portal & Instagram Gateway
+      // Containers: Main Portal & Authentication Gateway
       systemMainLayout: document.getElementById('systemMainLayout'),
       instagramAuthGateway: document.getElementById('instagramAuthGateway'),
       instaReturnToPortalBtn: document.getElementById('instaReturnToPortalBtn'),
@@ -539,7 +546,7 @@ class CampusNotificationManagementSystem {
       navInstaAuthBtn: document.getElementById('navInstaAuthBtn'),
       navSignOutBtn: document.getElementById('navSignOutBtn'),
 
-      // Instagram Auth Gateway Elements (Login & Register)
+      // Authentication Gateway Elements (Login & Register)
       instaLoginFormBox: document.getElementById('instaLoginFormBox'),
       instaLoginForm: document.getElementById('instaLoginForm'),
       instaLoginIdentifier: document.getElementById('instaLoginIdentifier'),
@@ -690,7 +697,7 @@ class CampusNotificationManagementSystem {
         const isHidden = this.dom.bioEditForm.style.display === 'none';
         this.dom.bioEditForm.style.display = isHidden ? 'block' : 'none';
         if (isHidden && this.dom.bioEditTextarea) {
-          this.dom.bioEditTextarea.value = this.currentUser.bio || '';
+          this.dom.bioEditTextarea.value = (this.currentUser && this.currentUser.bio) || '';
           this.dom.bioEditTextarea.focus();
         }
       });
@@ -752,7 +759,7 @@ class CampusNotificationManagementSystem {
       });
     }
 
-    // Register Form Submit (Instagram Style)
+    // Register Form Submit
     if (this.dom.registerForm) {
       this.dom.registerForm.addEventListener('submit', (e) => {
         e.preventDefault();
@@ -973,7 +980,7 @@ class CampusNotificationManagementSystem {
       });
     }
 
-    // 20. Dedicated Instagram Auth Gateway Actions & Triggers
+    // 20. Dedicated Authentication Gateway Actions & Triggers
     if (this.dom.navInstaAuthBtn) {
       this.dom.navInstaAuthBtn.addEventListener('click', () => {
         this.showInstagramGateway('login');
@@ -992,7 +999,7 @@ class CampusNotificationManagementSystem {
       });
     }
 
-    // Instagram Login Form Submit
+    // Login Form Submit
     if (this.dom.instaLoginForm) {
       this.dom.instaLoginForm.addEventListener('submit', (e) => {
         e.preventDefault();
@@ -1000,7 +1007,7 @@ class CampusNotificationManagementSystem {
       });
     }
 
-    // Instagram Register Form Submit
+    // Register Form Submit
     if (this.dom.instaSignupForm) {
       this.dom.instaSignupForm.addEventListener('submit', (e) => {
         e.preventDefault();
@@ -1056,7 +1063,7 @@ class CampusNotificationManagementSystem {
       });
     }
 
-    // Help Links in Instagram Login Form
+    // Help Links in Login Form
     if (this.dom.instaForgotPassLink) {
       this.dom.instaForgotPassLink.addEventListener('click', (e) => {
         e.preventDefault();
@@ -1145,15 +1152,48 @@ class CampusNotificationManagementSystem {
   /* --------------------------------------------------------------------------
      SESSION & ROLE AUTHORITY STATE
      -------------------------------------------------------------------------- */
+  isAuthenticated() {
+    return Boolean(this.currentUser && (this.currentUser.status === 'APPROVED' || this.currentUser.role === 'ADMIN'));
+  }
+
   hasPostingAuthority() {
-    return this.currentUser.role === 'ADMIN' || this.currentUser.canPost === true;
+    return Boolean(this.currentUser && (this.currentUser.role === 'ADMIN' || this.currentUser.canPost === true));
   }
 
   isAdmin() {
-    return this.currentUser.role === 'ADMIN';
+    return Boolean(this.currentUser && this.currentUser.role === 'ADMIN');
   }
 
   updateUserSessionUI() {
+    if (!this.isAuthenticated()) {
+      if (this.dom.navUserName) this.dom.navUserName.textContent = 'Guest / Unverified';
+      if (this.dom.navUserAvatar) this.dom.navUserAvatar.textContent = '🔒';
+      if (this.dom.navUserRole) {
+        this.dom.navUserRole.innerHTML = `🔒 Restricted &bull; Sign in required <span class="profile-gear-icon">🔐</span>`;
+      }
+      if (this.dom.openNewNoticeBtn) {
+        this.dom.openNewNoticeBtn.style.display = 'none';
+      }
+      if (this.dom.navSignOutBtn) {
+        this.dom.navSignOutBtn.style.display = 'none';
+      }
+      if (this.dom.globalSearchInput) {
+        this.dom.globalSearchInput.disabled = true;
+        this.dom.globalSearchInput.placeholder = '🔒 Sign in required to search official notices...';
+      }
+      if (this.dom.adminUserManagementPanel) {
+        this.dom.adminUserManagementPanel.style.display = 'none';
+      }
+      return;
+    }
+
+    if (this.dom.openNewNoticeBtn) this.dom.openNewNoticeBtn.style.display = '';
+    if (this.dom.navSignOutBtn) this.dom.navSignOutBtn.style.display = '';
+    if (this.dom.globalSearchInput) {
+      this.dom.globalSearchInput.disabled = false;
+      this.dom.globalSearchInput.placeholder = 'Search by Ref No, Subject, Department, Keywords...';
+    }
+
     const isAdm = this.isAdmin();
     const canPost = this.hasPostingAuthority();
 
@@ -1228,6 +1268,12 @@ class CampusNotificationManagementSystem {
      VIEW SWITCHER (Official Circulars vs Community Lounge)
      -------------------------------------------------------------------------- */
   switchView(targetView) {
+    if (!this.isAuthenticated()) {
+      this.showToast('Authentication Required: Please sign in or create an account to access the campus portal.', 'warning');
+      this.showInstagramGateway('login');
+      return;
+    }
+
     this.activeView = targetView;
     const isCirc = targetView === 'circulars';
 
@@ -1288,6 +1334,12 @@ class CampusNotificationManagementSystem {
   }
 
   handleSendLoungeMessage() {
+    if (!this.isAuthenticated()) {
+      this.showToast('Authentication Required: Please sign in or create an account to post in the community lounge.', 'warning');
+      this.showInstagramGateway('login');
+      return;
+    }
+
     if (!this.dom.loungeTextInput) return;
     const text = this.dom.loungeTextInput.value.trim();
 
@@ -1324,11 +1376,17 @@ class CampusNotificationManagementSystem {
   }
 
   handleDeleteLoungeMessage(msgId) {
+    if (!this.isAuthenticated()) {
+      this.showToast('Authentication Required.', 'warning');
+      this.showInstagramGateway('login');
+      return;
+    }
+
     const msg = this.loungeMessages.find(m => m.id === msgId);
     if (!msg) return;
 
     // Restriction check: Admin can delete any message; regular user can only delete own
-    const canDelete = this.isAdmin() || msg.senderId === this.currentUser.id;
+    const canDelete = this.isAdmin() || (this.currentUser && msg.senderId === this.currentUser.id);
     if (!canDelete) {
       this.showToast('Authority Restriction: Only Super Admin can delete messages by other users.', 'error');
       return;
@@ -1348,6 +1406,50 @@ class CampusNotificationManagementSystem {
 
   renderCommunityLounge() {
     if (!this.dom.loungeMessagesFeed) return;
+
+    if (!this.isAuthenticated()) {
+      if (this.dom.loungeMessagesCount) this.dom.loungeMessagesCount.textContent = '🔒';
+      if (this.dom.loungeFilesCount) this.dom.loungeFilesCount.textContent = '🔒';
+      if (this.dom.loungeTextInput) {
+        this.dom.loungeTextInput.disabled = true;
+        this.dom.loungeTextInput.placeholder = '🔒 Sign in required to participate in community discussions...';
+      }
+      if (this.dom.loungeSendBtn) this.dom.loungeSendBtn.disabled = true;
+      if (this.dom.loungeAttachBtn) this.dom.loungeAttachBtn.disabled = true;
+
+      this.dom.loungeMessagesFeed.innerHTML = `
+        <div class="auth-gate-shield-card" style="margin: 32px auto; max-width: 480px;">
+          <div class="gate-shield-icon">💬</div>
+          <h3 class="gate-shield-title">Campus Lounge Discussion Restricted</h3>
+          <p class="gate-shield-desc">
+            Campus discussion channels, academic queries, and peer document sharing are strictly reserved for verified students and faculty.
+          </p>
+          <div class="gate-action-buttons">
+            <button type="button" class="btn btn-primary btn-sm" id="gateLoungeLoginPromptBtn">
+              <span>Sign In to Join Discussion 🔑</span>
+            </button>
+          </div>
+          <div class="gate-privacy-badge">
+            <span>🛡️ Institutional Verification Required</span>
+          </div>
+        </div>
+      `;
+
+      const loungeGateBtn = document.getElementById('gateLoungeLoginPromptBtn');
+      if (loungeGateBtn) {
+        loungeGateBtn.addEventListener('click', () => {
+          this.showInstagramGateway('login');
+        });
+      }
+      return;
+    }
+
+    if (this.dom.loungeTextInput) {
+      this.dom.loungeTextInput.disabled = false;
+      this.dom.loungeTextInput.placeholder = 'Write an announcement inquiry, campus thought, or academic question... (Shift+Enter for new line)';
+    }
+    if (this.dom.loungeSendBtn) this.dom.loungeSendBtn.disabled = false;
+    if (this.dom.loungeAttachBtn) this.dom.loungeAttachBtn.disabled = false;
 
     // Update Counters
     const totalMsgs = this.loungeMessages.length;
@@ -1370,7 +1472,7 @@ class CampusNotificationManagementSystem {
 
     this.dom.loungeMessagesFeed.innerHTML = this.loungeMessages.map(msg => {
       const isAdm = msg.senderRole === 'ADMIN';
-      const isMe = msg.senderId === this.currentUser.id;
+      const isMe = Boolean(this.currentUser && msg.senderId === this.currentUser.id);
       const canDelete = this.isAdmin() || isMe;
       const roleBadge = isAdm
         ? `<span class="comment-role-tag comment-role-admin">👑 Admin</span>`
@@ -1452,6 +1554,9 @@ class CampusNotificationManagementSystem {
     this.dom.authModalBackdrop.setAttribute('aria-hidden', 'true');
     if (this.dom.loginForm) this.dom.loginForm.reset();
     if (this.dom.registerForm) this.dom.registerForm.reset();
+    if (!this.isAuthenticated()) {
+      this.showInstagramGateway('login');
+    }
   }
 
   switchAuthTab(tab) {
@@ -1538,12 +1643,20 @@ class CampusNotificationManagementSystem {
     if (this.dom.instaActiveUserSnippet) {
       this.dom.instaActiveUserSnippet.textContent = this.currentUser ? this.currentUser.name : 'Maruti Atpadkar';
     }
+    if (this.dom.instaReturnToPortalBtn) {
+      this.dom.instaReturnToPortalBtn.style.display = this.isAuthenticated() ? 'inline-flex' : 'none';
+    }
     this.switchInstaAuthMode(mode);
     this.renderInstaDeviceProfiles();
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   enterCampusPortal() {
+    if (!this.isAuthenticated()) {
+      this.showInstagramGateway('login');
+      this.showToast('Authentication Required: Please sign in or create an account to view campus notices.', 'warning');
+      return;
+    }
     if (this.dom.instagramAuthGateway) {
       this.dom.instagramAuthGateway.style.display = 'none';
     }
@@ -1584,7 +1697,7 @@ class CampusNotificationManagementSystem {
     }
 
     this.dom.instaDeviceProfilesChips.innerHTML = this.users.map(u => {
-      const isCur = u.id === this.currentUser.id;
+      const isCur = Boolean(this.currentUser && u.id === this.currentUser.id);
       const isAdm = u.role === 'ADMIN';
       const isPending = u.status === 'PENDING';
       const badge = isAdm
@@ -1769,7 +1882,11 @@ class CampusNotificationManagementSystem {
 
   handleSignOut() {
     localStorage.setItem('cnms_session_signed_out', 'true');
-    this.showToast('Signed out of session. Switched to Instagram Gateway.', 'info');
+    this.currentUser = null;
+    localStorage.removeItem('cnms_active_user');
+    this.updateUserSessionUI();
+    this.render();
+    this.showToast('Signed out of session. Switched to Authentication Gateway.', 'info');
     this.showInstagramGateway('login');
   }
 
@@ -1914,7 +2031,7 @@ class CampusNotificationManagementSystem {
     }
 
     this.dom.savedAccountsList.innerHTML = this.users.map(u => {
-      const isCur = u.id === this.currentUser.id;
+      const isCur = Boolean(this.currentUser && u.id === this.currentUser.id);
       const isAdm = u.role === 'ADMIN';
       const isPending = u.status === 'PENDING';
       const statusBadge = isAdm
@@ -2087,6 +2204,11 @@ class CampusNotificationManagementSystem {
   }
 
   handleSaveBio() {
+    if (!this.isAuthenticated() || !this.currentUser) {
+      this.showToast('Authentication Required.', 'warning');
+      this.showInstagramGateway('login');
+      return;
+    }
     if (!this.dom.bioEditTextarea) return;
     const newBio = this.dom.bioEditTextarea.value.trim();
 
@@ -2142,7 +2264,7 @@ class CampusNotificationManagementSystem {
   }
 
   updateThemeIcon(theme) {
-    if (this.dom.themeToggleBtn) {
+    if (this.dom && this.dom.themeToggleBtn) {
       const iconSpan = this.dom.themeToggleBtn.querySelector('.theme-icon');
       if (iconSpan) {
         iconSpan.textContent = theme === 'dark' ? '🌓' : '☀️';
@@ -2154,6 +2276,11 @@ class CampusNotificationManagementSystem {
      MODAL: OFFICER PROFILE & SYSTEM GOVERNANCE
      -------------------------------------------------------------------------- */
   openProfileModal() {
+    if (!this.isAuthenticated()) {
+      this.showToast('Authentication Required: Please sign in to view and manage your profile.', 'warning');
+      this.showInstagramGateway('login');
+      return;
+    }
     if (!this.dom.officerProfileModalBackdrop) return;
     this.updateUserSessionUI();
     this.dom.officerProfileModalBackdrop.classList.add('open');
@@ -2171,6 +2298,11 @@ class CampusNotificationManagementSystem {
      ACTIONS: LIKES, EMOJI REACTIONS, ACKNOWLEDGE, BOOKMARK, DELETE, SHARE
      -------------------------------------------------------------------------- */
   handleToggleNoticeLike(noticeId) {
+    if (!this.isAuthenticated()) {
+      this.showToast('Authentication Required: Please sign in or create an account to like notices.', 'warning');
+      this.showInstagramGateway('login');
+      return;
+    }
     const notice = this.notices.find(n => n.id === noticeId);
     if (!notice) return;
 
@@ -2193,6 +2325,11 @@ class CampusNotificationManagementSystem {
   }
 
   handleToggleReaction(noticeId, emoji) {
+    if (!this.isAuthenticated()) {
+      this.showToast('Authentication Required: Please sign in or create an account to react to notices.', 'warning');
+      this.showInstagramGateway('login');
+      return;
+    }
     const notice = this.notices.find(n => n.id === noticeId);
     if (!notice) return;
 
@@ -2220,6 +2357,11 @@ class CampusNotificationManagementSystem {
   }
 
   handleToggleAcknowledge(noticeId) {
+    if (!this.isAuthenticated()) {
+      this.showToast('Authentication Required: Please sign in or create an account to acknowledge notices.', 'warning');
+      this.showInstagramGateway('login');
+      return;
+    }
     const notice = this.notices.find(n => n.id === noticeId);
     if (!notice) return;
 
@@ -2240,6 +2382,11 @@ class CampusNotificationManagementSystem {
   }
 
   handleToggleBookmark(noticeId) {
+    if (!this.isAuthenticated()) {
+      this.showToast('Authentication Required: Please sign in or create an account to bookmark notices.', 'warning');
+      this.showInstagramGateway('login');
+      return;
+    }
     if (this.bookmarkSet.has(noticeId)) {
       this.bookmarkSet.delete(noticeId);
       this.showToast('Removed circular from saved list');
@@ -2253,11 +2400,16 @@ class CampusNotificationManagementSystem {
   }
 
   handleDeleteNotice(noticeId) {
+    if (!this.isAuthenticated()) {
+      this.showToast('Authentication Required.', 'warning');
+      this.showInstagramGateway('login');
+      return;
+    }
     const notice = this.notices.find(n => n.id === noticeId);
     if (!notice) return;
 
     // Authority Check: Only Super Admin or original Signatory
-    const canDelete = this.isAdmin() || notice.signatory.includes(this.currentUser.name);
+    const canDelete = this.isAdmin() || Boolean(this.currentUser && notice.signatory && notice.signatory.includes(this.currentUser.name));
     if (!canDelete) {
       this.showToast('Authority Restriction: Only Super Admin (Maruti Atpadkar) can delete circulars.', 'error');
       return;
@@ -2301,6 +2453,11 @@ class CampusNotificationManagementSystem {
      MODAL: ISSUE OFFICIAL CIRCULAR (Authority Restricted)
      -------------------------------------------------------------------------- */
   openNewNoticeModal() {
+    if (!this.isAuthenticated()) {
+      this.showToast('Authentication Required: Please sign in or create an account.', 'warning');
+      this.showInstagramGateway('login');
+      return;
+    }
     if (!this.hasPostingAuthority()) {
       this.showToast(
         'Authority Restriction: Only Super Admin (Maruti Atpadkar) or authorized officers can issue circulars.',
@@ -2337,7 +2494,7 @@ class CampusNotificationManagementSystem {
   }
 
   handlePublishCircular() {
-    if (!this.hasPostingAuthority()) {
+    if (!this.isAuthenticated() || !this.hasPostingAuthority()) {
       this.showToast('Permission denied: You do not have circular issuing authority.', 'error');
       return;
     }
@@ -2389,6 +2546,11 @@ class CampusNotificationManagementSystem {
      MODAL: OFFICIAL LETTERHEAD VIEW & PRINT
      -------------------------------------------------------------------------- */
   openLetterheadModal(noticeId) {
+    if (!this.isAuthenticated()) {
+      this.showToast('Authentication Required: Please sign in or create an account to view official circular letterheads.', 'warning');
+      this.showInstagramGateway('login');
+      return;
+    }
     const notice = this.notices.find(n => n.id === noticeId);
     if (!notice || !this.dom.officialLetterheadModalBackdrop) return;
 
@@ -2454,6 +2616,11 @@ class CampusNotificationManagementSystem {
      MODAL: INQUIRY & CLARIFICATION DESK (Admin Super Moderation Deletion)
      -------------------------------------------------------------------------- */
   openDiscussionModal(noticeId) {
+    if (!this.isAuthenticated()) {
+      this.showToast('Authentication Required: Please sign in or create an account to view or participate in discussions.', 'warning');
+      this.showInstagramGateway('login');
+      return;
+    }
     const notice = this.notices.find(n => n.id === noticeId);
     if (!notice || !this.dom.discussionModalBackdrop) return;
 
@@ -2500,7 +2667,7 @@ class CampusNotificationManagementSystem {
     this.dom.commentsListContainer.innerHTML = queries.map(q => {
       const isAdmComment = q.role === 'ADMIN' || (q.author && q.author.includes('Admin'));
       // Admin has full restriction authority to delete ANY comment in the system
-      const canDelete = this.isAdmin() || q.userId === this.currentUser.id;
+      const canDelete = this.isAdmin() || Boolean(this.currentUser && q.userId === this.currentUser.id);
 
       return `
         <div class="comment-item" id="comment_${q.id}">
@@ -2535,6 +2702,11 @@ class CampusNotificationManagementSystem {
   }
 
   handleSubmitInquiry() {
+    if (!this.isAuthenticated()) {
+      this.showToast('Authentication Required: Please sign in or create an account to post an inquiry.', 'warning');
+      this.showInstagramGateway('login');
+      return;
+    }
     if (!this.activeDiscussionNoticeId || !this.dom.commentInputText) return;
     const text = this.dom.commentInputText.value.trim();
     if (!text) return;
@@ -2566,6 +2738,11 @@ class CampusNotificationManagementSystem {
   }
 
   handleDeleteComment(commentId) {
+    if (!this.isAuthenticated()) {
+      this.showToast('Authentication Required.', 'warning');
+      this.showInstagramGateway('login');
+      return;
+    }
     if (!this.activeDiscussionNoticeId) return;
     const notice = this.notices.find(n => n.id === this.activeDiscussionNoticeId);
     if (!notice || !notice.comments) return;
@@ -2574,7 +2751,7 @@ class CampusNotificationManagementSystem {
     if (!targetComment) return;
 
     // Restriction check: Admin can delete any comment; normal users can only delete own
-    const canDelete = this.isAdmin() || targetComment.userId === this.currentUser.id;
+    const canDelete = this.isAdmin() || Boolean(this.currentUser && targetComment.userId === this.currentUser.id);
     if (!canDelete) {
       this.showToast('Authority Restriction: Only Super Admin (Maruti Atpadkar) can delete others’ inquiries.', 'error');
       return;
@@ -2595,6 +2772,41 @@ class CampusNotificationManagementSystem {
      RENDER SYSTEM & KPI METRICS
      -------------------------------------------------------------------------- */
   render() {
+    if (!this.isAuthenticated()) {
+      if (this.dom.metricTotalCirculars) this.dom.metricTotalCirculars.textContent = '🔒';
+      if (this.dom.metricUrgentCirculars) this.dom.metricUrgentCirculars.textContent = '🔒';
+      if (this.dom.metricAcknowledgedCount) this.dom.metricAcknowledgedCount.textContent = '🔒';
+      if (this.dom.circularsTabBadge) this.dom.circularsTabBadge.textContent = 'Restricted';
+      if (this.dom.noticesCountBadge) this.dom.noticesCountBadge.textContent = '0 (Sign In Required)';
+      if (this.dom.activeFilterAlert) this.dom.activeFilterAlert.style.display = 'none';
+      if (this.dom.emptyStateCard) this.dom.emptyStateCard.style.display = 'none';
+      if (this.dom.noticesContainer) {
+        this.dom.noticesContainer.innerHTML = `
+          <div class="auth-gate-shield-card">
+            <div class="gate-shield-icon">🔒</div>
+            <h3 class="gate-shield-title">Official Campus Circulars Restricted</h3>
+            <p class="gate-shield-desc">
+              Official semester circulars, examination schedules, departmental alerts, and institutional files are protected.
+              You must sign in with an approved student/faculty account or create a new account to access notices.
+            </p>
+            <div class="gate-action-buttons">
+              <button type="button" class="btn btn-primary" id="gateLoginPromptBtn">
+                <span>Sign In / Create Account 🚀</span>
+              </button>
+            </div>
+            <div class="gate-privacy-badge">
+              <span>🛡️ 256-Bit Cryptography &bull; DPDP Act 2023 Compliant</span>
+            </div>
+          </div>
+        `;
+        const gateBtn = document.getElementById('gateLoginPromptBtn');
+        if (gateBtn) {
+          gateBtn.addEventListener('click', () => this.showInstagramGateway('login'));
+        }
+      }
+      return;
+    }
+
     // 1. Calculate KPI Metrics
     const totalCount = this.notices.length;
     const urgentCount = this.notices.filter(n => n.priority === 'Urgent').length;
@@ -2704,7 +2916,7 @@ class CampusNotificationManagementSystem {
 
     // Likes count & status for current user
     const likesList = Array.isArray(notice.likes) ? notice.likes : [];
-    const isLiked = likesList.includes(this.currentUser.id);
+    const isLiked = this.currentUser ? likesList.includes(this.currentUser.id) : false;
     const likesCount = likesList.length;
 
     // Emoji reactions
@@ -2713,7 +2925,7 @@ class CampusNotificationManagementSystem {
 
     const reactionChipsHtml = standardEmojis.map(emoji => {
       const reactedUsers = Array.isArray(reactionsObj[emoji]) ? reactionsObj[emoji] : [];
-      const hasReacted = reactedUsers.includes(this.currentUser.id);
+      const hasReacted = this.currentUser ? reactedUsers.includes(this.currentUser.id) : false;
       const count = reactedUsers.length;
 
       return `
@@ -2731,7 +2943,7 @@ class CampusNotificationManagementSystem {
     }).join('');
 
     // Authority Check for deletion: Only Super Admin or Signatory
-    const canDeleteNotice = this.isAdmin() || (notice.signatory && notice.signatory.includes(this.currentUser.name));
+    const canDeleteNotice = this.isAdmin() || Boolean(this.currentUser && notice.signatory && notice.signatory.includes(this.currentUser.name));
 
     return `
       <article class="notice-item-card ${isUrgent ? 'is-urgent' : ''} ${isHigh ? 'is-high' : ''}" data-id="${notice.id}">
