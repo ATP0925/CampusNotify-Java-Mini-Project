@@ -152,7 +152,7 @@ async function runTests() {
 
   // Login as Super Admin
   cnms.handleQuickAdminLogin();
-  assert('Logged in user is Maruti Atpadkar', cnms.currentUser.name === 'Maruti Atpadkar');
+  assert('Logged in user is Pratik Atpadkar', cnms.currentUser.name === 'Pratik Atpadkar');
   assert('User role is ADMIN', cnms.currentUser.role === 'ADMIN');
   assert('isAuthenticated() returns true', cnms.isAuthenticated() === true);
   assert('isAdmin() returns true', cnms.isAdmin() === true);
@@ -172,7 +172,7 @@ async function runTests() {
   cnms.dom.noticeDepartment.value = 'IT Administration';
   cnms.dom.noticePriority.value = 'High';
   cnms.dom.noticeAudience.value = 'All Students & Faculty';
-  cnms.dom.noticeSignatory.value = 'Maruti Atpadkar, Central Controller';
+  cnms.dom.noticeSignatory.value = 'Pratik Atpadkar, Central Controller';
 
   cnms.handlePublishCircular();
   assert('Notice count increased by 1 for Super Admin', cnms.notices.length === initialNoticeCount + 1);
@@ -282,7 +282,7 @@ async function runTests() {
 
   // Attempt login with PENDING account
   let loginBlockedPending = false;
-  cnms.showToast = (msg, type) => { if (type === 'error' && msg.includes('PENDING approval from Super Admin')) loginBlockedPending = true; };
+  cnms.showToast = (msg, type) => { if (type === 'error' && msg.includes('PENDING approval from Campus Administration')) loginBlockedPending = true; };
   cnms.dom.instaLoginIdentifier.value = 'pooja_verma';
   cnms.dom.instaLoginPassword.value = 'Pooja@12345';
   await cnms.handleInstaLoginSubmit();

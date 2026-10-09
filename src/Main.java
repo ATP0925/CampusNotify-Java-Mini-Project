@@ -6,7 +6,7 @@ import java.util.Scanner;
  * Demonstrates modular design, control flow, user input handling, and OOP principles.
  */
 public class Main {
-    private static User currentUser = new User("ADMIN-01", "Maruti Atpadkar", "Admin", "Central Administration", "atpadkarmaruti@gmail.com", true);
+    private static User currentUser = new User("ADMIN-01", "Pratik Atpadkar", "Admin", "Central Administration", "atpadkarmaruti@gmail.com", true);
     private static NotificationManager manager = new NotificationManager();
     private static Scanner scanner = new Scanner(System.in);
 
@@ -140,7 +140,7 @@ public class Main {
 
         if (!currentUser.canPostNotices()) {
             System.out.println("[!] Authority Restriction: You do not have circular issuing authority.");
-            System.out.println("    Only Super Admin (Maruti Atpadkar) or users granted publishing authority can post announcements.");
+            System.out.println("    Only Super Admin (Pratik Atpadkar) or users granted publishing authority can post announcements.");
             System.out.println("    Current profile: " + currentUser);
             return;
         }
@@ -199,7 +199,7 @@ public class Main {
     private static void handleDeleteNotification() {
         System.out.println("\n--- DELETE ANNOUNCEMENT ---");
         if (!"Admin".equalsIgnoreCase(currentUser.getRole())) {
-            System.out.println("[!] Authority Restriction: Only Super Admin (Maruti Atpadkar) has authority to delete campus announcements.");
+            System.out.println("[!] Authority Restriction: Only Super Admin (Pratik Atpadkar) has authority to delete campus announcements.");
             System.out.println("    Current role: " + currentUser.getRole() + " (Use option 8 to switch role if needed).");
             return;
         }
@@ -227,14 +227,14 @@ public class Main {
     private static void handleSwitchUser() {
         System.out.println("\n--- SWITCH USER PROFILE ---");
         System.out.println("Select Role:");
-        System.out.println("  1. Super Admin (Maruti Atpadkar - Central Notice Controller)");
+        System.out.println("  1. Super Admin (Pratik Atpadkar - Central Notice Controller)");
         System.out.println("  2. Authorized Faculty Member (Notice Publishing Authority)");
         System.out.println("  3. Student / Viewer (Read-only Announcements & Discussions)");
         System.out.print("Choose role (1-3): ");
         String roleChoice = scanner.nextLine().trim();
 
         if ("1".equals(roleChoice)) {
-            currentUser = new User("ADMIN-01", "Maruti Atpadkar", "Admin", "Central Administration", "atpadkarmaruti@gmail.com", true);
+            currentUser = new User("ADMIN-01", "Pratik Atpadkar", "Admin", "Central Administration", "atpadkarmaruti@gmail.com", true);
             System.out.println("\n[✓] Switched to Super Admin: " + currentUser + "\n");
             return;
         }

@@ -21,13 +21,13 @@ To protect campus intellectual property and student privacy:
 - **No Unauthenticated Data Leakage**: Unauthenticated visitors cannot view any circulars, inquiries, metrics, or lounge chats.
 - **Privacy Shield Card**: The circular board renders a 256-bit cryptographic privacy shield until verified login.
 - **Dedicated Institutional Auth Gateway**: Supports phone/username/email sign-in and new account registration with bio and avatar generation.
-- **Multi-Account Device Governance**: Per campus security policy, any newly registered account on a device is flagged as `PENDING` and requires 1-click clearance by Super Admin Maruti Atpadkar before gaining portal access.
+- **Multi-Account Device Governance**: Per campus security policy, any newly registered account on a device is flagged as `PENDING` and requires 1-click clearance by Super Admin Pratik Atpadkar before gaining portal access.
 
 ### 👑 Super Admin Credentials
 - **Email:** `atpadkarmaruti@gmail.com`
-- **Username:** `admin_maruti`
+- **Username:** `admin_pratik`
 - **Password:** `PRATIK@00925`
-- **Super Administrator:** Maruti Atpadkar (ATP0925)
+- **Super Administrator:** Pratik Atpadkar (ATP0925)
 
 ---
 
@@ -41,7 +41,7 @@ To protect campus intellectual property and student privacy:
 - Flag notices as **Routine Announcement**, **⚠️ High Priority**, or **🚨 Urgent (Critical Deadlines / Immediate Action)**.
 
 ### 3. 🔐 Role-Based Authority & Moderation Hierarchy
-- **Notice Issuing Authority**: Only Super Admin Maruti Atpadkar and members explicitly granted permission (`canPost: true`) can draft and publish circulars.
+- **Notice Issuing Authority**: Only Super Admin Pratik Atpadkar and members explicitly granted permission (`canPost: true`) can draft and publish circulars.
 - **Viewer Interaction Privileges**: Viewers can like circulars, react with real-time emojis (👍, ❤️, 💡, 👏, 🎯, 🔥), submit official clarification inquiries, and record read acknowledgements.
 - **Master Deletion & Moderation**: Only Super Admin has authority to delete circulars or delete others' inquiries from the official ledger.
 
@@ -114,6 +114,6 @@ Or simply double-click **`run.bat`** on Windows.
 
 ## 👨‍💻 Submission Credits
 - **Project Title:** Campus Notification Management System (CNMS)
-- **Developer / Student:** Maruti Atpadkar (ATP0925)
+- **Developer / Student:** Pratik Atpadkar (ATP0925)
 - **Subject:** Java & Web Technology Mini Project
 - **Academic Session:** 2025 - 2026

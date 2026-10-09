@@ -4,22 +4,22 @@
  * Enterprise Academic & Administrative Circular Dispatch Portal Engine
  * Built for Java Mini Project & Institutional Enterprise Governance
  * Integrated with Google Cloud Firebase (Cloud Firestore & Auth) + LocalStorage Fallback
- * Super Administrator & Central Controller: Maruti Atpadkar (ATP0925)
+ * Super Administrator & Central Controller: Pratik Atpadkar (ATP0925)
  * ============================================================================
  */
 
 // Official Super Admin Default Account
 const DEFAULT_SUPER_ADMIN = {
   id: 'user_admin_0925',
-  username: 'admin_maruti',
+  username: 'admin_pratik',
   email: 'atpadkarmaruti@gmail.com',
   password: 'PRATIK@00925',
-  name: 'Maruti Atpadkar',
+  name: 'Pratik Atpadkar',
   role: 'ADMIN',
   canPost: true,
   status: 'APPROVED',
   bio: 'Chief System Administrator & Central Notice Dispatch Controller (ATP0925)',
-  avatar: 'MA',
+  avatar: 'PA',
   createdAt: 1740000000000
 };
 
@@ -98,9 +98,15 @@ class CampusNotificationManagementSystem {
         this.users = [DEFAULT_SUPER_ADMIN];
       }
 
-      // Ensure Super Admin is always present in users registry
-      const hasAdmin = this.users.some(u => u.email === DEFAULT_SUPER_ADMIN.email);
-      if (!hasAdmin) {
+      // Ensure Super Admin is always present in users registry & has updated identity
+      const adminUser = this.users.find(u => u.email === DEFAULT_SUPER_ADMIN.email || u.id === DEFAULT_SUPER_ADMIN.id || u.role === 'ADMIN');
+      if (adminUser) {
+        adminUser.name = 'Pratik Atpadkar';
+        adminUser.avatar = 'PA';
+        if (!adminUser.username || adminUser.username === 'admin_maruti') {
+          adminUser.username = 'admin_pratik';
+        }
+      } else {
         this.users.unshift(DEFAULT_SUPER_ADMIN);
       }
 
@@ -1075,14 +1081,14 @@ class CampusNotificationManagementSystem {
     if (this.dom.instaForgotPassLink) {
       this.dom.instaForgotPassLink.addEventListener('click', (e) => {
         e.preventDefault();
-        alert('Password Recovery Notice:\n\nSuper Admin (Maruti Atpadkar) password: PRATIK@00925\nFor student viewer accounts, passwords are cryptographically hashed for data privacy. You may request credential reset from the Super Admin desk.');
+        alert('Password Recovery Notice:\n\nFor security and data privacy, passwords are cryptographically protected. Please contact the Campus Administration Desk for identity verification and credential assistance.');
       });
     }
 
     if (this.dom.instaAdminApprovalHelpLink) {
       this.dom.instaAdminApprovalHelpLink.addEventListener('click', (e) => {
         e.preventDefault();
-        alert('Institutional Multi-Account Security Policy:\n\nTo prevent unauthorized bots and protect campus intellectual privacy, all newly registered accounts on this device remain under PENDING APPROVAL until Super Admin Maruti Atpadkar (ATP0925) grants clearance from the System Profile & Governance Desk.');
+        alert('Institutional Multi-Account Security Policy:\n\nTo prevent unauthorized bots and protect campus intellectual privacy, all newly registered accounts on this device remain under PENDING APPROVAL until Campus Administration grants clearance from the System Profile & Governance Desk.');
       });
     }
 
@@ -1656,7 +1662,7 @@ class CampusNotificationManagementSystem {
       this.dom.systemMainLayout.style.display = 'none';
     }
     if (this.dom.instaActiveUserSnippet) {
-      this.dom.instaActiveUserSnippet.textContent = this.currentUser ? this.currentUser.name : 'Maruti Atpadkar';
+      this.dom.instaActiveUserSnippet.textContent = this.currentUser ? this.currentUser.name : 'User';
     }
     if (this.dom.instaReturnToPortalBtn) {
       this.dom.instaReturnToPortalBtn.style.display = this.isAuthenticated() ? 'inline-flex' : 'none';
@@ -1724,7 +1730,7 @@ class CampusNotificationManagementSystem {
           : '✅ Approved';
 
       return `
-        <div class="insta-profile-chip ${isCur ? 'is-active-chip' : ''}" data-insta-switch-id="${u.id}" title="${isPending ? 'Pending approval by Maruti Atpadkar' : `Switch session to ${u.name}`}">
+        <div class="insta-profile-chip ${isCur ? 'is-active-chip' : ''}" data-insta-switch-id="${u.id}" title="${isPending ? 'Pending clearance by Campus Administration' : `Switch session to ${u.name}`}">
           <div class="insta-chip-avatar" style="${isAdm ? 'background: linear-gradient(135deg, #f59e0b, #ef4444);' : ''}">${this.getInitials(u.name)}</div>
           <div class="insta-chip-details">
             <span class="insta-chip-name">${this.escapeHTML(u.name)} ${isCur ? '(Active)' : ''}</span>
@@ -1740,7 +1746,7 @@ class CampusNotificationManagementSystem {
     if (!user) return;
 
     if (user.status === 'PENDING') {
-      this.showToast(`🔒 Privacy & Security Guard: Account @${user.username} is pending clearance by Super Admin Maruti Atpadkar.`, 'error');
+      this.showToast(`🔒 Privacy & Security Guard: Account @${user.username} is pending clearance by Campus Administration.`, 'error');
       return;
     }
     if (user.status === 'REJECTED') {
@@ -1766,14 +1772,14 @@ class CampusNotificationManagementSystem {
 
     // 1. Super Admin 1-Click Verification
     if (
-      (ident === 'atpadkarmaruti@gmail.com' || ident === 'admin_maruti' || ident === 'maruti') &&
+      (ident === 'atpadkarmaruti@gmail.com' || ident === 'admin_pratik' || ident === 'admin_maruti' || ident === 'admin' || ident === 'pratikatpadkar@gmail.com') &&
       pass === 'PRATIK@00925'
     ) {
       this.currentUser = Object.assign({}, DEFAULT_SUPER_ADMIN);
       this.saveUsers();
       this.updateUserSessionUI();
       this.enterCampusPortal();
-      this.showToast('Logged in as Super Admin Maruti Atpadkar (ATP0925) 👑', 'success');
+      this.showToast('Logged in as Super Admin (Pratik Atpadkar) 👑', 'success');
       return;
     }
 
@@ -1800,7 +1806,7 @@ class CampusNotificationManagementSystem {
 
     // 3. Status Gatekeeper & Institutional Security Policy
     if (user.status === 'PENDING') {
-      this.showToast(`🔒 Institutional Security Policy: Account @${user.username} is PENDING approval from Super Admin Maruti Atpadkar. Multi-account policy requires verification.`, 'error');
+      this.showToast(`🔒 Institutional Security Policy: Account @${user.username} is PENDING approval from Campus Administration. Multi-account policy requires verification.`, 'error');
       return;
     }
 
@@ -1870,7 +1876,7 @@ class CampusNotificationManagementSystem {
       passwordHash: passHash,
       role: 'VIEWER',
       canPost: false,
-      status: 'PENDING', // Multi-account device permission rule: Admin Maruti Atpadkar must approve
+      status: 'PENDING', // Multi-account device permission rule: Campus Administration must approve
       bio: bio || 'Campus student / academic viewer',
       avatar: this.getInitials(name),
       createdAt: Date.now(),
@@ -1884,7 +1890,7 @@ class CampusNotificationManagementSystem {
     // Push to Google Cloud Firebase
     this.pushToCloud('cnms_users', newUser.id, newUser);
 
-    this.showToast(`🎉 Welcome to CampusNotify, @${cleanUsername}! Account registered. 🕒 Awaiting 1-click clearance by Maruti Atpadkar.`, 'success');
+    this.showToast(`🎉 Welcome to CampusNotify, @${cleanUsername}! Account registered. 🕒 Awaiting clearance by Campus Administration.`, 'success');
 
     // Switch to login box and prefill identifier
     this.switchInstaAuthMode('login');
@@ -1962,7 +1968,7 @@ class CampusNotificationManagementSystem {
     this.updateUserSessionUI();
     this.closeAuthModal();
     this.enterCampusPortal();
-    this.showToast('Logged in as Super Admin Maruti Atpadkar (ATP0925) 👑', 'success');
+    this.showToast('Logged in as Super Admin (Pratik Atpadkar) 👑', 'success');
   }
 
   handleLoginSubmit() {
@@ -1976,7 +1982,7 @@ class CampusNotificationManagementSystem {
 
     // Special Check for Super Admin
     if (
-      (ident === 'atpadkarmaruti@gmail.com' || ident === 'admin_maruti' || ident === 'maruti') &&
+      (ident === 'atpadkarmaruti@gmail.com' || ident === 'admin_pratik' || ident === 'admin_maruti' || ident === 'admin' || ident === 'pratikatpadkar@gmail.com') &&
       pass === 'PRATIK@00925'
     ) {
       this.handleQuickAdminLogin();
@@ -2000,7 +2006,7 @@ class CampusNotificationManagementSystem {
 
     // Status Gatekeeper (Admin Approval Requirement)
     if (user.status === 'PENDING') {
-      this.showToast('Account is PENDING approval from Super Admin (Maruti Atpadkar). Please wait.', 'error');
+      this.showToast('Account is PENDING approval from Campus Administration. Please wait.', 'error');
       return;
     }
     if (user.status === 'REJECTED') {
@@ -2061,7 +2067,7 @@ class CampusNotificationManagementSystem {
     // Push to Google Firebase Cloud
     this.pushToCloud('cnms_users', newUser.id, newUser);
 
-    this.showToast(`Account @${cleanUsername} registered! 🕒 Awaiting Admin approval by Maruti Atpadkar.`, 'info');
+    this.showToast(`Account @${cleanUsername} registered! 🕒 Awaiting Admin approval.`, 'info');
     this.switchAuthTab('switch');
   }
 
@@ -2118,7 +2124,7 @@ class CampusNotificationManagementSystem {
     if (!user) return;
 
     if (user.status === 'PENDING') {
-      this.showToast('Cannot switch: This account is pending approval by Maruti Atpadkar.', 'error');
+      this.showToast('Cannot switch: This account is pending approval by Campus Administration.', 'error');
       return;
     }
 
@@ -2454,7 +2460,7 @@ class CampusNotificationManagementSystem {
     // Authority Check: Only Super Admin or original Signatory
     const canDelete = this.isAdmin() || Boolean(this.currentUser && notice.signatory && notice.signatory.includes(this.currentUser.name));
     if (!canDelete) {
-      this.showToast('Authority Restriction: Only Super Admin (Maruti Atpadkar) can delete circulars.', 'error');
+      this.showToast('Authority Restriction: Only Super Admin has authority to delete circulars.', 'error');
       return;
     }
 
@@ -2503,7 +2509,7 @@ class CampusNotificationManagementSystem {
     }
     if (!this.hasPostingAuthority()) {
       this.showToast(
-        'Authority Restriction: Only Super Admin (Maruti Atpadkar) or authorized officers can issue circulars.',
+        'Authority Restriction: Only Super Admin or authorized officers can issue circulars.',
         'error'
       );
       return;
@@ -2796,7 +2802,7 @@ class CampusNotificationManagementSystem {
     // Restriction check: Admin can delete any comment; normal users can only delete own
     const canDelete = this.isAdmin() || Boolean(this.currentUser && targetComment.userId === this.currentUser.id);
     if (!canDelete) {
-      this.showToast('Authority Restriction: Only Super Admin (Maruti Atpadkar) can delete others’ inquiries.', 'error');
+      this.showToast('Authority Restriction: Only Super Admin can delete others’ inquiries.', 'error');
       return;
     }
 
