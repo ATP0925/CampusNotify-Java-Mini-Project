@@ -1,125 +1,9 @@
 /**
  * CAMPUS NOTIFY / X - Client Application Engine
  * Twitter / X Style Campus Social Media & Announcement Feed
- * Full interactivity: Likes, Reposts, Bookmarks, Replies, Hashtags, Search, LocalStorage
+ * Completely clean without fake/demo data.
+ * Dynamic hashtag trending calculation, likes, reposts, replies, LocalStorage.
  */
-
-// Initial Seed Feed (Realistic College Campus Tweets & Broadcasts)
-const SEED_POSTS = [
-  {
-    id: "post-101",
-    authorName: "Controller of Examinations",
-    authorHandle: "@exam_cell",
-    avatarSeed: "ExamCell",
-    isVerified: true,
-    isOfficial: true,
-    isUrgent: true,
-    category: "Examination",
-    timeAgo: "2h",
-    text: "🚨 Winter 2026 End-Semester Examination timetable has been officially published!\n\nAll students must verify their exam schedule, branch-wise subject codes, and seating allotment on the exam portal. Hall ticket download closes this Friday at 4:00 PM. Report any clash immediately.\n\n#EndSemesterExams #Winter2026 #ExamNotice",
-    attachment: "TimeTable_Winter2026_Official.pdf",
-    likes: 142,
-    reposts: 68,
-    repliesCount: 23,
-    replies: [
-      { author: "Rohan Verma", handle: "@rohan_v", text: "Sir, what if two elective exams overlap?", time: "1h ago" },
-      { author: "Pooja Deshmukh", handle: "@pooja_d", text: "Are remedial exam dates also included in this circular?", time: "45m ago" }
-    ]
-  },
-  {
-    id: "post-102",
-    authorName: "Training & Placement Cell",
-    authorHandle: "@tpo_cell",
-    avatarSeed: "TPO",
-    isVerified: true,
-    isOfficial: true,
-    isUrgent: false,
-    category: "Placement",
-    timeAgo: "4h",
-    text: "💼 TCS Ninja & Digital Campus Recruitment Drive (Batch 2026) is here!\n\nEligibility: Minimum 6.5 CGPA with zero active backlogs across engineering branches. Mandatory registration on the NextStep portal before Wednesday 5:00 PM. Aptitude tests begin this weekend.\n\n#TCSRecruitment2026 #CampusPlacements #EngineeringJobs",
-    attachment: "TCS_Hiring_Guidelines_2026.pdf",
-    likes: 215,
-    reposts: 94,
-    repliesCount: 18,
-    replies: [
-      { author: "Amit Sharma", handle: "@amit_comp", text: "Is registration open for diploma direct second year students too?", time: "3h ago" },
-      { author: "T&P Cell", handle: "@tpo_cell", text: "@amit_comp Yes, if 10th/Diploma aggregate is above 60%.", time: "2h ago" }
-    ]
-  },
-  {
-    id: "post-103",
-    authorName: "CSI Tech Council",
-    authorHandle: "@csi_council",
-    avatarSeed: "Council",
-    isVerified: true,
-    isOfficial: false,
-    isUrgent: false,
-    category: "Event",
-    timeAgo: "6h",
-    text: "⚡ Registrations are LIVE for INNOVISION 2026 - National 36-Hour Hackathon!\n\nTracks: Generative AI, Decentralized Web, and Smart IoT Solutions. Cash prizes of ₹1,50,000 + Internship fast-tracks with industry sponsors. Teams of 2-4 can register now.\n\n#InnovisionHackathon #Hackathon2026 #BuildInPublic",
-    attachment: "Hackathon_Rulebook_2026.pdf",
-    likes: 189,
-    reposts: 53,
-    repliesCount: 12,
-    replies: [
-      { author: "Sneha Patil", handle: "@sneha_dev", text: "Looking for 1 frontend dev for our team! DM if interested.", time: "4h ago" }
-    ]
-  },
-  {
-    id: "post-104",
-    authorName: "Maruti Atpadkar",
-    authorHandle: "@atp0925",
-    avatarSeed: "MarutiAtpadkar",
-    isVerified: true,
-    isOfficial: false,
-    isUrgent: false,
-    category: "Academic",
-    timeAgo: "8h",
-    text: "Just submitted the final code demonstration for our Java & Web Technology Mini-Project! 🚀\n\nCentralized announcement engine with Twitter-style campus feed, live filters, and persistence. Huge thanks to our mentors and team.\n\n#CampusNotify #JavaMiniProject #WebDev #EngineeringLife",
-    attachment: "",
-    likes: 98,
-    reposts: 26,
-    repliesCount: 8,
-    replies: [
-      { author: "Kunal Naik", handle: "@kunal_n", text: "Bro UI looks super smooth! Love the dark mode.", time: "6h ago" },
-      { author: "Maruti Atpadkar", handle: "@atp0925", text: "@kunal_n Thanks brother! Pure HTML/CSS/JS without heavy frameworks.", time: "5h ago" }
-    ]
-  },
-  {
-    id: "post-105",
-    authorName: "Central Library Desk",
-    authorHandle: "@campus_library",
-    avatarSeed: "Library",
-    isVerified: true,
-    isOfficial: true,
-    isUrgent: false,
-    category: "Academic",
-    timeAgo: "1d",
-    text: "📚 Extended Reading Hall Hours Announced!\n\nStarting Monday, the 2nd Floor Digital Study Centre and Silent Reading Hall will remain open 24x7 during the end-semester examination period. High-speed Wi-Fi and power strips available at all desks.\n\n#Library24x7 #StudyGrind #ExamsPrep",
-    attachment: "Library_Notice_Timings.pdf",
-    likes: 310,
-    reposts: 112,
-    repliesCount: 15,
-    replies: []
-  },
-  {
-    id: "post-106",
-    authorName: "Sports & Fitness Cell",
-    authorHandle: "@sports_council",
-    avatarSeed: "Sports",
-    isVerified: false,
-    isOfficial: false,
-    isUrgent: false,
-    category: "Sports",
-    timeAgo: "1d",
-    text: "🏏 University Cricket & Football Championship Trials will be conducted this Saturday at 7:00 AM on the main campus turf ground. Carry college ID and appropriate sports gear.\n\n#CricketSelection #InterCollegeSports #CampusCup",
-    attachment: "",
-    likes: 74,
-    reposts: 19,
-    repliesCount: 5,
-    replies: []
-  }
-];
 
 class CampusXApp {
   constructor() {
@@ -127,7 +11,6 @@ class CampusXApp {
     this.userLikes = new Set();
     this.userReposts = new Set();
     this.userBookmarks = new Set();
-    this.userFollows = new Set();
     
     this.activeTab = 'all'; // 'all' | 'official' | 'trending' | 'bookmarks' | 'profile'
     this.searchQuery = '';
@@ -154,11 +37,18 @@ class CampusXApp {
 
   loadState() {
     try {
+      // Clear any legacy demo/seed posts if present
       const storedPosts = localStorage.getItem('campus_x_posts');
       if (storedPosts) {
-        this.posts = JSON.parse(storedPosts);
+        const parsed = JSON.parse(storedPosts);
+        // Only keep posts that were manually created by the user (IDs like post-17...)
+        // Purge old demo seed posts (IDs like post-101, post-102, etc.)
+        this.posts = Array.isArray(parsed) 
+          ? parsed.filter(p => p.id && !p.id.startsWith('post-10') && !p.authorHandle.includes('@exam_cell') && !p.authorHandle.includes('@tpo_cell'))
+          : [];
+        this.savePosts();
       } else {
-        this.posts = [...SEED_POSTS];
+        this.posts = [];
         this.savePosts();
       }
 
@@ -175,7 +65,7 @@ class CampusXApp {
       document.documentElement.setAttribute('data-theme', storedTheme);
     } catch (e) {
       console.warn("Storage load error:", e);
-      this.posts = [...SEED_POSTS];
+      this.posts = [];
     }
   }
 
@@ -201,6 +91,7 @@ class CampusXApp {
     this.dom = {
       feedContainer: document.getElementById('feedPostsContainer'),
       emptyFeed: document.getElementById('emptyFeedMessage'),
+      emptyFeedPostBtn: document.getElementById('emptyFeedPostBtn'),
       headerTitle: document.getElementById('timelineHeaderTitle'),
       // Tabs
       tabForYou: document.getElementById('tabForYou'),
@@ -258,12 +149,12 @@ class CampusXApp {
     this.dom.toolUrgentBtn.addEventListener('click', () => {
       this.composerUrgent = !this.composerUrgent;
       this.dom.toolUrgentBtn.classList.toggle('active-urgent', this.composerUrgent);
-      this.showToast(this.composerUrgent ? "🚨 Marked as Urgent Notice" : "Normal priority", "info");
+      this.showToast(this.composerUrgent ? "🚨 Flagged as Urgent Notice" : "Normal notice", "info");
     });
 
     // Composer attachment button
     this.dom.toolAttachBtn.addEventListener('click', () => {
-      const fileName = prompt("Enter circular or attachment file name (e.g. Schedule_2026.pdf):", "Circular_Document.pdf");
+      const fileName = prompt("Enter circular or attachment file name (e.g. Circular_Schedule.pdf):", "Notice_Document.pdf");
       if (fileName && fileName.trim()) {
         this.composerAttachment = fileName.trim();
         this.dom.previewFileName.textContent = this.composerAttachment;
@@ -281,11 +172,16 @@ class CampusXApp {
     // Submit Post
     this.dom.submitPostBtn.addEventListener('click', () => this.handleCreatePost());
 
-    // Sidebar Post Button focuses composer
-    this.dom.sidebarPostBtn.addEventListener('click', () => {
+    // Sidebar Post Button & Empty State CTA
+    const focusComposer = () => {
       this.dom.composerText.focus();
       window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
+    };
+
+    this.dom.sidebarPostBtn.addEventListener('click', focusComposer);
+    if (this.dom.emptyFeedPostBtn) {
+      this.dom.emptyFeedPostBtn.addEventListener('click', focusComposer);
+    }
 
     // Feed Tabs Click
     this.dom.feedTabs.forEach(tab => {
@@ -316,7 +212,7 @@ class CampusXApp {
       e.preventDefault();
       this.setActiveNav(this.dom.navExplore);
       this.dom.rightSearchInput.focus();
-      this.showToast("Type in the search box to explore topics", "info");
+      this.showToast("Search posts or #tags", "info");
     });
 
     this.dom.navOfficial.addEventListener('click', (e) => {
@@ -353,18 +249,6 @@ class CampusXApp {
       this.render();
     });
 
-    // Trending Items Click
-    this.dom.trendingList.querySelectorAll('.trending-item').forEach(item => {
-      item.addEventListener('click', () => {
-        const tag = item.getAttribute('data-tag');
-        this.activeTagFilter = `#${tag}`;
-        this.dom.rightSearchInput.value = `#${tag}`;
-        this.updateFilterStrip();
-        this.render();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      });
-    });
-
     // Clear Filter
     this.dom.clearFilterBtn.addEventListener('click', () => {
       this.activeTagFilter = null;
@@ -372,24 +256,6 @@ class CampusXApp {
       this.dom.rightSearchInput.value = '';
       this.updateFilterStrip();
       this.render();
-    });
-
-    // Follow Buttons in sidebar
-    document.querySelectorAll('.btn-follow').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const isFollowing = btn.getAttribute('data-following') === 'true';
-        if (isFollowing) {
-          btn.setAttribute('data-following', 'false');
-          btn.classList.remove('following');
-          btn.textContent = 'Follow';
-          this.showToast("Unfollowed channel", "info");
-        } else {
-          btn.setAttribute('data-following', 'true');
-          btn.classList.add('following');
-          btn.textContent = 'Following';
-          this.showToast("Following channel for live notices", "success");
-        }
-      });
     });
 
     // Theme Switch
@@ -430,13 +296,15 @@ class CampusXApp {
     if (!text) return;
 
     const category = this.dom.composerCategory.value;
+    const isOfficial = this.composerUrgent || category === "Examination" || category === "Placement";
+
     const newPost = {
       id: "post-" + Date.now(),
       authorName: this.currentUser.name,
       authorHandle: this.currentUser.handle,
       avatarSeed: this.currentUser.avatarSeed,
       isVerified: true,
-      isOfficial: false,
+      isOfficial: isOfficial,
       isUrgent: this.composerUrgent,
       category: category,
       timeAgo: "Just now",
@@ -460,7 +328,7 @@ class CampusXApp {
     this.composerAttachment = '';
     this.dom.composerAttachmentPreview.style.display = 'none';
 
-    this.showToast("Your campus post is live! 🚀", "success");
+    this.showToast("Your post is live on campus! 🚀", "success");
     this.render();
   }
 
@@ -556,7 +424,7 @@ class CampusXApp {
 
   renderRepliesList(post) {
     if (!post.replies || post.replies.length === 0) {
-      this.dom.repliesListContainer.innerHTML = `<p style="color: var(--text-secondary); font-size: 0.88rem; text-align: center; padding: 12px 0;">No replies yet. Be the first to join the conversation!</p>`;
+      this.dom.repliesListContainer.innerHTML = `<p style="color: var(--text-secondary); font-size: 0.88rem; text-align: center; padding: 12px 0;">No replies yet. Join the conversation!</p>`;
       return;
     }
 
@@ -592,7 +460,7 @@ class CampusXApp {
     this.savePosts();
     this.renderRepliesList(this.activeReplyPost);
     this.dom.replyInputText.value = '';
-    this.showToast("Reply published! 💬", "success");
+    this.showToast("Reply posted! 💬", "success");
     this.render();
   }
 
@@ -609,6 +477,51 @@ class CampusXApp {
     } else {
       this.dom.bookmarkCountBadge.style.display = 'none';
     }
+  }
+
+  // Dynamically calculate trending hashtags from actual user posts
+  updateTrendingWidget() {
+    const hashtagMap = new Map();
+    this.posts.forEach(post => {
+      const matches = post.text.match(/#(\w+)/g);
+      if (matches) {
+        matches.forEach(tag => {
+          const lower = tag.toLowerCase();
+          hashtagMap.set(lower, (hashtagMap.get(lower) || 0) + 1);
+        });
+      }
+    });
+
+    if (hashtagMap.size === 0) {
+      this.dom.trendingList.innerHTML = `
+        <div style="color: var(--text-secondary); font-size: 0.84rem; padding: 6px 0; line-height: 1.45;">
+          No trending topics yet.<br>Add <strong>#hashtags</strong> in your posts to start a campus trend!
+        </div>
+      `;
+      return;
+    }
+
+    const sorted = [...hashtagMap.entries()].sort((a, b) => b[1] - a[1]).slice(0, 5);
+
+    this.dom.trendingList.innerHTML = sorted.map(([tag, count]) => `
+      <div class="trending-item" data-tag="${tag.replace('#', '')}">
+        <div class="trending-meta">Campus &bull; Trending</div>
+        <div class="trending-name">${tag}</div>
+        <div class="trending-count">${count} post${count > 1 ? 's' : ''}</div>
+      </div>
+    `).join('');
+
+    // Attach click listeners to trending tags
+    this.dom.trendingList.querySelectorAll('.trending-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const tag = item.getAttribute('data-tag');
+        this.activeTagFilter = `#${tag}`;
+        this.dom.rightSearchInput.value = `#${tag}`;
+        this.updateFilterStrip();
+        this.render();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    });
   }
 
   // Filter Computation
@@ -653,6 +566,7 @@ class CampusXApp {
 
   render() {
     this.updateBookmarkBadge();
+    this.updateTrendingWidget();
     const posts = this.getFilteredPosts();
 
     if (posts.length === 0) {
@@ -678,7 +592,7 @@ class CampusXApp {
             <div class="tweet-header">
               <div class="author-info">
                 <span class="author-name">${this.escapeHTML(post.authorName)}</span>
-                ${post.isVerified ? '<span class="verified-check" title="Verified Campus Entity">✓</span>' : ''}
+                ${post.isVerified ? '<span class="verified-check" title="Verified Campus Member">✓</span>' : ''}
                 <span class="author-handle">${this.escapeHTML(post.authorHandle)}</span>
                 <span class="dot-separator">&bull;</span>
                 <span class="tweet-time">${post.timeAgo}</span>
@@ -800,7 +714,6 @@ class CampusXApp {
   formatTweetText(text) {
     if (!text) return '';
     const escaped = this.escapeHTML(text);
-    // Convert #hashtags to clickable links
     return escaped.replace(/#(\w+)/g, '<span class="tweet-hashtag">#$1</span>');
   }
 

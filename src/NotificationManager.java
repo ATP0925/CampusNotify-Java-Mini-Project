@@ -14,46 +14,11 @@ public class NotificationManager {
         this.notifications = new ArrayList<>();
         this.nextId = 1;
         loadFromFile();
-        if (notifications.isEmpty()) {
-            seedSampleNotifications();
-            saveToFile();
-        } else {
-            // Set nextId to highest existing ID + 1
-            for (Notification n : notifications) {
-                if (n.getId() >= nextId) {
-                    nextId = n.getId() + 1;
-                }
+        for (Notification n : notifications) {
+            if (n.getId() >= nextId) {
+                nextId = n.getId() + 1;
             }
         }
-    }
-
-    /**
-     * Seed initial sample data so the project has realistic data out-of-the-box.
-     */
-    private void seedSampleNotifications() {
-        addNotificationInternal("End-Semester Examination Time Table Released",
-                "The schedule for regular and supplementary end-sem exams (Winter 2026) is posted on the notice board and portal. Check your dates.",
-                "Examination", "Urgent", "Exam Cell");
-
-        addNotificationInternal("TCS Campus Recruitment Drive 2026",
-                "Tata Consultancy Services is visiting for Campus Placements. Eligible final-year students must register before Friday 5:00 PM.",
-                "Placement", "High", "Training & Placement Cell");
-
-        addNotificationInternal("Annual Tech Fest - 'INNOVISION 2026'",
-                "Department of Computer Science invites project submissions and hackathon registrations for the 3-day inter-college technical festival.",
-                "Event", "Medium", "CS Student Council");
-
-        addNotificationInternal("Library Working Hours Extended",
-                "The Central Library and Digital Reading Hall will remain open 24x7 starting next Monday to assist with examination preparation.",
-                "Academic", "Medium", "Chief Librarian");
-
-        addNotificationInternal("Inter-College Cricket Tournament Trials",
-                "Selection trials for the college cricket team will take place tomorrow at 7:00 AM in the main sports ground. Bring valid college ID.",
-                "Sports", "Low", "Director of Physical Education");
-
-        addNotificationInternal("Emergency Maintenance: Campus Wi-Fi",
-                "Campus network and Wi-Fi services will undergo scheduled downtime on Saturday from 2:00 AM to 6:00 AM for core switch upgrades.",
-                "General", "High", "IT Infrastructure Team");
     }
 
     private void addNotificationInternal(String title, String description, String category, String priority, String author) {

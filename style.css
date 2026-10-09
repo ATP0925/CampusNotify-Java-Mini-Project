@@ -1146,6 +1146,26 @@ a {
   to   { transform: translateY(0); opacity: 1; }
 }
 
+.guidelines-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.45;
+}
+
+.guidelines-list strong {
+  color: var(--text-primary);
+}
+
+.empty-state-btn {
+  width: auto !important;
+  padding: 10px 24px !important;
+  margin: 16px auto 0 !important;
+  display: inline-flex !important;
+}
+
 /* ==========================================================================
    RESPONSIVE DESIGN (Twitter Style)
    ========================================================================== */
