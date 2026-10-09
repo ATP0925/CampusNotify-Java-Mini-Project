@@ -228,22 +228,29 @@ class CampusNotificationManagementSystem {
       return;
     }
 
-    let config = null;
+    const DEFAULT_FIREBASE_CONFIG = {
+      apiKey: "AIzaSyBpUKTP-9t2P6b5fZjslNCKsTI_PsWbi90",
+      authDomain: "campnotify-eef91.firebaseapp.com",
+      projectId: "campnotify-eef91",
+      storageBucket: "campnotify-eef91.firebasestorage.app",
+      messagingSenderId: "731953392545",
+      appId: "1:731953392545:web:49223c1539a4a74566b9e0",
+      measurementId: "G-W057SME5BJ"
+    };
+
+    let config = Object.assign({}, DEFAULT_FIREBASE_CONFIG);
     if (configRaw) {
       try {
-        config = JSON.parse(configRaw);
+        const parsed = JSON.parse(configRaw);
+        if (parsed && typeof parsed === 'object') {
+          config = Object.assign(config, parsed);
+        }
       } catch (e) {}
     }
 
-    if (!config || !config.projectId) {
-      config = {
-        apiKey: localStorage.getItem('cnms_firebase_api_key') || '',
-        projectId: 'campnotify-eef91',
-        authDomain: 'campnotify-eef91.firebaseapp.com',
-        storageBucket: 'campnotify-eef91.firebasestorage.app',
-        appId: localStorage.getItem('cnms_firebase_app_id') || ''
-      };
-    }
+    if (!config.apiKey) config.apiKey = DEFAULT_FIREBASE_CONFIG.apiKey;
+    if (!config.appId) config.appId = DEFAULT_FIREBASE_CONFIG.appId;
+    if (!config.projectId) config.projectId = DEFAULT_FIREBASE_CONFIG.projectId;
 
     // Populate input values in settings card
     if (document.getElementById('fbApiKey')) document.getElementById('fbApiKey').value = config.apiKey || '';
@@ -280,6 +287,13 @@ class CampusNotificationManagementSystem {
             this.syncFirebaseUserToLocal(firebaseUser);
           }
         });
+      }
+      if (firebase.analytics && config.measurementId) {
+        try {
+          this.firebaseAnalytics = firebase.analytics();
+        } catch (anErr) {
+          console.log('[Firebase Analytics] note:', anErr);
+        }
       }
       this.firebaseConnected = true;
 
@@ -2032,9 +2046,21 @@ class CampusNotificationManagementSystem {
     this.closeAuthModal();
     this.enterCampusPortal();
     this.showToast('Logged in as Super Admin (Pratik Atpadkar) 👑', 'success');
+
+    // Attempt Firebase Email/Password Auth Sync in background
+    if (this.firebaseAuth) {
+      this.firebaseAuth.signInWithEmailAndPassword('atpadkarmaruti@gmail.com', 'PRATIK@00925')
+        .catch(err => {
+          if (err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential') {
+            return this.firebaseAuth.createUserWithEmailAndPassword('atpadkarmaruti@gmail.com', 'PRATIK@00925');
+          }
+        }).catch(err => {
+          console.log('[Firebase Auth] Admin sync note:', err.message);
+        });
+    }
   }
 
-  handleLoginSubmit() {
+  async handleLoginSubmit() {
     const ident = this.dom.loginIdentifier ? this.dom.loginIdentifier.value.trim().toLowerCase() : '';
     const pass = this.dom.loginPassword ? this.dom.loginPassword.value.trim() : '';
 
@@ -2058,6 +2084,22 @@ class CampusNotificationManagementSystem {
     );
 
     if (!user) {
+      // If not found locally, try Firebase Auth directly
+      if (this.firebaseAuth && ident.includes('@')) {
+        try {
+          this.showToast('Checking credentials with Firebase Auth...', 'info');
+          const fbRes = await this.firebaseAuth.signInWithEmailAndPassword(ident, pass);
+          if (fbRes && fbRes.user) {
+            await this.syncFirebaseUserToLocal(fbRes.user);
+            this.closeAuthModal();
+            this.enterCampusPortal();
+            this.showToast(`Signed in via Firebase Auth as ${fbRes.user.email}! 🚀`, 'success');
+            return;
+          }
+        } catch (fbErr) {
+          console.warn('[Firebase Auth Login]', fbErr);
+        }
+      }
       this.showToast('No campus account found with that username or email.', 'error');
       return;
     }
@@ -2084,9 +2126,18 @@ class CampusNotificationManagementSystem {
     this.closeAuthModal();
     this.enterCampusPortal();
     this.showToast(`Signed in successfully as ${user.name}! 🚀`, 'success');
+
+    // Sync to Firebase Auth in background
+    if (this.firebaseAuth && user.email) {
+      this.firebaseAuth.signInWithEmailAndPassword(user.email, pass).catch(err => {
+        if (err.code === 'auth/user-not-found') {
+          this.firebaseAuth.createUserWithEmailAndPassword(user.email, pass).catch(() => {});
+        }
+      });
+    }
   }
 
-  handleRegisterSubmit() {
+  async handleRegisterSubmit() {
     const name = this.dom.regFullName ? this.dom.regFullName.value.trim() : '';
     const rawUsername = this.dom.regUsername ? this.dom.regUsername.value.trim() : '';
     const pass = this.dom.regPassword ? this.dom.regPassword.value.trim() : '';
@@ -2110,11 +2161,12 @@ class CampusNotificationManagementSystem {
       return;
     }
 
+    const email = `${cleanUsername}@campus.edu`;
     const newUser = {
       id: 'user_' + Date.now(),
       name: name,
       username: cleanUsername,
-      email: `${cleanUsername}@campus.edu`,
+      email: email,
       password: pass,
       role: 'VIEWER',
       canPost: false,
@@ -2123,6 +2175,18 @@ class CampusNotificationManagementSystem {
       avatar: this.getInitials(name),
       createdAt: Date.now()
     };
+
+    // Attempt Firebase Auth account registration
+    if (this.firebaseAuth) {
+      try {
+        const fbRes = await this.firebaseAuth.createUserWithEmailAndPassword(email, pass);
+        if (fbRes && fbRes.user) {
+          newUser.firebaseUid = fbRes.user.uid;
+        }
+      } catch (fbErr) {
+        console.warn('[Firebase Auth Registration note]', fbErr.message);
+      }
+    }
 
     this.users.push(newUser);
     this.saveUsers();
