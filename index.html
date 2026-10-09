@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Campus Notify - Official Digital Campus Announcement & Notice Board Portal for Students and Faculty">
-  <title>Campus Notify | Digital Academic Bulletin & Notice Board</title>
+  <meta name="description" content="Campus Notify - The Campus Social Network & Announcement Feed (X / Twitter for College)">
+  <title>Campus Notify / X — What's Happening on Campus</title>
   
   <!-- Modern Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -15,483 +15,312 @@
 </head>
 <body>
 
-  <!-- Top Notification Flash / Marquee Bar -->
-  <aside class="emergency-marquee" id="emergencyMarquee" aria-label="Urgent Broadcasts">
-    <div class="marquee-content">
-      <span class="pulse-tag">URGENT ALERT</span>
-      <span class="marquee-text" id="marqueeText">
-        📢 Winter 2026 End-Semester Exam Schedule published. Hall Ticket verification closes this Friday at 4:00 PM.
-      </span>
-      <button class="marquee-close-btn" id="closeMarqueeBtn" title="Dismiss banner">&times;</button>
-    </div>
-  </aside>
-
-  <!-- Main Navigation Header -->
-  <header class="main-header">
-    <div class="header-container">
-      <div class="brand-group">
-        <div class="brand-logo" aria-hidden="true">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-          </svg>
-        </div>
-        <div class="brand-meta">
-          <h1 class="brand-title">CAMPUS <span>NOTIFY</span></h1>
-          <p class="brand-sub">Centralized Academic Notice Portal & Bulletin</p>
-        </div>
-      </div>
-
-      <!-- Quick Search Bar -->
-      <div class="search-wrapper">
-        <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="11" cy="11" r="8"></circle>
-          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-        </svg>
-        <input 
-          type="search" 
-          id="globalSearchInput" 
-          placeholder="Search by keywords, subject, teacher or exam... (Press '/' to focus)" 
-          autocomplete="off"
-        >
-        <span class="shortcut-badge">/</span>
-      </div>
-
-      <!-- User Role, Actions & Theme Controls -->
-      <div class="header-actions">
-        <!-- Role Indicator & Switcher -->
-        <div class="role-selector" title="Switch your active portal role">
-          <span class="role-label">Role:</span>
-          <select id="userRoleSelect" aria-label="Select User Role">
-            <option value="student">🎓 Student View</option>
-            <option value="faculty">👨‍🏫 Faculty View</option>
-            <option value="admin">🏛️ Dean / Admin View</option>
-          </select>
-        </div>
-
-        <!-- Post Announcement CTA Button -->
-        <button class="btn btn-primary" id="openPostModalBtn">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="12" y1="5" x2="12" y2="19"></line>
-            <line x1="5" y1="12" x2="19" y2="12"></line>
-          </svg>
-          <span>Post Notice</span>
-        </button>
-
-        <!-- Dark/Light Mode Switcher -->
-        <button class="theme-toggle-btn" id="themeToggleBtn" title="Toggle Dark/Light Mode" aria-label="Toggle Theme">
-          <svg class="sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="5"></circle>
-            <line x1="12" y1="1" x2="12" y2="3"></line>
-            <line x1="12" y1="21" x2="12" y2="23"></line>
-            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-            <line x1="1" y1="12" x2="3" y2="12"></line>
-            <line x1="21" y1="12" x2="23" y2="12"></line>
-            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-          </svg>
-          <svg class="moon-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-          </svg>
-        </button>
-      </div>
-    </div>
-  </header>
-
-  <!-- Student Submission Info Banner (Authentic College Project Feel) -->
-  <section class="project-info-bar">
-    <div class="container project-info-inner">
-      <div class="project-pill">
-        <span class="dot"></span>
-        <span>Mini Project Submission (AY 2026-27)</span>
-      </div>
-      <div class="project-meta-text">
-        <strong>Subject:</strong> Java & Web Technology Project &bull; 
-        <strong>Branch:</strong> Computer Engineering &bull; 
-        <strong>System:</strong> Campus Notification Management Engine
-      </div>
-      <div class="project-status">
-        <span class="live-clock" id="liveClockDisplay">--:--:--</span>
-      </div>
-    </div>
-  </section>
-
-  <!-- Main Container -->
-  <main class="container page-main">
+  <div class="app-layout">
     
-    <!-- Quick Analytics Strip -->
-    <section class="metrics-grid" aria-label="Portal Statistics">
-      <div class="metric-card">
-        <div class="metric-icon total">📋</div>
-        <div class="metric-data">
-          <span class="metric-count" id="statTotalCount">0</span>
-          <span class="metric-label">Total Notices</span>
-        </div>
-      </div>
-      <div class="metric-card">
-        <div class="metric-icon exam">📝</div>
-        <div class="metric-data">
-          <span class="metric-count" id="statExamCount">0</span>
-          <span class="metric-label">Exam Circulars</span>
-        </div>
-      </div>
-      <div class="metric-card">
-        <div class="metric-icon placement">💼</div>
-        <div class="metric-data">
-          <span class="metric-count" id="statPlacementCount">0</span>
-          <span class="metric-label">Placement Drives</span>
-        </div>
-      </div>
-      <div class="metric-card">
-        <div class="metric-icon events">🎉</div>
-        <div class="metric-data">
-          <span class="metric-count" id="statEventCount">0</span>
-          <span class="metric-label">Events & Fests</span>
-        </div>
-      </div>
-      <div class="metric-card">
-        <div class="metric-icon urgent">🚨</div>
-        <div class="metric-data">
-          <span class="metric-count" id="statUrgentCount">0</span>
-          <span class="metric-label">Urgent Action</span>
-        </div>
-      </div>
-    </section>
-
-    <!-- Filter & Control Toolbar -->
-    <section class="toolbar-section">
-      <div class="category-tabs" id="categoryTabs" role="tablist">
-        <button class="tab-btn active" data-category="ALL" role="tab" aria-selected="true">
-          <span>All Notices</span>
-          <span class="tab-count" id="countAll">0</span>
-        </button>
-        <button class="tab-btn" data-category="Examination" role="tab" aria-selected="false">
-          <span>Examination</span>
-          <span class="tab-count" id="countExam">0</span>
-        </button>
-        <button class="tab-btn" data-category="Academic" role="tab" aria-selected="false">
-          <span>Academics</span>
-          <span class="tab-count" id="countAcad">0</span>
-        </button>
-        <button class="tab-btn" data-category="Placement" role="tab" aria-selected="false">
-          <span>Placements</span>
-          <span class="tab-count" id="countPlace">0</span>
-        </button>
-        <button class="tab-btn" data-category="Event" role="tab" aria-selected="false">
-          <span>Events & Fests</span>
-          <span class="tab-count" id="countEvent">0</span>
-        </button>
-        <button class="tab-btn" data-category="Sports" role="tab" aria-selected="false">
-          <span>Sports</span>
-          <span class="tab-count" id="countSports">0</span>
-        </button>
-        <button class="tab-btn" data-category="General" role="tab" aria-selected="false">
-          <span>General</span>
-          <span class="tab-count" id="countGen">0</span>
-        </button>
-      </div>
-
-      <!-- Secondary Filters & View Switchers -->
-      <div class="secondary-filters">
-        <div class="filter-dropdown-wrap">
-          <label for="priorityFilter">Priority:</label>
-          <select id="priorityFilter">
-            <option value="ALL">All Priorities</option>
-            <option value="Urgent">🚨 Urgent</option>
-            <option value="High">⚡ High</option>
-            <option value="Medium">🔹 Medium</option>
-            <option value="Low">🌱 Low</option>
-          </select>
-        </div>
-
-        <div class="filter-dropdown-wrap">
-          <label for="departmentFilter">Department:</label>
-          <select id="departmentFilter">
-            <option value="ALL">All Branches</option>
-            <option value="Computer">Computer Engg</option>
-            <option value="IT">Information Tech</option>
-            <option value="Mechanical">Mechanical</option>
-            <option value="Exam Cell">Exam Cell</option>
-            <option value="Training & Placement">T&P Cell</option>
-            <option value="Student Affairs">Student Affairs</option>
-          </select>
-        </div>
-
-        <!-- Bookmarks Filter Toggle -->
-        <button class="btn btn-secondary" id="toggleBookmarksBtn" title="View only notices saved by you">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+    <!-- LEFT SIDEBAR: Navigation -->
+    <header class="sidebar-left">
+      <div class="sidebar-inner">
+        <!-- Logo -->
+        <a href="#" class="brand-logo" aria-label="Campus Notify Home">
+          <svg class="x-brand-icon" viewBox="0 0 24 24" width="30" height="30" fill="currentColor">
+            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
           </svg>
-          <span id="bookmarkBtnText">Saved Only</span>
+          <span class="brand-name">Campus<span class="accent-text">Notify</span></span>
+        </a>
+
+        <!-- Navigation Menu -->
+        <nav class="nav-menu" aria-label="Main Navigation">
+          <a href="#" class="nav-item active" id="navHome">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+              <path d="M12 1.696L.622 8.807l1.06 1.696L3 9.679V19.5C3 20.881 4.119 22 5.5 22h13c1.381 0 2.5-1.119 2.5-2.5V9.679l1.318.824 1.06-1.696L12 1.696zM12 16.5c-1.381 0-2.5-1.119-2.5-2.5s1.119-2.5 2.5-2.5 2.5 1.119 2.5 2.5-1.119 2.5-2.5 2.5z"/>
+            </svg>
+            <span class="nav-label">Home</span>
+          </a>
+
+          <a href="#" class="nav-item" id="navExplore">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <span class="nav-label">Explore</span>
+          </a>
+
+          <a href="#" class="nav-item" id="navOfficial">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+            <span class="nav-label">Official Circulars</span>
+          </a>
+
+          <a href="#" class="nav-item" id="navBookmarks">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+            </svg>
+            <span class="nav-label">Bookmarks</span>
+            <span class="nav-badge" id="bookmarkCountBadge" style="display: none;">0</span>
+          </a>
+
+          <a href="#" class="nav-item" id="navProfile">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            <span class="nav-label">Profile</span>
+          </a>
+        </nav>
+
+        <!-- Main "Post" Button -->
+        <button class="btn btn-tweet-main" id="sidebarPostBtn">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" class="mobile-post-icon">
+            <path d="M12 5v14M5 12h14"></path>
+          </svg>
+          <span class="btn-text">Post</span>
         </button>
-      </div>
-    </section>
 
-    <!-- Notices Feed Area -->
-    <section class="notices-section">
-      <div class="section-heading-row">
-        <div>
-          <h2 class="section-title" id="currentFeedTitle">Active Announcements</h2>
-          <p class="section-subtitle" id="feedStatusText">Showing verified campus circulars</p>
-        </div>
-        <div class="feed-actions">
-          <button class="btn btn-outline" id="refreshBtn" title="Reload announcements">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="23 4 23 10 17 10"></polyline>
-              <polyline points="1 20 1 14 7 14"></polyline>
-              <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
-            </svg>
-            <span>Refresh</span>
+        <!-- Theme Toggle & User Profile Card at Bottom -->
+        <div class="sidebar-bottom">
+          <button class="theme-switch-btn" id="themeToggleBtn" title="Switch Theme (Dark / Light)">
+            <span class="theme-icon">🌓</span>
+            <span class="theme-text">Toggle Theme</span>
           </button>
-          <button class="btn btn-outline" id="printAllBtn" title="Print this bulletin">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="6 9 6 2 18 2 18 9"></polyline>
-              <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
-              <rect x="6" y="14" width="12" height="8"></rect>
-            </svg>
-            <span>Print Board</span>
-          </button>
+
+          <div class="user-profile-badge" id="userProfilePill">
+            <div class="user-avatar">
+              <img src="https://api.dicebear.com/7.x/bottts/svg?seed=MarutiAtpadkar" alt="Avatar" class="avatar-img">
+            </div>
+            <div class="user-meta">
+              <div class="user-name-row">
+                <span class="user-name">Maruti Atpadkar</span>
+                <span class="verified-check" title="Campus Member">✓</span>
+              </div>
+              <span class="user-handle">@atp0925</span>
+            </div>
+          </div>
         </div>
       </div>
+    </header>
 
-      <!-- Notice Cards Grid -->
-      <div class="notices-grid" id="noticesGrid">
+    <!-- CENTER FEED: What's Happening Timeline -->
+    <main class="timeline-center">
+      <!-- Sticky Timeline Header -->
+      <div class="timeline-header">
+        <h2 class="timeline-title" id="timelineHeaderTitle">Home</h2>
+        <div class="feed-tabs">
+          <button class="feed-tab active" data-tab="all" id="tabForYou">For You</button>
+          <button class="feed-tab" data-tab="official" id="tabOfficial">Official Notices 🏛️</button>
+          <button class="feed-tab" data-tab="trending" id="tabTrending">Trending 🔥</button>
+        </div>
+      </div>
+
+      <!-- Tweet / Announcement Composer Box -->
+      <section class="tweet-composer">
+        <div class="composer-avatar">
+          <img src="https://api.dicebear.com/7.x/bottts/svg?seed=MarutiAtpadkar" alt="User Avatar" class="avatar-img">
+        </div>
+        <div class="composer-content">
+          <textarea 
+            id="composerText" 
+            placeholder="What's happening on campus? Post an announcement, update, or question..."
+            rows="3"
+            maxlength="400"
+          ></textarea>
+
+          <!-- Composer Attachment Preview Area -->
+          <div class="composer-attachment-preview" id="composerAttachmentPreview" style="display: none;">
+            <span class="preview-filename" id="previewFileName">document.pdf</span>
+            <button class="remove-attachment-btn" id="removeAttachmentBtn">&times;</button>
+          </div>
+
+          <!-- Composer Action Toolbar -->
+          <div class="composer-toolbar">
+            <div class="composer-tools">
+              <!-- Category Selector Tag -->
+              <select id="composerCategory" class="composer-select" title="Select Category">
+                <option value="General">🏷️ General</option>
+                <option value="Examination">📝 Examination</option>
+                <option value="Placement">💼 Placement</option>
+                <option value="Academic">📚 Academic</option>
+                <option value="Event">🎉 Event / Fest</option>
+                <option value="Sports">🏆 Sports</option>
+              </select>
+
+              <!-- Optional Attachment / Link Button -->
+              <button class="tool-btn" id="toolAttachBtn" title="Add File Attachment or Circular Link">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
+                </svg>
+              </button>
+
+              <!-- Urgent Flag Button -->
+              <button class="tool-btn" id="toolUrgentBtn" title="Mark as Urgent Announcement">
+                <span class="urgent-emoji">🚨</span>
+              </button>
+            </div>
+
+            <div class="composer-actions">
+              <span class="char-counter" id="charCounter">400</span>
+              <button class="btn btn-tweet-submit" id="submitPostBtn" disabled>Post</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Active Filter Banner (shows when searching or exploring tag) -->
+      <div class="active-filter-strip" id="activeFilterStrip" style="display: none;">
+        <span class="filter-text" id="filterStatusText">Filtering by tag</span>
+        <button class="clear-filter-btn" id="clearFilterBtn">&times; Clear Filter</button>
+      </div>
+
+      <!-- Tweets / Notices Feed Container -->
+      <div class="feed-posts" id="feedPostsContainer">
         <!-- Rendered dynamically by JavaScript -->
       </div>
 
-      <!-- Empty State Illustration -->
-      <div class="empty-state" id="emptyState" style="display: none;">
-        <div class="empty-illustration">🔍</div>
-        <h3>No Announcements Found</h3>
-        <p>No circulars match your current filter or search query. Try clearing filters or search with a different keyword.</p>
-        <button class="btn btn-primary" id="resetFiltersBtn">Reset All Filters</button>
+      <!-- Empty State -->
+      <div class="empty-feed" id="emptyFeedMessage" style="display: none;">
+        <div class="empty-icon">📭</div>
+        <h3>No posts found</h3>
+        <p>There are no posts matching this query right now. Be the first to share an update on campus!</p>
       </div>
-    </section>
-  </main>
+    </main>
 
-  <!-- Modal: Post Notice Form -->
-  <div class="modal-backdrop" id="postModalBackdrop" aria-hidden="true">
-    <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="postModalTitle">
-      <div class="modal-header">
-        <div>
-          <h3 class="modal-title" id="postModalTitle">Publish Official Notice</h3>
-          <p class="modal-sub">Broadcast an announcement to the campus community</p>
-        </div>
-        <button class="modal-close-btn" id="closePostModalBtn">&times;</button>
-      </div>
-
-      <form id="postNoticeForm" class="modal-body">
-        <div class="form-group">
-          <label for="noticeTitleInput">Notice Title <span class="required">*</span></label>
-          <input 
-            type="text" 
-            id="noticeTitleInput" 
-            placeholder="e.g. Schedule for Submission of Term Work & Viva Voce" 
-            required 
-            maxlength="120"
-          >
-          <small class="helper-text">Keep it clear, formal and concise.</small>
-        </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label for="noticeCategoryInput">Category <span class="required">*</span></label>
-            <select id="noticeCategoryInput" required>
-              <option value="Examination">Examination Cell</option>
-              <option value="Academic">Academic Affairs</option>
-              <option value="Placement">Training & Placement</option>
-              <option value="Event">Events & Fests</option>
-              <option value="Sports">Sports Department</option>
-              <option value="General">General Notice</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="noticePriorityInput">Priority Level <span class="required">*</span></label>
-            <select id="noticePriorityInput" required>
-              <option value="Urgent">🚨 Urgent (Immediate Attention)</option>
-              <option value="High">⚡ High (Important Deadline)</option>
-              <option value="Medium" selected>🔹 Medium (Standard Notice)</option>
-              <option value="Low">🌱 Low (Information Only)</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label for="noticeDepartmentInput">Issuing Department <span class="required">*</span></label>
-            <select id="noticeDepartmentInput" required>
-              <option value="Computer Engg">Department of Computer Engg</option>
-              <option value="Information Tech">Information Technology</option>
-              <option value="Mechanical Engg">Mechanical Engineering</option>
-              <option value="Exam Cell">Controller of Examinations</option>
-              <option value="Training & Placement">Training & Placement Cell</option>
-              <option value="Student Council">Student Council / Cultural</option>
-              <option value="General Admin">General Administration</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="noticeAuthorInput">Author / Designation <span class="required">*</span></label>
-            <input 
-              type="text" 
-              id="noticeAuthorInput" 
-              placeholder="e.g. Dr. A. K. Sharma (HOD Comp)" 
-              required
-            >
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label for="noticeDescriptionInput">Official Circular Body & Instructions <span class="required">*</span></label>
-          <textarea 
-            id="noticeDescriptionInput" 
-            rows="5" 
-            placeholder="Enter complete details, venues, timings, dates, guidelines, or requirements..." 
-            required
-          ></textarea>
-        </div>
-
-        <div class="form-group">
-          <label for="noticeAttachmentInput">Simulated Attachment / Link (Optional)</label>
-          <input 
-            type="text" 
-            id="noticeAttachmentInput" 
-            placeholder="e.g. Circular_Winter_2026.pdf or https://forms.gle/..."
-          >
-        </div>
-
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" id="cancelPostBtn">Cancel</button>
-          <button type="submit" class="btn btn-primary" id="submitNoticeBtn">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <line x1="22" y1="2" x2="11" y2="13"></line>
-              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-            </svg>
-            <span>Publish Announcement</span>
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- Modal: View Detailed Notice / Print View -->
-  <div class="modal-backdrop" id="detailModalBackdrop" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="dialog" aria-modal="true" aria-labelledby="detailTitle">
-      <div class="modal-header">
-        <div>
-          <span class="detail-category-badge" id="detailCategoryBadge">EXAMINATION</span>
-          <span class="detail-priority-badge" id="detailPriorityBadge">HIGH PRIORITY</span>
-        </div>
-        <div class="modal-header-actions">
-          <button class="btn btn-outline btn-sm" id="printSingleNoticeBtn" title="Print this specific circular">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="6 9 6 2 18 2 18 9"></polyline>
-              <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
-              <rect x="6" y="14" width="12" height="8"></rect>
-            </svg>
-            <span>Print Notice</span>
-          </button>
-          <button class="modal-close-btn" id="closeDetailModalBtn">&times;</button>
-        </div>
-      </div>
-
-      <div class="modal-body detail-modal-body" id="printNoticeArea">
-        <!-- Letterhead (Appears in Print View as Official Circular) -->
-        <div class="official-letterhead">
-          <div class="letterhead-logo">🏛️</div>
-          <div class="letterhead-text">
-            <h2>CAMPUS NOTIFY ACADEMIC NETWORK</h2>
-            <p>Official Digital Notice & University Bulletin System</p>
-            <div class="letterhead-divider"></div>
-          </div>
-        </div>
-
-        <div class="detail-meta-strip">
-          <div class="meta-item">
-            <span class="meta-label">Reference ID:</span>
-            <span class="meta-value" id="detailId">#000</span>
-          </div>
-          <div class="meta-item">
-            <span class="meta-label">Issued On:</span>
-            <span class="meta-value" id="detailDate">Date</span>
-          </div>
-          <div class="meta-item">
-            <span class="meta-label">Department:</span>
-            <span class="meta-value" id="detailDepartment">Dept</span>
-          </div>
-          <div class="meta-item">
-            <span class="meta-label">Issuing Authority:</span>
-            <span class="meta-value" id="detailAuthor">Author</span>
-          </div>
-        </div>
-
-        <h2 class="detail-title" id="detailTitle">Notice Title</h2>
-        
-        <div class="detail-body-content" id="detailDescription">
-          <!-- Notice Description -->
-        </div>
-
-        <div class="detail-attachment-box" id="detailAttachmentBox">
-          <div class="attachment-icon">📎</div>
-          <div class="attachment-info">
-            <span class="attachment-name" id="detailAttachmentName">document.pdf</span>
-            <span class="attachment-type">Official Verified Document</span>
-          </div>
-          <button class="btn btn-outline btn-sm" id="downloadAttachmentSimBtn">Download</button>
-        </div>
-
-        <div class="official-signoff">
-          <div class="signoff-signature">
-            <div class="sig-line">Digital Verification Seal</div>
-            <div class="sig-name" id="detailSignName">Authority Signature</div>
-            <div class="sig-stamp">VERIFIED CAMPUS NOTICE</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="modal-footer">
-        <button class="btn btn-secondary" id="closeDetailBtn">Close</button>
-        <button class="btn btn-danger btn-sm" id="deleteNoticeInModalBtn" style="display: none;">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="3 6 5 6 21 6"></polyline>
-            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+    <!-- RIGHT SIDEBAR: Search, Trending, Campus Channels -->
+    <aside class="sidebar-right">
+      <div class="sidebar-right-inner">
+        <!-- Search Input -->
+        <div class="search-box">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" class="search-svg">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
           </svg>
-          <span>Delete Notice (Admin)</span>
-        </button>
+          <input 
+            type="search" 
+            id="rightSearchInput" 
+            placeholder="Search posts, #tags, or authors..." 
+            autocomplete="off"
+          >
+        </div>
+
+        <!-- Trending Campus Topics Widget -->
+        <div class="sidebar-widget">
+          <h3 class="widget-title">What's happening on campus</h3>
+          <div class="trending-list" id="trendingList">
+            <!-- Dynamically populated or interactive hashtags -->
+            <div class="trending-item" data-tag="EndSemesterExams">
+              <div class="trending-meta">Examination &bull; Trending</div>
+              <div class="trending-name">#EndSemesterExams</div>
+              <div class="trending-count">1.4k posts</div>
+            </div>
+            <div class="trending-item" data-tag="TCSRecruitment2026">
+              <div class="trending-meta">Placements &bull; Trending</div>
+              <div class="trending-name">#TCSRecruitment2026</div>
+              <div class="trending-count">920 posts</div>
+            </div>
+            <div class="trending-item" data-tag="InnovisionHackathon">
+              <div class="trending-meta">Events &bull; Trending</div>
+              <div class="trending-name">#InnovisionHackathon</div>
+              <div class="trending-count">640 posts</div>
+            </div>
+            <div class="trending-item" data-tag="Library24x7">
+              <div class="trending-meta">Academics &bull; Trending</div>
+              <div class="trending-name">#Library24x7</div>
+              <div class="trending-count">480 posts</div>
+            </div>
+            <div class="trending-item" data-tag="CricketSelection">
+              <div class="trending-meta">Sports &bull; Trending</div>
+              <div class="trending-name">#CricketSelection</div>
+              <div class="trending-count">290 posts</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Campus Channels / Verified Authorities -->
+        <div class="sidebar-widget">
+          <h3 class="widget-title">Campus Channels</h3>
+          <div class="channels-list">
+            <div class="channel-item">
+              <img src="https://api.dicebear.com/7.x/identicon/svg?seed=ExamCell" alt="Exam Cell" class="channel-avatar">
+              <div class="channel-info">
+                <div class="channel-name-row">
+                  <span class="channel-name">Controller of Exams</span>
+                  <span class="verified-check" title="Official Authority">✓</span>
+                </div>
+                <span class="channel-handle">@exam_cell</span>
+              </div>
+              <button class="btn btn-follow" data-following="false">Follow</button>
+            </div>
+
+            <div class="channel-item">
+              <img src="https://api.dicebear.com/7.x/identicon/svg?seed=TPO" alt="T&P Cell" class="channel-avatar">
+              <div class="channel-info">
+                <div class="channel-name-row">
+                  <span class="channel-name">Training & Placement</span>
+                  <span class="verified-check" title="Official Authority">✓</span>
+                </div>
+                <span class="channel-handle">@tpo_cell</span>
+              </div>
+              <button class="btn btn-follow" data-following="false">Follow</button>
+            </div>
+
+            <div class="channel-item">
+              <img src="https://api.dicebear.com/7.x/identicon/svg?seed=Council" alt="Student Council" class="channel-avatar">
+              <div class="channel-info">
+                <div class="channel-name-row">
+                  <span class="channel-name">Student Council</span>
+                  <span class="verified-check" title="Official Authority">✓</span>
+                </div>
+                <span class="channel-handle">@student_council</span>
+              </div>
+              <button class="btn btn-follow" data-following="false">Follow</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer / Credits -->
+        <div class="sidebar-footer">
+          <p>Campus Notify &bull; College Social Network &bull; Built with Pure Web Standards</p>
+          <p>&copy; 2026 Campus Notify (ATP0925)</p>
+        </div>
+      </div>
+    </aside>
+
+  </div>
+
+  <!-- Modal: Comments / Replies Drawer -->
+  <div class="modal-backdrop" id="replyModalBackdrop" aria-hidden="true">
+    <div class="modal-dialog reply-modal-dialog" role="dialog" aria-modal="true">
+      <div class="modal-header">
+        <h3 class="modal-title">Replies</h3>
+        <button class="modal-close-btn" id="closeReplyModalBtn">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Original Tweet in Reply Modal -->
+        <div class="reply-target-post" id="replyTargetPostContainer">
+          <!-- Populated dynamically -->
+        </div>
+
+        <!-- Reply Input Box -->
+        <div class="reply-composer">
+          <img src="https://api.dicebear.com/7.x/bottts/svg?seed=MarutiAtpadkar" alt="Avatar" class="avatar-img-sm">
+          <div class="reply-input-wrap">
+            <textarea id="replyInputText" placeholder="Post your reply..." rows="2" maxlength="280"></textarea>
+            <div class="reply-actions">
+              <button class="btn btn-tweet-submit btn-sm" id="submitReplyBtn">Reply</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Existing Replies List -->
+        <div class="replies-list" id="repliesListContainer">
+          <!-- Populated dynamically -->
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- Toast Notification Container -->
-  <div class="toast-container" id="toastContainer" aria-live="polite"></div>
-
-  <!-- Footer -->
-  <footer class="main-footer">
-    <div class="container footer-content">
-      <div class="footer-left">
-        <div class="footer-brand">
-          <span class="footer-icon">🏛️</span>
-          <strong>CAMPUS NOTIFY</strong>
-        </div>
-        <p class="footer-tagline">
-          Centralized Announcement Management System designed for college semester submission.
-        </p>
-      </div>
-      <div class="footer-center">
-        <h4>System Information</h4>
-        <p>Built with Pure HTML5, CSS3, JavaScript (Vanilla ES6) & Core Java Backend.</p>
-        <p>Zero external heavy dependencies &bull; 100% Offline Capable with LocalStorage.</p>
-      </div>
-      <div class="footer-right">
-        <h4>Submission Credits</h4>
-        <p><strong>Course:</strong> Mini Project & OOP Lab</p>
-        <p><strong>Developed by:</strong> Maruti Atpadkar (ATP0925)</p>
-        <p class="copyright-text">&copy; 2026 Campus Notify. All Rights Reserved.</p>
-      </div>
-    </div>
-  </footer>
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
 
   <script src="app.js"></script>
 </body>

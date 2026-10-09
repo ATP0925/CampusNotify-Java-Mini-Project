@@ -1,102 +1,146 @@
 /**
- * CAMPUS NOTIFY - Client-Side Application Logic
- * Handcrafted vanilla JavaScript with LocalStorage persistence,
- * search engine, dynamic filtering, role management, and print utilities.
+ * CAMPUS NOTIFY / X - Client Application Engine
+ * Twitter / X Style Campus Social Media & Announcement Feed
+ * Full interactivity: Likes, Reposts, Bookmarks, Replies, Hashtags, Search, LocalStorage
  */
 
-// Initial Seed Data (Authentic College Notices)
-const DEFAULT_NOTICES = [
+// Initial Seed Feed (Realistic College Campus Tweets & Broadcasts)
+const SEED_POSTS = [
   {
-    id: 101,
-    title: "Winter 2026 End-Semester Examination Schedule & Guidelines",
+    id: "post-101",
+    authorName: "Controller of Examinations",
+    authorHandle: "@exam_cell",
+    avatarSeed: "ExamCell",
+    isVerified: true,
+    isOfficial: true,
+    isUrgent: true,
     category: "Examination",
-    priority: "Urgent",
-    department: "Exam Cell",
-    author: "Controller of Examinations",
-    description: "The official timetable for regular and backlog semester examinations (Winter 2026) has been uploaded. Students must verify their exam dates, seating halls, and report discrepancies to the Exam Section by Friday 4:00 PM. Hall tickets are mandatory for entry.",
-    datePosted: "2026-10-09 10:30",
-    attachment: "Exam_TimeTable_Winter2026.pdf"
+    timeAgo: "2h",
+    text: "🚨 Winter 2026 End-Semester Examination timetable has been officially published!\n\nAll students must verify their exam schedule, branch-wise subject codes, and seating allotment on the exam portal. Hall ticket download closes this Friday at 4:00 PM. Report any clash immediately.\n\n#EndSemesterExams #Winter2026 #ExamNotice",
+    attachment: "TimeTable_Winter2026_Official.pdf",
+    likes: 142,
+    reposts: 68,
+    repliesCount: 23,
+    replies: [
+      { author: "Rohan Verma", handle: "@rohan_v", text: "Sir, what if two elective exams overlap?", time: "1h ago" },
+      { author: "Pooja Deshmukh", handle: "@pooja_d", text: "Are remedial exam dates also included in this circular?", time: "45m ago" }
+    ]
   },
   {
-    id: 102,
-    title: "TCS Ninja & Digital National Campus Recruitment Drive",
+    id: "post-102",
+    authorName: "Training & Placement Cell",
+    authorHandle: "@tpo_cell",
+    avatarSeed: "TPO",
+    isVerified: true,
+    isOfficial: true,
+    isUrgent: false,
     category: "Placement",
-    priority: "High",
-    department: "Training & Placement",
-    author: "Prof. S. K. Roy (Head T&P)",
-    description: "Tata Consultancy Services is hosting its annual campus recruitment drive for final-year engineering students. Minimum criteria: 6.5 CGPA with no active backlogs. Interested candidates must register on the NextStep portal before Wednesday 5:00 PM.",
-    datePosted: "2026-10-08 14:15",
-    attachment: "TCS_Drive_Guidelines_2026.pdf"
+    timeAgo: "4h",
+    text: "💼 TCS Ninja & Digital Campus Recruitment Drive (Batch 2026) is here!\n\nEligibility: Minimum 6.5 CGPA with zero active backlogs across engineering branches. Mandatory registration on the NextStep portal before Wednesday 5:00 PM. Aptitude tests begin this weekend.\n\n#TCSRecruitment2026 #CampusPlacements #EngineeringJobs",
+    attachment: "TCS_Hiring_Guidelines_2026.pdf",
+    likes: 215,
+    reposts: 94,
+    repliesCount: 18,
+    replies: [
+      { author: "Amit Sharma", handle: "@amit_comp", text: "Is registration open for diploma direct second year students too?", time: "3h ago" },
+      { author: "T&P Cell", handle: "@tpo_cell", text: "@amit_comp Yes, if 10th/Diploma aggregate is above 60%.", time: "2h ago" }
+    ]
   },
   {
-    id: 103,
-    title: "Submission of Term Work, Seminar Reports & Mini Project Viva",
-    category: "Academic",
-    priority: "Urgent",
-    department: "Computer Engg",
-    author: "Dr. A. K. Sharma (HOD Computer)",
-    description: "All Third-Year (TE) students are strictly instructed to submit their spiral-bound Mini Project reports and complete code demonstration before 18th October. Continuous assessment marks will be locked thereafter.",
-    datePosted: "2026-10-08 09:45",
-    attachment: "MiniProject_Rubrics_2026.pdf"
-  },
-  {
-    id: 104,
-    title: "INNOVISION 2026 - Annual Inter-College Technical Hackathon",
+    id: "post-103",
+    authorName: "CSI Tech Council",
+    authorHandle: "@csi_council",
+    avatarSeed: "Council",
+    isVerified: true,
+    isOfficial: false,
+    isUrgent: false,
     category: "Event",
-    priority: "Medium",
-    department: "Student Affairs",
-    author: "Student Council & CSI Chapter",
-    description: "Registrations are now open for INNOVISION 2026, a 36-hour national hackathon featuring Web3, AI/ML, and IoT tracks with a cash prize pool of ₹1,50,000. Form teams of 2 to 4 members and submit problem proposals online.",
-    datePosted: "2026-10-07 16:20",
-    attachment: "Hackathon_Rulebook_2026.pdf"
+    timeAgo: "6h",
+    text: "⚡ Registrations are LIVE for INNOVISION 2026 - National 36-Hour Hackathon!\n\nTracks: Generative AI, Decentralized Web, and Smart IoT Solutions. Cash prizes of ₹1,50,000 + Internship fast-tracks with industry sponsors. Teams of 2-4 can register now.\n\n#InnovisionHackathon #Hackathon2026 #BuildInPublic",
+    attachment: "Hackathon_Rulebook_2026.pdf",
+    likes: 189,
+    reposts: 53,
+    repliesCount: 12,
+    replies: [
+      { author: "Sneha Patil", handle: "@sneha_dev", text: "Looking for 1 frontend dev for our team! DM if interested.", time: "4h ago" }
+    ]
   },
   {
-    id: 105,
-    title: "Central Library Extended 24x7 Reading Hall Access",
+    id: "post-104",
+    authorName: "Maruti Atpadkar",
+    authorHandle: "@atp0925",
+    avatarSeed: "MarutiAtpadkar",
+    isVerified: true,
+    isOfficial: false,
+    isUrgent: false,
     category: "Academic",
-    priority: "Medium",
-    department: "General Admin",
-    author: "Chief Librarian",
-    description: "In view of upcoming practicals and semester examinations, the Central Library air-conditioned reading hall and high-speed Wi-Fi facility will remain accessible 24 hours a day starting next Monday. Maintain strict silence.",
-    datePosted: "2026-10-06 11:00",
-    attachment: "Library_Rules_Extended.pdf"
+    timeAgo: "8h",
+    text: "Just submitted the final code demonstration for our Java & Web Technology Mini-Project! 🚀\n\nCentralized announcement engine with Twitter-style campus feed, live filters, and persistence. Huge thanks to our mentors and team.\n\n#CampusNotify #JavaMiniProject #WebDev #EngineeringLife",
+    attachment: "",
+    likes: 98,
+    reposts: 26,
+    repliesCount: 8,
+    replies: [
+      { author: "Kunal Naik", handle: "@kunal_n", text: "Bro UI looks super smooth! Love the dark mode.", time: "6h ago" },
+      { author: "Maruti Atpadkar", handle: "@atp0925", text: "@kunal_n Thanks brother! Pure HTML/CSS/JS without heavy frameworks.", time: "5h ago" }
+    ]
   },
   {
-    id: 106,
-    title: "Inter-College Cricket & Football Selection Trials",
+    id: "post-105",
+    authorName: "Central Library Desk",
+    authorHandle: "@campus_library",
+    avatarSeed: "Library",
+    isVerified: true,
+    isOfficial: true,
+    isUrgent: false,
+    category: "Academic",
+    timeAgo: "1d",
+    text: "📚 Extended Reading Hall Hours Announced!\n\nStarting Monday, the 2nd Floor Digital Study Centre and Silent Reading Hall will remain open 24x7 during the end-semester examination period. High-speed Wi-Fi and power strips available at all desks.\n\n#Library24x7 #StudyGrind #ExamsPrep",
+    attachment: "Library_Notice_Timings.pdf",
+    likes: 310,
+    reposts: 112,
+    repliesCount: 15,
+    replies: []
+  },
+  {
+    id: "post-106",
+    authorName: "Sports & Fitness Cell",
+    authorHandle: "@sports_council",
+    avatarSeed: "Sports",
+    isVerified: false,
+    isOfficial: false,
+    isUrgent: false,
     category: "Sports",
-    priority: "Low",
-    department: "Student Affairs",
-    author: "Director of Physical Education",
-    description: "Selection trials for the university sports contingent will commence this Saturday at 7:00 AM on the campus sports pavilion. Students with verified university sports registration are eligible to participate.",
-    datePosted: "2026-10-05 17:30",
-    attachment: "Sports_Selection_Schedule.pdf"
-  },
-  {
-    id: 107,
-    title: "Scheduled Maintenance of Campus Core Wi-Fi Infrastructure",
-    category: "General",
-    priority: "Low",
-    department: "General Admin",
-    author: "Network Operations Centre (NOC)",
-    description: "Upgradation of campus core switches and access points will occur this Saturday night between 01:00 AM and 05:00 AM. Internet and hostel intranet connectivity will experience brief intermittent downtime.",
-    datePosted: "2026-10-04 12:10",
-    attachment: ""
+    timeAgo: "1d",
+    text: "🏏 University Cricket & Football Championship Trials will be conducted this Saturday at 7:00 AM on the main campus turf ground. Carry college ID and appropriate sports gear.\n\n#CricketSelection #InterCollegeSports #CampusCup",
+    attachment: "",
+    likes: 74,
+    reposts: 19,
+    repliesCount: 5,
+    replies: []
   }
 ];
 
-// App State Management
-class CampusNotifyApp {
+class CampusXApp {
   constructor() {
-    this.notices = [];
-    this.bookmarks = new Set();
-    this.currentRole = 'student'; // 'student' | 'faculty' | 'admin'
-    this.activeCategory = 'ALL';
-    this.activePriority = 'ALL';
-    this.activeDepartment = 'ALL';
+    this.posts = [];
+    this.userLikes = new Set();
+    this.userReposts = new Set();
+    this.userBookmarks = new Set();
+    this.userFollows = new Set();
+    
+    this.activeTab = 'all'; // 'all' | 'official' | 'trending' | 'bookmarks' | 'profile'
     this.searchQuery = '';
-    this.bookmarksOnly = false;
-    this.selectedNotice = null;
+    this.activeTagFilter = null;
+    this.composerUrgent = false;
+    this.composerAttachment = '';
+    this.activeReplyPost = null;
+
+    this.currentUser = {
+      name: "Maruti Atpadkar",
+      handle: "@atp0925",
+      avatarSeed: "MarutiAtpadkar"
+    };
 
     this.init();
   }
@@ -105,573 +149,673 @@ class CampusNotifyApp {
     this.loadState();
     this.bindDOM();
     this.bindEvents();
-    this.startLiveClock();
     this.render();
   }
 
-  // Load from LocalStorage or initialize with defaults
   loadState() {
     try {
-      const stored = localStorage.getItem('campus_notify_data');
-      if (stored) {
-        this.notices = JSON.parse(stored);
+      const storedPosts = localStorage.getItem('campus_x_posts');
+      if (storedPosts) {
+        this.posts = JSON.parse(storedPosts);
       } else {
-        this.notices = [...DEFAULT_NOTICES];
-        this.saveState();
+        this.posts = [...SEED_POSTS];
+        this.savePosts();
       }
 
-      const savedBookmarks = localStorage.getItem('campus_notify_bookmarks');
-      if (savedBookmarks) {
-        this.bookmarks = new Set(JSON.parse(savedBookmarks));
-      }
+      const storedLikes = localStorage.getItem('campus_x_likes');
+      if (storedLikes) this.userLikes = new Set(JSON.parse(storedLikes));
 
-      const savedTheme = localStorage.getItem('campus_notify_theme') || 'light';
-      document.documentElement.setAttribute('data-theme', savedTheme);
+      const storedReposts = localStorage.getItem('campus_x_reposts');
+      if (storedReposts) this.userReposts = new Set(JSON.parse(storedReposts));
 
-      const savedRole = localStorage.getItem('campus_notify_role') || 'student';
-      this.currentRole = savedRole;
+      const storedBookmarks = localStorage.getItem('campus_x_bookmarks');
+      if (storedBookmarks) this.userBookmarks = new Set(JSON.parse(storedBookmarks));
+
+      const storedTheme = localStorage.getItem('campus_x_theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', storedTheme);
     } catch (e) {
-      console.warn("Storage loading error:", e);
-      this.notices = [...DEFAULT_NOTICES];
+      console.warn("Storage load error:", e);
+      this.posts = [...SEED_POSTS];
     }
   }
 
-  saveState() {
+  savePosts() {
     try {
-      localStorage.setItem('campus_notify_data', JSON.stringify(this.notices));
-      localStorage.setItem('campus_notify_bookmarks', JSON.stringify([...this.bookmarks]));
-      localStorage.setItem('campus_notify_role', this.currentRole);
+      localStorage.setItem('campus_x_posts', JSON.stringify(this.posts));
     } catch (e) {
-      console.error("Storage saving error:", e);
+      console.error(e);
+    }
+  }
+
+  saveInteractions() {
+    try {
+      localStorage.setItem('campus_x_likes', JSON.stringify([...this.userLikes]));
+      localStorage.setItem('campus_x_reposts', JSON.stringify([...this.userReposts]));
+      localStorage.setItem('campus_x_bookmarks', JSON.stringify([...this.userBookmarks]));
+    } catch (e) {
+      console.error(e);
     }
   }
 
   bindDOM() {
-    // Elements
-    this.elements = {
-      noticesGrid: document.getElementById('noticesGrid'),
-      emptyState: document.getElementById('emptyState'),
-      globalSearchInput: document.getElementById('globalSearchInput'),
-      userRoleSelect: document.getElementById('userRoleSelect'),
+    this.dom = {
+      feedContainer: document.getElementById('feedPostsContainer'),
+      emptyFeed: document.getElementById('emptyFeedMessage'),
+      headerTitle: document.getElementById('timelineHeaderTitle'),
+      // Tabs
+      tabForYou: document.getElementById('tabForYou'),
+      tabOfficial: document.getElementById('tabOfficial'),
+      tabTrending: document.getElementById('tabTrending'),
+      feedTabs: document.querySelectorAll('.feed-tab'),
+      // Composer
+      composerText: document.getElementById('composerText'),
+      composerCategory: document.getElementById('composerCategory'),
+      toolAttachBtn: document.getElementById('toolAttachBtn'),
+      toolUrgentBtn: document.getElementById('toolUrgentBtn'),
+      submitPostBtn: document.getElementById('submitPostBtn'),
+      charCounter: document.getElementById('charCounter'),
+      composerAttachmentPreview: document.getElementById('composerAttachmentPreview'),
+      previewFileName: document.getElementById('previewFileName'),
+      removeAttachmentBtn: document.getElementById('removeAttachmentBtn'),
+      // Navigation
+      navHome: document.getElementById('navHome'),
+      navExplore: document.getElementById('navExplore'),
+      navOfficial: document.getElementById('navOfficial'),
+      navBookmarks: document.getElementById('navBookmarks'),
+      navProfile: document.getElementById('navProfile'),
+      sidebarPostBtn: document.getElementById('sidebarPostBtn'),
+      bookmarkCountBadge: document.getElementById('bookmarkCountBadge'),
+      // Search & Trending
+      rightSearchInput: document.getElementById('rightSearchInput'),
+      trendingList: document.getElementById('trendingList'),
+      activeFilterStrip: document.getElementById('activeFilterStrip'),
+      filterStatusText: document.getElementById('filterStatusText'),
+      clearFilterBtn: document.getElementById('clearFilterBtn'),
+      // Theme Toggle
       themeToggleBtn: document.getElementById('themeToggleBtn'),
-      openPostModalBtn: document.getElementById('openPostModalBtn'),
-      postModalBackdrop: document.getElementById('postModalBackdrop'),
-      closePostModalBtn: document.getElementById('closePostModalBtn'),
-      cancelPostBtn: document.getElementById('cancelPostBtn'),
-      postNoticeForm: document.getElementById('postNoticeForm'),
-      priorityFilter: document.getElementById('priorityFilter'),
-      departmentFilter: document.getElementById('departmentFilter'),
-      toggleBookmarksBtn: document.getElementById('toggleBookmarksBtn'),
-      bookmarkBtnText: document.getElementById('bookmarkBtnText'),
-      refreshBtn: document.getElementById('refreshBtn'),
-      printAllBtn: document.getElementById('printAllBtn'),
-      resetFiltersBtn: document.getElementById('resetFiltersBtn'),
-      categoryTabs: document.getElementById('categoryTabs'),
-      liveClockDisplay: document.getElementById('liveClockDisplay'),
-      emergencyMarquee: document.getElementById('emergencyMarquee'),
-      closeMarqueeBtn: document.getElementById('closeMarqueeBtn'),
-      toastContainer: document.getElementById('toastContainer'),
-      // Detail Modal
-      detailModalBackdrop: document.getElementById('detailModalBackdrop'),
-      closeDetailModalBtn: document.getElementById('closeDetailModalBtn'),
-      closeDetailBtn: document.getElementById('closeDetailBtn'),
-      printSingleNoticeBtn: document.getElementById('printSingleNoticeBtn'),
-      deleteNoticeInModalBtn: document.getElementById('deleteNoticeInModalBtn'),
-      // Stats Counters
-      statTotalCount: document.getElementById('statTotalCount'),
-      statExamCount: document.getElementById('statExamCount'),
-      statPlacementCount: document.getElementById('statPlacementCount'),
-      statEventCount: document.getElementById('statEventCount'),
-      statUrgentCount: document.getElementById('statUrgentCount'),
-      // Tab Counters
-      countAll: document.getElementById('countAll'),
-      countExam: document.getElementById('countExam'),
-      countAcad: document.getElementById('countAcad'),
-      countPlace: document.getElementById('countPlace'),
-      countEvent: document.getElementById('countEvent'),
-      countSports: document.getElementById('countSports'),
-      countGen: document.getElementById('countGen')
+      // Reply Modal
+      replyModalBackdrop: document.getElementById('replyModalBackdrop'),
+      closeReplyModalBtn: document.getElementById('closeReplyModalBtn'),
+      replyTargetPostContainer: document.getElementById('replyTargetPostContainer'),
+      replyInputText: document.getElementById('replyInputText'),
+      submitReplyBtn: document.getElementById('submitReplyBtn'),
+      repliesListContainer: document.getElementById('repliesListContainer'),
+      // Toast
+      toastContainer: document.getElementById('toastContainer')
     };
-
-    if (this.elements.userRoleSelect) {
-      this.elements.userRoleSelect.value = this.currentRole;
-    }
   }
 
   bindEvents() {
-    // Search input
-    this.elements.globalSearchInput.addEventListener('input', (e) => {
-      this.searchQuery = e.target.value.trim().toLowerCase();
-      this.render();
+    // Composer text input
+    this.dom.composerText.addEventListener('input', () => {
+      const len = this.dom.composerText.value.length;
+      const remaining = 400 - len;
+      this.dom.charCounter.textContent = remaining;
+      this.dom.submitPostBtn.disabled = this.dom.composerText.value.trim().length === 0;
     });
 
-    // Keyboard shortcut '/' to search
-    window.addEventListener('keydown', (e) => {
-      if (e.key === '/' && document.activeElement !== this.elements.globalSearchInput && !document.querySelector('.modal-backdrop.open')) {
-        e.preventDefault();
-        this.elements.globalSearchInput.focus();
-      } else if (e.key === 'Escape') {
-        this.closeAllModals();
+    // Composer urgent button toggle
+    this.dom.toolUrgentBtn.addEventListener('click', () => {
+      this.composerUrgent = !this.composerUrgent;
+      this.dom.toolUrgentBtn.classList.toggle('active-urgent', this.composerUrgent);
+      this.showToast(this.composerUrgent ? "🚨 Marked as Urgent Notice" : "Normal priority", "info");
+    });
+
+    // Composer attachment button
+    this.dom.toolAttachBtn.addEventListener('click', () => {
+      const fileName = prompt("Enter circular or attachment file name (e.g. Schedule_2026.pdf):", "Circular_Document.pdf");
+      if (fileName && fileName.trim()) {
+        this.composerAttachment = fileName.trim();
+        this.dom.previewFileName.textContent = this.composerAttachment;
+        this.dom.composerAttachmentPreview.style.display = 'flex';
+        this.showToast("Attachment linked", "info");
       }
     });
 
-    // Role switcher
-    this.elements.userRoleSelect.addEventListener('change', (e) => {
-      this.currentRole = e.target.value;
-      this.saveState();
-      this.showToast(`Switched to ${this.getRoleDisplayName(this.currentRole)}`, 'info');
+    // Remove attachment
+    this.dom.removeAttachmentBtn.addEventListener('click', () => {
+      this.composerAttachment = '';
+      this.dom.composerAttachmentPreview.style.display = 'none';
+    });
+
+    // Submit Post
+    this.dom.submitPostBtn.addEventListener('click', () => this.handleCreatePost());
+
+    // Sidebar Post Button focuses composer
+    this.dom.sidebarPostBtn.addEventListener('click', () => {
+      this.dom.composerText.focus();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    // Feed Tabs Click
+    this.dom.feedTabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        this.dom.feedTabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        this.activeTab = tab.getAttribute('data-tab');
+        this.activeTagFilter = null;
+        this.searchQuery = '';
+        this.updateFilterStrip();
+        this.render();
+      });
+    });
+
+    // Nav Menu Items
+    this.dom.navHome.addEventListener('click', (e) => {
+      e.preventDefault();
+      this.setActiveNav(this.dom.navHome);
+      this.activeTab = 'all';
+      this.activeTagFilter = null;
+      this.searchQuery = '';
+      this.dom.headerTitle.textContent = "Home";
+      this.updateFilterStrip();
       this.render();
     });
 
-    // Theme toggle
-    this.elements.themeToggleBtn.addEventListener('click', () => {
+    this.dom.navExplore.addEventListener('click', (e) => {
+      e.preventDefault();
+      this.setActiveNav(this.dom.navExplore);
+      this.dom.rightSearchInput.focus();
+      this.showToast("Type in the search box to explore topics", "info");
+    });
+
+    this.dom.navOfficial.addEventListener('click', (e) => {
+      e.preventDefault();
+      this.setActiveNav(this.dom.navOfficial);
+      this.activeTab = 'official';
+      this.dom.headerTitle.textContent = "Official Circulars";
+      this.updateFilterStrip();
+      this.render();
+    });
+
+    this.dom.navBookmarks.addEventListener('click', (e) => {
+      e.preventDefault();
+      this.setActiveNav(this.dom.navBookmarks);
+      this.activeTab = 'bookmarks';
+      this.dom.headerTitle.textContent = "Saved Bookmarks";
+      this.updateFilterStrip();
+      this.render();
+    });
+
+    this.dom.navProfile.addEventListener('click', (e) => {
+      e.preventDefault();
+      this.setActiveNav(this.dom.navProfile);
+      this.activeTab = 'profile';
+      this.dom.headerTitle.textContent = "My Campus Profile";
+      this.updateFilterStrip();
+      this.render();
+    });
+
+    // Search Box
+    this.dom.rightSearchInput.addEventListener('input', (e) => {
+      this.searchQuery = e.target.value.trim().toLowerCase();
+      this.updateFilterStrip();
+      this.render();
+    });
+
+    // Trending Items Click
+    this.dom.trendingList.querySelectorAll('.trending-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const tag = item.getAttribute('data-tag');
+        this.activeTagFilter = `#${tag}`;
+        this.dom.rightSearchInput.value = `#${tag}`;
+        this.updateFilterStrip();
+        this.render();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    });
+
+    // Clear Filter
+    this.dom.clearFilterBtn.addEventListener('click', () => {
+      this.activeTagFilter = null;
+      this.searchQuery = '';
+      this.dom.rightSearchInput.value = '';
+      this.updateFilterStrip();
+      this.render();
+    });
+
+    // Follow Buttons in sidebar
+    document.querySelectorAll('.btn-follow').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const isFollowing = btn.getAttribute('data-following') === 'true';
+        if (isFollowing) {
+          btn.setAttribute('data-following', 'false');
+          btn.classList.remove('following');
+          btn.textContent = 'Follow';
+          this.showToast("Unfollowed channel", "info");
+        } else {
+          btn.setAttribute('data-following', 'true');
+          btn.classList.add('following');
+          btn.textContent = 'Following';
+          this.showToast("Following channel for live notices", "success");
+        }
+      });
+    });
+
+    // Theme Switch
+    this.dom.themeToggleBtn.addEventListener('click', () => {
       const current = document.documentElement.getAttribute('data-theme');
       const next = current === 'dark' ? 'light' : 'dark';
       document.documentElement.setAttribute('data-theme', next);
-      localStorage.setItem('campus_notify_theme', next);
-      this.showToast(`Switched to ${next} mode`, 'info');
+      localStorage.setItem('campus_x_theme', next);
+      this.showToast(`Switched to ${next} mode`, "info");
     });
 
-    // Category Tabs
-    this.elements.categoryTabs.addEventListener('click', (e) => {
-      const btn = e.target.closest('.tab-btn');
-      if (!btn) return;
-
-      this.elements.categoryTabs.querySelectorAll('.tab-btn').forEach(b => {
-        b.classList.remove('active');
-        b.setAttribute('aria-selected', 'false');
-      });
-      btn.classList.add('active');
-      btn.setAttribute('aria-selected', 'true');
-
-      this.activeCategory = btn.getAttribute('data-category');
-      this.render();
+    // Reply Modal Close
+    this.dom.closeReplyModalBtn.addEventListener('click', () => this.closeReplyModal());
+    this.dom.replyModalBackdrop.addEventListener('click', (e) => {
+      if (e.target === this.dom.replyModalBackdrop) this.closeReplyModal();
     });
 
-    // Secondary Filters
-    this.elements.priorityFilter.addEventListener('change', (e) => {
-      this.activePriority = e.target.value;
-      this.render();
-    });
-
-    this.elements.departmentFilter.addEventListener('change', (e) => {
-      this.activeDepartment = e.target.value;
-      this.render();
-    });
-
-    // Bookmarks Filter Toggle
-    this.elements.toggleBookmarksBtn.addEventListener('click', () => {
-      this.bookmarksOnly = !this.bookmarksOnly;
-      this.elements.toggleBookmarksBtn.classList.toggle('active', this.bookmarksOnly);
-      this.elements.bookmarkBtnText.textContent = this.bookmarksOnly ? "Showing Saved" : "Saved Only";
-      this.render();
-    });
-
-    // Refresh & Reset
-    this.elements.refreshBtn.addEventListener('click', () => {
-      this.showToast("Bulletin refreshed with latest notices", "info");
-      this.render();
-    });
-
-    this.elements.resetFiltersBtn.addEventListener('click', () => {
-      this.resetAllFilters();
-    });
-
-    // Print Entire Board
-    this.elements.printAllBtn.addEventListener('click', () => {
-      window.print();
-    });
-
-    // Emergency Marquee Close
-    this.elements.closeMarqueeBtn.addEventListener('click', () => {
-      this.elements.emergencyMarquee.style.display = 'none';
-    });
-
-    // Post Notice Modal Open/Close
-    this.elements.openPostModalBtn.addEventListener('click', () => {
-      this.openPostModal();
-    });
-
-    this.elements.closePostModalBtn.addEventListener('click', () => this.closePostModal());
-    this.elements.cancelPostBtn.addEventListener('click', () => this.closePostModal());
-
-    // Post Notice Form Submit
-    this.elements.postNoticeForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      this.handlePostNoticeSubmit();
-    });
-
-    // Detail Modal Close
-    this.elements.closeDetailModalBtn.addEventListener('click', () => this.closeDetailModal());
-    this.elements.closeDetailBtn.addEventListener('click', () => this.closeDetailModal());
-
-    // Print Single Notice
-    this.elements.printSingleNoticeBtn.addEventListener('click', () => {
-      window.print();
-    });
-
-    // Delete in Modal (Admin Action)
-    this.elements.deleteNoticeInModalBtn.addEventListener('click', () => {
-      if (this.selectedNotice) {
-        this.deleteNotice(this.selectedNotice.id);
-        this.closeDetailModal();
-      }
-    });
-
-    // Backdrop clicks to dismiss
-    this.elements.postModalBackdrop.addEventListener('click', (e) => {
-      if (e.target === this.elements.postModalBackdrop) this.closePostModal();
-    });
-
-    this.elements.detailModalBackdrop.addEventListener('click', (e) => {
-      if (e.target === this.elements.detailModalBackdrop) this.closeDetailModal();
-    });
+    // Reply Submit
+    this.dom.submitReplyBtn.addEventListener('click', () => this.handleAddReply());
   }
 
-  startLiveClock() {
-    const updateTime = () => {
-      const now = new Date();
-      const options = { weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
-      this.elements.liveClockDisplay.textContent = now.toLocaleDateString('en-IN', options);
+  setActiveNav(el) {
+    document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  updateFilterStrip() {
+    if (this.activeTagFilter || this.searchQuery) {
+      this.dom.activeFilterStrip.style.display = 'flex';
+      this.dom.filterStatusText.textContent = `Showing results for: ${this.activeTagFilter || this.searchQuery}`;
+    } else {
+      this.dom.activeFilterStrip.style.display = 'none';
+    }
+  }
+
+  handleCreatePost() {
+    const text = this.dom.composerText.value.trim();
+    if (!text) return;
+
+    const category = this.dom.composerCategory.value;
+    const newPost = {
+      id: "post-" + Date.now(),
+      authorName: this.currentUser.name,
+      authorHandle: this.currentUser.handle,
+      avatarSeed: this.currentUser.avatarSeed,
+      isVerified: true,
+      isOfficial: false,
+      isUrgent: this.composerUrgent,
+      category: category,
+      timeAgo: "Just now",
+      text: text,
+      attachment: this.composerAttachment,
+      likes: 0,
+      reposts: 0,
+      repliesCount: 0,
+      replies: []
     };
-    updateTime();
-    setInterval(updateTime, 1000);
+
+    this.posts.unshift(newPost);
+    this.savePosts();
+
+    // Reset composer
+    this.dom.composerText.value = '';
+    this.dom.charCounter.textContent = '400';
+    this.dom.submitPostBtn.disabled = true;
+    this.composerUrgent = false;
+    this.dom.toolUrgentBtn.classList.remove('active-urgent');
+    this.composerAttachment = '';
+    this.dom.composerAttachmentPreview.style.display = 'none';
+
+    this.showToast("Your campus post is live! 🚀", "success");
+    this.render();
   }
 
-  getRoleDisplayName(role) {
-    if (role === 'admin') return 'Dean / Admin';
-    if (role === 'faculty') return 'Faculty Member';
-    return 'Student';
-  }
+  toggleLike(postId, e) {
+    e.stopPropagation();
+    const post = this.posts.find(p => p.id === postId);
+    if (!post) return;
 
-  openPostModal() {
-    if (this.currentRole === 'student') {
-      const switchConfirm = confirm(
-        "Notice: You are currently in 'Student View' (Read-Only).\n\nWould you like to switch to 'Faculty View' to publish this announcement?"
-      );
-      if (switchConfirm) {
-        this.currentRole = 'faculty';
-        this.elements.userRoleSelect.value = 'faculty';
-        this.saveState();
-        this.showToast("Switched to Faculty mode to compose notice", "info");
-      } else {
-        return;
-      }
-    }
-
-    this.elements.postModalBackdrop.classList.add('open');
-    this.elements.postModalBackdrop.setAttribute('aria-hidden', 'false');
-    document.getElementById('noticeTitleInput').focus();
-  }
-
-  closePostModal() {
-    this.elements.postModalBackdrop.classList.remove('open');
-    this.elements.postModalBackdrop.setAttribute('aria-hidden', 'true');
-    this.elements.postNoticeForm.reset();
-  }
-
-  openDetailModal(notice) {
-    this.selectedNotice = notice;
-
-    document.getElementById('detailCategoryBadge').textContent = notice.category.toUpperCase();
-    document.getElementById('detailCategoryBadge').className = `detail-category-badge badge-category cat-${notice.category.toLowerCase()}`;
-
-    document.getElementById('detailPriorityBadge').textContent = `${notice.priority.toUpperCase()} PRIORITY`;
-    document.getElementById('detailPriorityBadge').className = `detail-priority-badge badge-priority priority-${notice.priority.toLowerCase()}`;
-
-    document.getElementById('detailId').textContent = `#${notice.id}`;
-    document.getElementById('detailDate').textContent = notice.datePosted;
-    document.getElementById('detailDepartment').textContent = notice.department;
-    document.getElementById('detailAuthor').textContent = notice.author;
-    document.getElementById('detailTitle').textContent = notice.title;
-    document.getElementById('detailDescription').textContent = notice.description;
-    document.getElementById('detailSignName').textContent = notice.author;
-
-    const attachmentBox = document.getElementById('detailAttachmentBox');
-    if (notice.attachment && notice.attachment.trim().length > 0) {
-      attachmentBox.style.display = 'flex';
-      document.getElementById('detailAttachmentName').textContent = notice.attachment;
-      document.getElementById('downloadAttachmentSimBtn').onclick = () => {
-        this.showToast(`Downloading: ${notice.attachment}`, 'success');
-      };
+    if (this.userLikes.has(postId)) {
+      this.userLikes.delete(postId);
+      post.likes = Math.max(0, post.likes - 1);
     } else {
-      attachmentBox.style.display = 'none';
+      this.userLikes.add(postId);
+      post.likes += 1;
     }
+    this.savePosts();
+    this.saveInteractions();
+    this.render();
+  }
 
-    // Admin Delete button visibility
-    if (this.currentRole === 'admin') {
-      this.elements.deleteNoticeInModalBtn.style.display = 'inline-flex';
+  toggleRepost(postId, e) {
+    e.stopPropagation();
+    const post = this.posts.find(p => p.id === postId);
+    if (!post) return;
+
+    if (this.userReposts.has(postId)) {
+      this.userReposts.delete(postId);
+      post.reposts = Math.max(0, post.reposts - 1);
+      this.showToast("Undo repost", "info");
     } else {
-      this.elements.deleteNoticeInModalBtn.style.display = 'none';
+      this.userReposts.add(postId);
+      post.reposts += 1;
+      this.showToast("Reposted to your feed! 🔁", "success");
     }
-
-    this.elements.detailModalBackdrop.classList.add('open');
-    this.elements.detailModalBackdrop.setAttribute('aria-hidden', 'false');
+    this.savePosts();
+    this.saveInteractions();
+    this.render();
   }
 
-  closeDetailModal() {
-    this.elements.detailModalBackdrop.classList.remove('open');
-    this.elements.detailModalBackdrop.setAttribute('aria-hidden', 'true');
-    this.selectedNotice = null;
+  toggleBookmark(postId, e) {
+    e.stopPropagation();
+    if (this.userBookmarks.has(postId)) {
+      this.userBookmarks.delete(postId);
+      this.showToast("Removed from Bookmarks", "info");
+    } else {
+      this.userBookmarks.add(postId);
+      this.showToast("Saved to Bookmarks 🔖", "success");
+    }
+    this.saveInteractions();
+    this.updateBookmarkBadge();
+    this.render();
   }
 
-  closeAllModals() {
-    this.closePostModal();
-    this.closeDetailModal();
+  sharePost(postId, e) {
+    e.stopPropagation();
+    const shareUrl = `${window.location.origin}${window.location.pathname}#${postId}`;
+    navigator.clipboard?.writeText(shareUrl).then(() => {
+      this.showToast("Post link copied to clipboard! 📋", "success");
+    }).catch(() => {
+      this.showToast("Shared post link!", "info");
+    });
   }
 
-  handlePostNoticeSubmit() {
-    const title = document.getElementById('noticeTitleInput').value.trim();
-    const category = document.getElementById('noticeCategoryInput').value;
-    const priority = document.getElementById('noticePriorityInput').value;
-    const department = document.getElementById('noticeDepartmentInput').value;
-    const author = document.getElementById('noticeAuthorInput').value.trim();
-    const description = document.getElementById('noticeDescriptionInput').value.trim();
-    const attachment = document.getElementById('noticeAttachmentInput').value.trim();
+  openReplyModal(postId, e) {
+    if (e) e.stopPropagation();
+    const post = this.posts.find(p => p.id === postId);
+    if (!post) return;
 
-    if (!title || !description || !author) {
-      this.showToast("Please fill in all mandatory fields.", "error");
+    this.activeReplyPost = post;
+
+    this.dom.replyTargetPostContainer.innerHTML = `
+      <div class="tweet-card" style="border: none; padding: 0;">
+        <div class="tweet-avatar">
+          <img src="https://api.dicebear.com/7.x/identicon/svg?seed=${post.avatarSeed}" class="avatar-img" alt="Avatar">
+        </div>
+        <div class="tweet-body">
+          <div class="author-info">
+            <span class="author-name">${this.escapeHTML(post.authorName)}</span>
+            <span class="author-handle">${this.escapeHTML(post.authorHandle)}</span>
+            <span class="dot-separator">&bull;</span>
+            <span class="tweet-time">${post.timeAgo}</span>
+          </div>
+          <p class="tweet-text" style="margin-top: 6px;">${this.formatTweetText(post.text)}</p>
+        </div>
+      </div>
+    `;
+
+    this.renderRepliesList(post);
+    this.dom.replyInputText.value = '';
+    this.dom.replyModalBackdrop.classList.add('open');
+    this.dom.replyInputText.focus();
+  }
+
+  renderRepliesList(post) {
+    if (!post.replies || post.replies.length === 0) {
+      this.dom.repliesListContainer.innerHTML = `<p style="color: var(--text-secondary); font-size: 0.88rem; text-align: center; padding: 12px 0;">No replies yet. Be the first to join the conversation!</p>`;
       return;
     }
 
-    const now = new Date();
-    const dateFormatted = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-
-    const newId = this.notices.length > 0 ? Math.max(...this.notices.map(n => n.id)) + 1 : 101;
-
-    const newNotice = {
-      id: newId,
-      title,
-      category,
-      priority,
-      department,
-      author,
-      description,
-      datePosted: dateFormatted,
-      attachment: attachment || ""
-    };
-
-    this.notices.unshift(newNotice);
-    this.saveState();
-    this.closePostModal();
-    this.showToast(`Notice #${newId} published successfully!`, "success");
-    this.render();
+    this.dom.repliesListContainer.innerHTML = post.replies.map(r => `
+      <div class="reply-item">
+        <img src="https://api.dicebear.com/7.x/identicon/svg?seed=${encodeURIComponent(r.handle)}" class="avatar-img-sm" alt="Avatar">
+        <div class="reply-item-content">
+          <div class="reply-item-author">
+            <span>${this.escapeHTML(r.author)}</span>
+            <span style="color: var(--text-secondary); font-weight: 500; font-size: 0.8rem;">${this.escapeHTML(r.handle)} &bull; ${r.time}</span>
+          </div>
+          <div class="reply-item-text">${this.escapeHTML(r.text)}</div>
+        </div>
+      </div>
+    `).join('');
   }
 
-  deleteNotice(id) {
-    if (this.currentRole !== 'admin') {
-      this.showToast("Permission denied: Only Admin can delete notices.", "error");
-      return;
-    }
+  handleAddReply() {
+    if (!this.activeReplyPost) return;
+    const text = this.dom.replyInputText.value.trim();
+    if (!text) return;
 
-    if (confirm(`Are you sure you want to delete notice #${id}? This action cannot be undone.`)) {
-      this.notices = this.notices.filter(n => n.id !== id);
-      this.bookmarks.delete(id);
-      this.saveState();
-      this.showToast(`Notice #${id} deleted from bulletin.`, "info");
-      this.render();
-    }
-  }
+    if (!this.activeReplyPost.replies) this.activeReplyPost.replies = [];
 
-  toggleBookmark(id, event) {
-    event.stopPropagation();
-    if (this.bookmarks.has(id)) {
-      this.bookmarks.delete(id);
-      this.showToast("Removed from saved notices", "info");
-    } else {
-      this.bookmarks.add(id);
-      this.showToast("Saved notice to bookmarks", "success");
-    }
-    this.saveState();
-    this.render();
-  }
-
-  resetAllFilters() {
-    this.activeCategory = 'ALL';
-    this.activePriority = 'ALL';
-    this.activeDepartment = 'ALL';
-    this.searchQuery = '';
-    this.bookmarksOnly = false;
-    this.elements.globalSearchInput.value = '';
-    this.elements.priorityFilter.value = 'ALL';
-    this.elements.departmentFilter.value = 'ALL';
-    this.elements.toggleBookmarksBtn.classList.remove('active');
-    this.elements.bookmarkBtnText.textContent = "Saved Only";
-
-    this.elements.categoryTabs.querySelectorAll('.tab-btn').forEach(b => {
-      b.classList.toggle('active', b.getAttribute('data-category') === 'ALL');
-      b.setAttribute('aria-selected', b.getAttribute('data-category') === 'ALL');
+    this.activeReplyPost.replies.push({
+      author: this.currentUser.name,
+      handle: this.currentUser.handle,
+      text: text,
+      time: "Just now"
     });
+    this.activeReplyPost.repliesCount = this.activeReplyPost.replies.length;
 
-    this.showToast("All filters reset", "info");
+    this.savePosts();
+    this.renderRepliesList(this.activeReplyPost);
+    this.dom.replyInputText.value = '';
+    this.showToast("Reply published! 💬", "success");
     this.render();
   }
 
-  // Filter and Query Computation
-  getFilteredNotices() {
-    return this.notices.filter(notice => {
-      // Category Filter
-      if (this.activeCategory !== 'ALL' && notice.category !== this.activeCategory) {
+  closeReplyModal() {
+    this.dom.replyModalBackdrop.classList.remove('open');
+    this.activeReplyPost = null;
+  }
+
+  updateBookmarkBadge() {
+    const count = this.userBookmarks.size;
+    if (count > 0) {
+      this.dom.bookmarkCountBadge.style.display = 'inline-block';
+      this.dom.bookmarkCountBadge.textContent = count;
+    } else {
+      this.dom.bookmarkCountBadge.style.display = 'none';
+    }
+  }
+
+  // Filter Computation
+  getFilteredPosts() {
+    return this.posts.filter(post => {
+      // Tab Filters
+      if (this.activeTab === 'official' && !post.isOfficial && !post.isUrgent) {
         return false;
       }
-      // Priority Filter
-      if (this.activePriority !== 'ALL' && notice.priority !== this.activePriority) {
+      if (this.activeTab === 'bookmarks' && !this.userBookmarks.has(post.id)) {
         return false;
       }
-      // Department Filter
-      if (this.activeDepartment !== 'ALL') {
-        const deptMatch = notice.department.toLowerCase().includes(this.activeDepartment.toLowerCase());
-        if (!deptMatch) return false;
-      }
-      // Bookmarks Only
-      if (this.bookmarksOnly && !this.bookmarks.has(notice.id)) {
+      if (this.activeTab === 'profile' && post.authorHandle !== this.currentUser.handle) {
         return false;
       }
-      // Search Query
-      if (this.searchQuery) {
-        const matchesTitle = notice.title.toLowerCase().includes(this.searchQuery);
-        const matchesDesc = notice.description.toLowerCase().includes(this.searchQuery);
-        const matchesAuthor = notice.author.toLowerCase().includes(this.searchQuery);
-        const matchesDept = notice.department.toLowerCase().includes(this.searchQuery);
-        if (!matchesTitle && !matchesDesc && !matchesAuthor && !matchesDept) {
+
+      // Tag Filter
+      if (this.activeTagFilter) {
+        if (!post.text.toLowerCase().includes(this.activeTagFilter.toLowerCase())) {
           return false;
         }
       }
+
+      // Search Query
+      if (this.searchQuery) {
+        const full = `${post.authorName} ${post.authorHandle} ${post.text} ${post.category}`.toLowerCase();
+        if (!full.includes(this.searchQuery)) {
+          return false;
+        }
+      }
+
       return true;
+    }).sort((a, b) => {
+      if (this.activeTab === 'trending') {
+        const engA = a.likes + a.reposts * 2 + (a.repliesCount || 0);
+        const engB = b.likes + b.reposts * 2 + (b.repliesCount || 0);
+        return engB - engA;
+      }
+      return 0; // Default chronological order
     });
   }
 
-  updateMetrics() {
-    const total = this.notices.length;
-    const exams = this.notices.filter(n => n.category === 'Examination').length;
-    const placements = this.notices.filter(n => n.category === 'Placement').length;
-    const events = this.notices.filter(n => n.category === 'Event').length;
-    const urgent = this.notices.filter(n => n.priority === 'Urgent').length;
-
-    this.elements.statTotalCount.textContent = total;
-    this.elements.statExamCount.textContent = exams;
-    this.elements.statPlacementCount.textContent = placements;
-    this.elements.statEventCount.textContent = events;
-    this.elements.statUrgentCount.textContent = urgent;
-
-    // Tab Counts
-    this.elements.countAll.textContent = total;
-    this.elements.countExam.textContent = exams;
-    this.elements.countAcad.textContent = this.notices.filter(n => n.category === 'Academic').length;
-    this.elements.countPlace.textContent = placements;
-    this.elements.countEvent.textContent = events;
-    this.elements.countSports.textContent = this.notices.filter(n => n.category === 'Sports').length;
-    this.elements.countGen.textContent = this.notices.filter(n => n.category === 'General').length;
-  }
-
   render() {
-    this.updateMetrics();
-    const filtered = this.getFilteredNotices();
+    this.updateBookmarkBadge();
+    const posts = this.getFilteredPosts();
 
-    if (filtered.length === 0) {
-      this.elements.noticesGrid.innerHTML = '';
-      this.elements.emptyState.style.display = 'block';
+    if (posts.length === 0) {
+      this.dom.feedContainer.innerHTML = '';
+      this.dom.emptyFeed.style.display = 'block';
       return;
     }
 
-    this.elements.emptyState.style.display = 'none';
+    this.dom.emptyFeed.style.display = 'none';
 
-    this.elements.noticesGrid.innerHTML = filtered.map(notice => {
-      const isBookmarked = this.bookmarks.has(notice.id);
-      const isUrgent = notice.priority === 'Urgent';
-      const isHigh = notice.priority === 'High';
-
-      const authorInitial = notice.author ? notice.author.charAt(0).toUpperCase() : 'C';
+    this.dom.feedContainer.innerHTML = posts.map(post => {
+      const isLiked = this.userLikes.has(post.id);
+      const isReposted = this.userReposts.has(post.id);
+      const isBookmarked = this.userBookmarks.has(post.id);
 
       return `
-        <article 
-          class="notice-card priority-${notice.priority.toLowerCase()}" 
-          data-id="${notice.id}"
-          tabindex="0"
-          role="button"
-          aria-label="View notice ${notice.title}"
-        >
-          <div class="card-top">
-            <div class="card-badges">
-              <span class="badge-category cat-${notice.category.toLowerCase()}">${notice.category}</span>
-              <span class="badge-priority priority-${notice.priority.toLowerCase()}">
-                ${isUrgent ? '★ URGENT' : (isHigh ? '⚡ HIGH' : notice.priority)}
-              </span>
-            </div>
-            <button 
-              class="btn-bookmark ${isBookmarked ? 'bookmarked' : ''}" 
-              data-bookmark-id="${notice.id}" 
-              title="${isBookmarked ? 'Remove from saved' : 'Save for later'}"
-              aria-label="${isBookmarked ? 'Saved' : 'Save notice'}"
-            >
-              <svg width="18" height="18" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none">
-                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
-              </svg>
-            </button>
+        <article class="tweet-card ${post.isUrgent ? 'is-urgent' : ''}" data-id="${post.id}">
+          <div class="tweet-avatar">
+            <img src="https://api.dicebear.com/7.x/identicon/svg?seed=${post.avatarSeed}" class="avatar-img" alt="${post.authorName}">
           </div>
 
-          <h3 class="card-title">${this.escapeHTML(notice.title)}</h3>
-          <p class="card-description">${this.escapeHTML(notice.description)}</p>
-
-          <div class="card-meta-row">
-            <div class="meta-author" title="${this.escapeHTML(notice.department)}">
-              <div class="author-avatar">${authorInitial}</div>
-              <span>${this.escapeHTML(notice.author)}</span>
+          <div class="tweet-body">
+            <div class="tweet-header">
+              <div class="author-info">
+                <span class="author-name">${this.escapeHTML(post.authorName)}</span>
+                ${post.isVerified ? '<span class="verified-check" title="Verified Campus Entity">✓</span>' : ''}
+                <span class="author-handle">${this.escapeHTML(post.authorHandle)}</span>
+                <span class="dot-separator">&bull;</span>
+                <span class="tweet-time">${post.timeAgo}</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 6px;">
+                ${post.isUrgent ? '<span class="urgent-badge">URGENT</span>' : ''}
+                <span class="category-tag" data-cat="${post.category}">${post.category}</span>
+              </div>
             </div>
-            <div class="meta-time">
-              <span>📅 ${notice.datePosted.split(' ')[0]}</span>
+
+            <div class="tweet-text">${this.formatTweetText(post.text)}</div>
+
+            ${post.attachment ? `
+              <div class="tweet-attachment" data-file="${this.escapeHTML(post.attachment)}">
+                <span>📎</span>
+                <span>${this.escapeHTML(post.attachment)}</span>
+              </div>
+            ` : ''}
+
+            <!-- Tweet Interactive Actions -->
+            <div class="tweet-actions-bar">
+              <button class="action-item action-reply" data-id="${post.id}" title="Reply">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+                </svg>
+                <span>${post.repliesCount || 0}</span>
+              </button>
+
+              <button class="action-item action-repost ${isReposted ? 'reposted' : ''}" data-id="${post.id}" title="Repost">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M17 1l4 4-4 4"></path>
+                  <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
+                  <path d="M7 23l-4-4 4-4"></path>
+                  <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
+                </svg>
+                <span>${post.reposts || 0}</span>
+              </button>
+
+              <button class="action-item action-like ${isLiked ? 'liked' : ''}" data-id="${post.id}" title="Like">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="${isLiked ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2">
+                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                </svg>
+                <span>${post.likes || 0}</span>
+              </button>
+
+              <button class="action-item action-bookmark ${isBookmarked ? 'bookmarked' : ''}" data-id="${post.id}" title="Bookmark">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="${isBookmarked ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2">
+                  <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+                </svg>
+              </button>
+
+              <button class="action-item action-share" data-id="${post.id}" title="Share">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
+                  <polyline points="16 6 12 2 8 6"></polyline>
+                  <line x1="12" y1="2" x2="12" y2="15"></line>
+                </svg>
+              </button>
             </div>
           </div>
         </article>
       `;
     }).join('');
 
-    // Attach click events on newly rendered cards
-    this.elements.noticesGrid.querySelectorAll('.notice-card').forEach(card => {
-      card.addEventListener('click', (e) => {
-        // Prevent modal opening when clicking bookmark button
-        if (e.target.closest('.btn-bookmark')) return;
-        const id = parseInt(card.getAttribute('data-id'), 10);
-        const notice = this.notices.find(n => n.id === id);
-        if (notice) this.openDetailModal(notice);
-      });
+    // Attach Action Bar Listeners
+    this.dom.feedContainer.querySelectorAll('.action-like').forEach(btn => {
+      btn.addEventListener('click', (e) => this.toggleLike(btn.getAttribute('data-id'), e));
+    });
 
-      card.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          const id = parseInt(card.getAttribute('data-id'), 10);
-          const notice = this.notices.find(n => n.id === id);
-          if (notice) this.openDetailModal(notice);
-        }
+    this.dom.feedContainer.querySelectorAll('.action-repost').forEach(btn => {
+      btn.addEventListener('click', (e) => this.toggleRepost(btn.getAttribute('data-id'), e));
+    });
+
+    this.dom.feedContainer.querySelectorAll('.action-bookmark').forEach(btn => {
+      btn.addEventListener('click', (e) => this.toggleBookmark(btn.getAttribute('data-id'), e));
+    });
+
+    this.dom.feedContainer.querySelectorAll('.action-reply').forEach(btn => {
+      btn.addEventListener('click', (e) => this.openReplyModal(btn.getAttribute('data-id'), e));
+    });
+
+    this.dom.feedContainer.querySelectorAll('.action-share').forEach(btn => {
+      btn.addEventListener('click', (e) => this.sharePost(btn.getAttribute('data-id'), e));
+    });
+
+    // Hashtag clicks
+    this.dom.feedContainer.querySelectorAll('.tweet-hashtag').forEach(ht => {
+      ht.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const tag = ht.textContent.trim();
+        this.activeTagFilter = tag;
+        this.dom.rightSearchInput.value = tag;
+        this.updateFilterStrip();
+        this.render();
       });
     });
 
-    // Bookmark button click listeners
-    this.elements.noticesGrid.querySelectorAll('.btn-bookmark').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        const id = parseInt(btn.getAttribute('data-bookmark-id'), 10);
-        this.toggleBookmark(id, e);
+    // Attachment clicks
+    this.dom.feedContainer.querySelectorAll('.tweet-attachment').forEach(att => {
+      att.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.showToast(`Downloading: ${att.getAttribute('data-file')}`, "info");
+      });
+    });
+
+    // Category tag clicks
+    this.dom.feedContainer.querySelectorAll('.category-tag').forEach(tag => {
+      tag.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const cat = tag.getAttribute('data-cat');
+        this.searchQuery = cat.toLowerCase();
+        this.dom.rightSearchInput.value = cat;
+        this.updateFilterStrip();
+        this.render();
       });
     });
   }
 
+  formatTweetText(text) {
+    if (!text) return '';
+    const escaped = this.escapeHTML(text);
+    // Convert #hashtags to clickable links
+    return escaped.replace(/#(\w+)/g, '<span class="tweet-hashtag">#$1</span>');
+  }
+
   showToast(message, type = 'info') {
     const toast = document.createElement('div');
-    toast.className = `toast toast-${type}`;
-
-    let icon = 'ℹ️';
-    if (type === 'success') icon = '✅';
-    if (type === 'error') icon = '⚠️';
-
-    toast.innerHTML = `<span>${icon}</span><span>${this.escapeHTML(message)}</span>`;
-    this.elements.toastContainer.appendChild(toast);
+    toast.className = 'toast';
+    toast.textContent = message;
+    this.dom.toastContainer.appendChild(toast);
 
     setTimeout(() => {
       toast.style.opacity = '0';
       toast.style.transform = 'translateY(10px)';
       toast.style.transition = 'all 0.2s ease';
       setTimeout(() => toast.remove(), 200);
-    }, 3200);
+    }, 2800);
   }
 
   escapeHTML(str) {
@@ -685,7 +829,7 @@ class CampusNotifyApp {
   }
 }
 
-// Instantiate on DOMContentLoaded
+// Initialize on DOM Ready
 document.addEventListener('DOMContentLoaded', () => {
-  window.campusApp = new CampusNotifyApp();
+  window.campusX = new CampusXApp();
 });
