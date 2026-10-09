@@ -1,50 +1,44 @@
 # Campus Notify 📢
-> **Java Mini Project** — College Announcement & Notification Management System
+> **College Mini Project (Web Technology & Core Java)** — Digital Notice Board & Announcement Management System
 
 [![Java Version](https://img.shields.io/badge/Java-21%20%7C%2017%20%7C%208%2B-orange.svg)](https://www.oracle.com/java/)
+[![Frontend](https://img.shields.io/badge/Frontend-HTML5%20%7C%20CSS3%20%7C%20Vanilla%20JS-blue.svg)]()
+[![Platform](https://img.shields.io/badge/Platform-Cross--Platform%20%28Web%20%26%20Terminal%29-green.svg)]()
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Platform](https://img.shields.io/badge/Platform-Cross--Platform%20(Windows%2FMac%2FLinux)-green.svg)]()
 
 ---
 
 ## 📌 Project Overview
-**Campus Notify** is a lightweight, console-based Java application developed as a college mini-project. It simulates a digital notice board system for universities and colleges, allowing administrators, faculty members, and students to broadcast, view, filter, and search campus announcements seamlessly.
+**Campus Notify** is an all-in-one digital notice board and announcement management portal designed for colleges and universities. It allows administrators, faculty members, and students to broadcast, view, filter, bookmark, and search campus announcements seamlessly.
 
-This project uses pure Java (Core Java / Standard Edition) without requiring complex frameworks or external database servers, making it easy to run and evaluate for academic submissions, lab evaluations, and vivas.
+This project includes both:
+1. **🌐 Interactive Web Portal (`index.html`)**: A modern, handcrafted web dashboard featuring dark/light themes, live search, category and priority filters, role switcher (Student / Faculty / Admin), modal announcement publisher, printable circular views, and LocalStorage persistence.
+2. **☕ Core Java Engine (`src/`)**: A modular, object-oriented console application demonstrating Core Java, File I/O, OOP principles (Encapsulation, Polymorphism, Abstraction), and interactive CLI navigation.
 
 ---
 
 ## 🎯 Key Features
 
-- **📢 Notice Board Display**: View all campus announcements with structured, formatted cards including IDs, timestamps, categories, and priority badges.
-- **🔍 Full-Text Search**: Search through announcements by keywords across **Titles**, **Descriptions**, or **Authors**.
-- **🏷️ Category Filtering**: Filter announcements by specific tags:
-  - `Examination`
-  - `Academic`
-  - `Placement`
-  - `Event`
-  - `Sports`
-  - `General`
-- **⚡ Priority Tagging**: Highlight important announcements with priority ratings (`Urgent`, `High`, `Medium`, `Low`).
-- **👥 Role-Based Profiles**: Switch between different campus roles:
-  - **Admin**: Full permissions (Post, View, Search, Delete, View Analytics).
-  - **Faculty**: Can publish announcements and view/search notices.
-  - **Student**: Read-only access to view, search, and filter notices.
-- **📊 Analytics & Statistics**: View instant breakdown and statistics of total notices by category and priority.
-- **💾 Local File Persistence**: Automatically saves notifications to `notifications_data.txt` and reloads them when the application starts.
-- **🌱 Pre-populated Realistic Data**: Comes with sample academic, exam, and placement notifications so the system is ready to explore immediately.
+### 🌐 Web Application Features
+- **🎨 Handcrafted Modern UI**: Clean academic design with soft glassmorphism, responsive grid, and custom dark/light theme toggle.
+- **⚡ Urgent Announcement Ticker**: Prominently highlights critical broadcast notices (e.g. Exam schedules).
+- **🔍 Instant Live Search Engine**: Search through circulars by title, keywords, teacher/author, or department in real-time.
+- **🏷️ Multi-Filter Navigation**:
+  - **Category Tabs**: `Examination`, `Academics`, `Placements`, `Events & Fests`, `Sports`, `General`.
+  - **Priority Filter**: `Urgent`, `High`, `Medium`, `Low`.
+  - **Department Filter**: `Computer Engg`, `Information Tech`, `Mechanical`, `Exam Cell`, `T&P Cell`, etc.
+- **👥 Multi-Role Portal Simulation**:
+  - **Student View**: Read-only access, bookmark important circulars, download/print notice.
+  - **Faculty View**: Can publish notices and broadcast circulars to specific departments.
+  - **Dean / Admin View**: Full permissions including deletion of expired or archived notices.
+- **📄 Printable Circular View (`@media print`)**: Click any notice card to view its official University circular format complete with digital verification stamp, printable directly to PDF or paper.
+- **💾 LocalStorage Persistence**: All notices created, modified, or bookmarked are saved locally in the browser.
 
----
-
-## 🏛️ Object-Oriented Programming (OOP) Concepts Applied
-
-| OOP Concept | Implementation Details |
-|---|---|
-| **Encapsulation** | Private fields in `Notification` and `User` accessed via public getters and setters. |
-| **Separation of Concerns** | Clear modularization into Models (`User`, `Notification`), Business Logic/Storage (`NotificationManager`), and CLI Controller (`Main`). |
-| **Data Abstraction** | File serialization, search parsing, and filtering algorithms are abstracted away inside `NotificationManager`. |
-| **Polymorphism** | Overridden `toString()`, specialized string formatters, and custom deserialization methods. |
-| **Exception Handling & Validation** | Robust handling of numeric inputs, empty queries, invalid choices, and file I/O streams using `try-with-resources`. |
+### ☕ Core Java Console Features
+- Object-Oriented architecture (`User`, `Notification`, `NotificationManager`, `Main`).
+- Full-text search and category filtering in terminal.
+- Statistics summary report breakdown.
+- Persistent file storage (`notifications_data.txt`).
 
 ---
 
@@ -53,78 +47,52 @@ This project uses pure Java (Core Java / Standard Edition) without requiring com
 ```text
 CampusNotify-Java-Mini-Project/
 │
-├── src/
-│   ├── Main.java                 # Main CLI application & interactive menu
-│   ├── Notification.java         # Notification data model & formatting
-│   ├── NotificationManager.java  # Business logic, search, filter, & file I/O
+├── index.html                    # Modern web application interface
+├── style.css                     # Handcrafted CSS styles, theme variables, print layout
+├── app.js                        # Client-side state manager, search, filtering, persistence
+│
+├── src/                          # Java Core Mini-Project source code
+│   ├── Main.java                 # Interactive CLI application & menu
+│   ├── Notification.java         # Announcement model (Card formatting & serialization)
+│   ├── NotificationManager.java  # Business logic, search, filter, file I/O
 │   └── User.java                 # User profile model (Admin / Faculty / Student)
 │
-├── .gitignore                    # Ignores build artifacts and compiled .class files
-├── run.bat                       # One-click Windows build and launch script
-└── README.md                     # Comprehensive project documentation
+├── run.bat                       # 1-Click Windows build & execution script for Java
+├── .gitignore                    # Excludes compiled .class files and local data
+└── README.md                     # Comprehensive project report & documentation
 ```
 
 ---
 
-## 🚀 How to Compile and Run
+## 🚀 How to Run the Project
 
-### Option 1: Quick Run (Windows)
-Double-click `run.bat` or run it from command prompt:
-```cmd
-run.bat
-```
+### 1. Opening the Web Portal (Instant Preview)
+Simply double-click **`index.html`** or open it with any web browser (Chrome, Edge, Firefox, Safari).  
+No server installation, Node.js, or complex database setup required!
 
-### Option 2: Command Line (Cross-Platform)
+### 2. Running the Java Application (Windows 1-Click)
+Double-click **`run.bat`** in the project folder to automatically compile and launch the Java CLI.
 
-1. **Clone or Download the repository:**
-   ```bash
-   git clone https://github.com/ATP0925/CampusNotify-Java-Mini-Project.git
-   cd CampusNotify-Java-Mini-Project
-   ```
+### 3. Running the Java Application via Terminal (Cross-Platform)
+```bash
+# 1. Clone repository
+git clone https://github.com/ATP0925/CampusNotify-Java-Mini-Project.git
 
-2. **Compile the Java source files:**
-   ```bash
-   javac src/*.java
-   ```
+# 2. Open project folder
+cd CampusNotify-Java-Mini-Project
 
-3. **Run the application:**
-   ```bash
-   java -cp src Main
-   ```
+# 3. Compile Java files
+javac src/*.java
 
----
-
-## 💻 Sample Terminal Interface
-
-```text
-================================================================================
-    ____                                       _   _       _   _  __       
-   / ___|__ _ _ __ ___  _ __  _   _ ___       | \ | | ___ | |_(_)/ _|_   _ 
-  | |   / _` | '_ ` _ \| '_ \| | | / __|      |  \| |/ _ \| __| | |_| | | |
-  | |__| (_| | | | | | | |_) | |_| \__ \      | |\  | (_) | |_| |  _| |_| |
-   \____\__,_|_| |_| |_| .__/ \__,_|___/      |_| \_|\___/ \__|_|_|  \__, |
-                       |_|                                           |___/ 
-            CAMPUS NOTIFY - College Announcement Management System              
-                    (Java Console Mini-Project 2026)                          
-================================================================================
---------------------------------------------------------------------------------
- Active User: Dr. A. K. Sharma (Admin - Dean Office) [ID: ADM-101]
---------------------------------------------------------------------------------
- [1] View All Announcements
- [2] Search Announcements (Title, Description, or Author)
- [3] Filter Announcements by Category
- [4] Filter Announcements by Priority
- [5] Post New Announcement
- [6] Delete Announcement
- [7] View Summary & Statistics
- [8] Switch User Profile (Admin / Faculty / Student)
- [9] Exit
---------------------------------------------------------------------------------
+# 4. Run application
+java -cp src Main
 ```
 
 ---
 
-## 👨‍💻 Author & Submission Info
-- **Project Title**: Campus Notify
-- **Subject**: Java Mini Project / OOP Lab
-- **Developed with**: Java SE (JDK 17+)
+## 🏛️ Academic / Submission Metadata
+- **Project Title:** Campus Notify
+- **Subject:** Mini Project / OOP & Web Technology
+- **Branch:** Computer Engineering
+- **Student / Author:** Maruti Atpadkar (ATP0925)
+- **Year:** Academic Year 2026-27
