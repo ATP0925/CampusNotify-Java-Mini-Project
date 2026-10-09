@@ -2,41 +2,134 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    // ===============================================================
+    // Assumed Data Models
+    // ===============================================================
+    // Collection: cnms_notices
+    //   - id: string
+    //   - refNo: string
+    //   - title: string
+    //   - department: string
+    //   - priority: string
+    //   - audience: string
+    //   - description: string
+    //   - attachment: string | null
+    //   - signatory: string
+    //   - issuedAt: string (ISO timestamp)
+    //   - likes: list
+    //   - reactions: map
+    //   - comments: list
+    //
+    // Collection: cnms_users
+    //   - id: string
+    //   - name: string
+    //   - username: string
+    //   - email: string
+    //   - role: 'ADMIN' | 'VIEWER' | 'STUDENT' | 'FACULTY'
+    //   - canPost: bool
+    //   - status: 'PENDING' | 'APPROVED' | 'REJECTED'
+    //   - bio: string
+    //   - avatar: string
+    //
+    // Collection: cnms_community_messages
+    //   - id: string
+    //   - senderId: string
+    //   - senderName: string
+    //   - senderUsername: string
+    //   - text: string
+    //   - timestamp: string
+    //   - reactions: map
+    //   - file: map | null
+    // ===============================================================
+
     // Helper functions
     function isAuthenticated() {
       return request.auth != null;
     }
 
-    function isAdmin() {
+    function isSuperAdmin() {
       return isAuthenticated() && (
-        request.auth.token.email == 'atpadkarmaruti@gmail.com' ||
-        (exists(/databases/$(database)/documents/cnms_users/$(request.auth.uid)) && 
-         get(/databases/$(database)/documents/cnms_users/$(request.auth.uid)).data.role == 'ADMIN')
+        request.auth.token.email in ['atpadkarmaruti@gmail.com', 'pratikatpadkar@gmail.com'] ||
+        request.auth.uid == 'admin_pratik'
       );
     }
 
-    // Official Notices Collection
+    function isAdmin() {
+      return isSuperAdmin() || (
+        isAuthenticated() &&
+        exists(/databases/$(database)/documents/cnms_users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/cnms_users/$(request.auth.uid)).data.role == 'ADMIN'
+      );
+    }
+
+    function canPostNotice() {
+      return isAdmin() || (
+        isAuthenticated() &&
+        exists(/databases/$(database)/documents/cnms_users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/cnms_users/$(request.auth.uid)).data.canPost == true &&
+        get(/databases/$(database)/documents/cnms_users/$(request.auth.uid)).data.status == 'APPROVED'
+      );
+    }
+
+    // 1. Official Notices Collection
     match /cnms_notices/{noticeId} {
-      // Anyone can read official campus circulars
+      // Public / Campus wide read access for official announcements
       allow read: if true;
-      
-      // Authenticated users or admins can publish / update circulars
-      allow create, update: if true;
-      
-      // Only Admin can delete notices
-      allow delete: if true;
+
+      // Issuing circulars requires publishing authority or super admin
+      allow create: if canPostNotice() || isSuperAdmin();
+
+      // Updates: Admins/authors can edit notice, or authenticated members can add reactions/comments
+      allow update: if isAuthenticated();
+
+      // Strictly only Admin can delete official circulars
+      allow delete: if isAdmin();
     }
 
-    // Campus User Profiles Collection
+    // 2. Campus User Profiles Collection (Privilege escalation protection)
     match /cnms_users/{userId} {
-      allow read: if true;
-      allow write: if true;
+      // Authenticated campus members can read profiles
+      allow read: if isAuthenticated() || isSuperAdmin();
+
+      // Creating profile: Admin can create any, self-user can register with non-admin defaults
+      allow create: if isAuthenticated() && (
+        isAdmin() ||
+        (request.auth.uid == userId &&
+         request.resource.data.role != 'ADMIN' &&
+         request.resource.data.canPost != true)
+      );
+
+      // Updating profile: Admin can approve/promote, self-user can update bio/name but cannot elevate role/status/canPost
+      allow update: if isAuthenticated() && (
+        isAdmin() ||
+        (request.auth.uid == userId &&
+         request.resource.data.role == resource.data.role &&
+         request.resource.data.canPost == resource.data.canPost &&
+         request.resource.data.status == resource.data.status)
+      );
+
+      // Deleting user profiles restricted to Admin
+      allow delete: if isAdmin();
     }
 
-    // Campus Community Lounge Messages & Shared Files
+    // 3. Campus Community Lounge Messages (Audited chat & file sharing)
     match /cnms_community_messages/{messageId} {
-      allow read: if true;
-      allow create, update, delete: if true;
+      // Lounge messages visible to authenticated campus users
+      allow read: if isAuthenticated();
+
+      // Message author must match authenticated session UID or admin
+      allow create: if isAuthenticated() && (
+        request.resource.data.senderId == request.auth.uid ||
+        isAdmin()
+      );
+
+      // Members can add reactions or edit own message
+      allow update: if isAuthenticated();
+
+      // Author or Admin can delete messages
+      allow delete: if isAdmin() || (
+        isAuthenticated() && resource.data.senderId == request.auth.uid
+      );
     }
   }
 }

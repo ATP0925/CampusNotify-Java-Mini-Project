@@ -1404,6 +1404,15 @@ class CampusNotificationManagementSystem {
       return;
     }
 
+    // Security Check: Block dangerous executable and script files
+    const ext = file.name.split('.').pop().toLowerCase();
+    const dangerousExtensions = ['exe', 'bat', 'cmd', 'vbs', 'msi', 'scr', 'pif', 'com', 'js', 'sh', 'php', 'apk', 'jar'];
+    if (dangerousExtensions.includes(ext)) {
+      this.showToast('Security Alert: Executable and script files cannot be shared on campus network.', 'error');
+      e.target.value = '';
+      return;
+    }
+
     const reader = new FileReader();
     reader.onload = (event) => {
       this.currentAttachedFile = {
@@ -1443,6 +1452,11 @@ class CampusNotificationManagementSystem {
 
     if (!text && !this.currentAttachedFile) {
       this.showToast('Please type a message or attach a file to send.', 'error');
+      return;
+    }
+
+    if (text.length > 2000) {
+      this.showToast('Lounge message cannot exceed 2,000 characters.', 'warning');
       return;
     }
 
@@ -1617,7 +1631,7 @@ class CampusNotificationManagementSystem {
                     <span class="file-download-size">${this.formatFileSize(msg.file.size)}</span>
                   </div>
                 </div>
-                <a href="${msg.file.dataUrl}" download="${this.escapeHTML(msg.file.name)}" class="file-download-btn">
+                <a href="${this.sanitizeDownloadUrl(msg.file.dataUrl)}" download="${this.escapeHTML(msg.file.name)}" class="file-download-btn">
                   <span>⬇️ Download</span>
                 </a>
               </div>
@@ -2151,6 +2165,18 @@ class CampusNotificationManagementSystem {
     const cleanUsername = rawUsername.toLowerCase().replace(/[^a-z0-9_]/g, '');
     if (cleanUsername.length < 3) {
       this.showToast('Username must be at least 3 alphanumeric characters.', 'error');
+      return;
+    }
+    if (cleanUsername.length > 30) {
+      this.showToast('Username cannot exceed 30 characters.', 'error');
+      return;
+    }
+    if (pass.length < 6) {
+      this.showToast('Password must be at least 6 characters long.', 'error');
+      return;
+    }
+    if (pass.length > 100) {
+      this.showToast('Password cannot exceed 100 characters.', 'error');
       return;
     }
 
@@ -2838,6 +2864,15 @@ class CampusNotificationManagementSystem {
       return;
     }
 
+    if (title.length > 250) {
+      this.showToast('Circular Subject cannot exceed 250 characters.', 'warning');
+      return;
+    }
+    if (description.length > 15000) {
+      this.showToast('Circular text content cannot exceed 15,000 characters.', 'warning');
+      return;
+    }
+
     const newCircular = {
       id: 'CNMS-' + Date.now(),
       refNo: refNo,
@@ -3035,6 +3070,11 @@ class CampusNotificationManagementSystem {
     if (!this.activeDiscussionNoticeId || !this.dom.commentInputText) return;
     const text = this.dom.commentInputText.value.trim();
     if (!text) return;
+
+    if (text.length > 1000) {
+      this.showToast('Inquiry comment cannot exceed 1,000 characters.', 'warning');
+      return;
+    }
 
     const notice = this.notices.find(n => n.id === this.activeDiscussionNoticeId);
     if (!notice) return;
@@ -3471,6 +3511,17 @@ class CampusNotificationManagementSystem {
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&#039;');
+  }
+
+  sanitizeDownloadUrl(url) {
+    if (!url || typeof url !== 'string') return '#';
+    const trimmed = url.trim();
+    if (trimmed.startsWith('data:') || trimmed.startsWith('blob:') || trimmed.startsWith('https://')) {
+      if (!trimmed.toLowerCase().includes('javascript:') && !trimmed.toLowerCase().includes('vbscript:')) {
+        return trimmed;
+      }
+    }
+    return '#';
   }
 
   /* --------------------------------------------------------------------------
