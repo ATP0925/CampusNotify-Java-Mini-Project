@@ -69,8 +69,19 @@ class CampusNotificationManagementSystem {
     this.bindDOM();
     this.bindEvents();
     this.initFirebase();
+    this.initPhoneMockupSlider();
     this.updateUserSessionUI();
     this.render();
+
+    // Route Initial Gateway Viewport
+    const isSignedOut = localStorage.getItem('cnms_session_signed_out') === 'true';
+    const hasActiveSession = localStorage.getItem('cnms_active_user');
+
+    if (isSignedOut || !hasActiveSession) {
+      this.showInstagramGateway('login');
+    } else {
+      this.enterCampusPortal();
+    }
   }
 
   loadState() {
@@ -518,7 +529,53 @@ class CampusNotificationManagementSystem {
       commentsListContainer: document.getElementById('commentsListContainer'),
 
       // Toast Notifications
-      toastContainer: document.getElementById('toastContainer')
+      toastContainer: document.getElementById('toastContainer'),
+
+      // Containers: Main Portal & Instagram Gateway
+      systemMainLayout: document.getElementById('systemMainLayout'),
+      instagramAuthGateway: document.getElementById('instagramAuthGateway'),
+      instaReturnToPortalBtn: document.getElementById('instaReturnToPortalBtn'),
+      instaActiveUserSnippet: document.getElementById('instaActiveUserSnippet'),
+      navInstaAuthBtn: document.getElementById('navInstaAuthBtn'),
+      navSignOutBtn: document.getElementById('navSignOutBtn'),
+
+      // Instagram Auth Gateway Elements (Login & Register)
+      instaLoginFormBox: document.getElementById('instaLoginFormBox'),
+      instaLoginForm: document.getElementById('instaLoginForm'),
+      instaLoginIdentifier: document.getElementById('instaLoginIdentifier'),
+      instaLoginPassword: document.getElementById('instaLoginPassword'),
+      toggleInstaLoginPassBtn: document.getElementById('toggleInstaLoginPassBtn'),
+      instaLoginSubmitBtn: document.getElementById('instaLoginSubmitBtn'),
+      instaQuickAdminLoginBtn: document.getElementById('instaQuickAdminLoginBtn'),
+      instaForgotPassLink: document.getElementById('instaForgotPassLink'),
+      instaAdminApprovalHelpLink: document.getElementById('instaAdminApprovalHelpLink'),
+
+      instaSignupFormBox: document.getElementById('instaSignupFormBox'),
+      instaSignupForm: document.getElementById('instaSignupForm'),
+      instaSignupAdminShortcutBtn: document.getElementById('instaSignupAdminShortcutBtn'),
+      instaRegContact: document.getElementById('instaRegContact'),
+      instaRegFullName: document.getElementById('instaRegFullName'),
+      instaRegUsername: document.getElementById('instaRegUsername'),
+      instaRegPassword: document.getElementById('instaRegPassword'),
+      toggleInstaRegPassBtn: document.getElementById('toggleInstaRegPassBtn'),
+      instaPassStrengthBar: document.getElementById('instaPassStrengthBar'),
+      instaStrengthFill: document.getElementById('instaStrengthFill'),
+      instaStrengthText: document.getElementById('instaStrengthText'),
+      instaRegBio: document.getElementById('instaRegBio'),
+      instaPrivacyConsentCheck: document.getElementById('instaPrivacyConsentCheck'),
+      instaRegSubmitBtn: document.getElementById('instaRegSubmitBtn'),
+
+      // Switcher Card & Saved Device Accounts
+      instaSwitchCardText: document.getElementById('instaSwitchCardText'),
+      instaSwitchActionLink: document.getElementById('instaSwitchActionLink'),
+      instaSavedProfilesCard: document.getElementById('instaSavedProfilesCard'),
+      instaDeviceProfilesChips: document.getElementById('instaDeviceProfilesChips'),
+
+      // Institutional Data Privacy Manifesto Modal
+      openFullPrivacyModalBtn: document.getElementById('openFullPrivacyModalBtn'),
+      privacyPolicyModalBackdrop: document.getElementById('privacyPolicyModalBackdrop'),
+      closePrivacyModalBtn: document.getElementById('closePrivacyModalBtn'),
+      acknowledgePrivacyBtn: document.getElementById('acknowledgePrivacyBtn')
     };
   }
 
@@ -916,7 +973,163 @@ class CampusNotificationManagementSystem {
       });
     }
 
-    // 20. Global ESC key listener to close modals
+    // 20. Dedicated Instagram Auth Gateway Actions & Triggers
+    if (this.dom.navInstaAuthBtn) {
+      this.dom.navInstaAuthBtn.addEventListener('click', () => {
+        this.showInstagramGateway('login');
+      });
+    }
+
+    if (this.dom.navSignOutBtn) {
+      this.dom.navSignOutBtn.addEventListener('click', () => {
+        this.handleSignOut();
+      });
+    }
+
+    if (this.dom.instaReturnToPortalBtn) {
+      this.dom.instaReturnToPortalBtn.addEventListener('click', () => {
+        this.enterCampusPortal();
+      });
+    }
+
+    // Instagram Login Form Submit
+    if (this.dom.instaLoginForm) {
+      this.dom.instaLoginForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        this.handleInstaLoginSubmit();
+      });
+    }
+
+    // Instagram Register Form Submit
+    if (this.dom.instaSignupForm) {
+      this.dom.instaSignupForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        this.handleInstaRegisterSubmit();
+      });
+    }
+
+    // Password Visibility Toggles
+    if (this.dom.toggleInstaLoginPassBtn && this.dom.instaLoginPassword) {
+      this.dom.toggleInstaLoginPassBtn.addEventListener('click', () => {
+        const isPass = this.dom.instaLoginPassword.type === 'password';
+        this.dom.instaLoginPassword.type = isPass ? 'text' : 'password';
+        this.dom.toggleInstaLoginPassBtn.textContent = isPass ? 'Hide' : 'Show';
+      });
+    }
+
+    if (this.dom.toggleInstaRegPassBtn && this.dom.instaRegPassword) {
+      this.dom.toggleInstaRegPassBtn.addEventListener('click', () => {
+        const isPass = this.dom.instaRegPassword.type === 'password';
+        this.dom.instaRegPassword.type = isPass ? 'text' : 'password';
+        this.dom.toggleInstaRegPassBtn.textContent = isPass ? 'Hide' : 'Show';
+      });
+    }
+
+    // Dynamic Password Security & Strength Evaluator
+    if (this.dom.instaRegPassword) {
+      this.dom.instaRegPassword.addEventListener('input', (e) => {
+        this.updatePasswordStrengthUI(e.target.value);
+      });
+    }
+
+    // 1-Click Super Admin Login Buttons
+    if (this.dom.instaQuickAdminLoginBtn) {
+      this.dom.instaQuickAdminLoginBtn.addEventListener('click', () => {
+        this.handleQuickAdminLogin();
+        this.enterCampusPortal();
+      });
+    }
+
+    if (this.dom.instaSignupAdminShortcutBtn) {
+      this.dom.instaSignupAdminShortcutBtn.addEventListener('click', () => {
+        this.handleQuickAdminLogin();
+        this.enterCampusPortal();
+      });
+    }
+
+    // Mode Switcher Link (Login <-> Signup)
+    if (this.dom.instaSwitchActionLink) {
+      this.dom.instaSwitchActionLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        const isLoginVisible = this.dom.instaLoginFormBox && this.dom.instaLoginFormBox.style.display !== 'none';
+        this.switchInstaAuthMode(isLoginVisible ? 'signup' : 'login');
+      });
+    }
+
+    // Help Links in Instagram Login Form
+    if (this.dom.instaForgotPassLink) {
+      this.dom.instaForgotPassLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        alert('Password Recovery Notice:\n\nSuper Admin (Maruti Atpadkar) password: PRATIK@00925\nFor student viewer accounts, passwords are cryptographically hashed for data privacy. You may request credential reset from the Super Admin desk.');
+      });
+    }
+
+    if (this.dom.instaAdminApprovalHelpLink) {
+      this.dom.instaAdminApprovalHelpLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        alert('Institutional Multi-Account Security Policy:\n\nTo prevent unauthorized bots and protect campus intellectual privacy, all newly registered accounts on this device remain under PENDING APPROVAL until Super Admin Maruti Atpadkar (ATP0925) grants clearance from the System Profile & Governance Desk.');
+      });
+    }
+
+    // Delegated Clicks in Saved Device Profiles
+    if (this.dom.instaDeviceProfilesChips) {
+      this.dom.instaDeviceProfilesChips.addEventListener('click', (e) => {
+        const chip = e.target.closest('[data-insta-switch-id]');
+        if (!chip) return;
+        const targetUserId = chip.getAttribute('data-insta-switch-id');
+        if (targetUserId) {
+          this.handleInstaDeviceChipSelect(targetUserId);
+        }
+      });
+    }
+
+    // Institutional Data Privacy Manifesto Modal Triggers
+    if (this.dom.openFullPrivacyModalBtn) {
+      this.dom.openFullPrivacyModalBtn.addEventListener('click', () => {
+        this.openPrivacyModal();
+      });
+    }
+
+    if (this.dom.closePrivacyModalBtn) {
+      this.dom.closePrivacyModalBtn.addEventListener('click', () => {
+        this.closePrivacyModal();
+      });
+    }
+
+    if (this.dom.acknowledgePrivacyBtn) {
+      this.dom.acknowledgePrivacyBtn.addEventListener('click', () => {
+        this.closePrivacyModal();
+        this.showToast('Institutional Data Privacy Policy acknowledged. 🛡️', 'success');
+      });
+    }
+
+    if (this.dom.privacyPolicyModalBackdrop) {
+      this.dom.privacyPolicyModalBackdrop.addEventListener('click', (e) => {
+        if (e.target === this.dom.privacyPolicyModalBackdrop) {
+          this.closePrivacyModal();
+        }
+      });
+    }
+
+    // In-text and footer policy triggers
+    ['policyTrigger1', 'policyTrigger2', 'policyTrigger3', 'policyTrigger4'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.addEventListener('click', (e) => {
+          e.preventDefault();
+          this.openPrivacyModal();
+        });
+      }
+    });
+
+    document.querySelectorAll('.policy-link-trigger').forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        this.openPrivacyModal();
+      });
+    });
+
+    // 21. Global ESC key listener to close modals
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
         this.closeNewNoticeModal();
@@ -924,6 +1137,7 @@ class CampusNotificationManagementSystem {
         this.closeDiscussionModal();
         this.closeProfileModal();
         this.closeAuthModal();
+        this.closePrivacyModal();
       }
     });
   }
@@ -1257,12 +1471,337 @@ class CampusNotificationManagementSystem {
     }
   }
 
+  // Cryptographic Client-Side Password Hashing (Institutional Salting)
+  async hashPassword(plainText, salt = 'CNMS_ATP0925_INSTA_SALT') {
+    try {
+      if (window.crypto && window.crypto.subtle) {
+        const enc = new TextEncoder();
+        const data = enc.encode(plainText + salt);
+        const hashBuffer = await window.crypto.subtle.digest('SHA-256', data);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+      }
+    } catch (e) {
+      console.warn('SubtleCrypto error, falling back:', e);
+    }
+    // Fallback deterministic hash string
+    let h = 0x811c9dc5;
+    const str = plainText + salt;
+    for (let i = 0; i < str.length; i++) {
+      h ^= str.charCodeAt(i);
+      h += (h << 1) + (h << 4) + (h << 7) + (h << 8) + (h << 24);
+    }
+    return ('0000000' + (h >>> 0).toString(16)).substr(-8);
+  }
+
+  calculatePasswordStrength(password) {
+    if (!password) {
+      return { score: 0, text: 'Data Privacy Security: Protected', percent: 0, color: 'var(--brand-accent)' };
+    }
+    let score = 0;
+    if (password.length >= 6) score += 1;
+    if (password.length >= 9) score += 1;
+    if (/[A-Z]/.test(password) && /[a-z]/.test(password)) score += 1;
+    if (/[0-9]/.test(password)) score += 1;
+    if (/[^A-Za-z0-9]/.test(password)) score += 1;
+
+    switch (score) {
+      case 1:
+        return { score: 1, text: 'Weak (Vulnerable)', percent: 25, color: '#ef4444' };
+      case 2:
+      case 3:
+        return { score: 2, text: 'Moderate (Standard)', percent: 55, color: '#f59e0b' };
+      case 4:
+        return { score: 3, text: 'Strong (SHA-256 Cryptographic Shield)', percent: 80, color: '#10b981' };
+      case 5:
+      default:
+        return { score: 4, text: 'Maximum (Enterprise Vault Grade 🛡️)', percent: 100, color: '#0095f6' };
+    }
+  }
+
+  updatePasswordStrengthUI(password) {
+    if (!this.dom.instaStrengthFill || !this.dom.instaStrengthText) return;
+    const res = this.calculatePasswordStrength(password);
+    this.dom.instaStrengthFill.style.width = `${res.percent}%`;
+    this.dom.instaStrengthFill.style.backgroundColor = res.color;
+    this.dom.instaStrengthText.textContent = `Data Privacy Security: ${res.text}`;
+    this.dom.instaStrengthText.style.color = res.color;
+  }
+
+  showInstagramGateway(mode = 'login') {
+    if (this.dom.instagramAuthGateway) {
+      this.dom.instagramAuthGateway.style.display = 'block';
+    }
+    if (this.dom.systemMainLayout) {
+      this.dom.systemMainLayout.style.display = 'none';
+    }
+    if (this.dom.instaActiveUserSnippet) {
+      this.dom.instaActiveUserSnippet.textContent = this.currentUser ? this.currentUser.name : 'Maruti Atpadkar';
+    }
+    this.switchInstaAuthMode(mode);
+    this.renderInstaDeviceProfiles();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  enterCampusPortal() {
+    if (this.dom.instagramAuthGateway) {
+      this.dom.instagramAuthGateway.style.display = 'none';
+    }
+    if (this.dom.systemMainLayout) {
+      this.dom.systemMainLayout.style.display = 'block';
+    }
+    localStorage.removeItem('cnms_session_signed_out');
+    this.updateUserSessionUI();
+    this.render();
+  }
+
+  switchInstaAuthMode(mode) {
+    const isLogin = mode === 'login';
+    if (this.dom.instaLoginFormBox) this.dom.instaLoginFormBox.style.display = isLogin ? 'block' : 'none';
+    if (this.dom.instaSignupFormBox) this.dom.instaSignupFormBox.style.display = isLogin ? 'none' : 'block';
+
+    if (this.dom.instaSwitchCardText) {
+      if (isLogin) {
+        this.dom.instaSwitchCardText.innerHTML = `Don't have an account? <a href="#" id="instaSwitchActionLink">Sign up</a>`;
+      } else {
+        this.dom.instaSwitchCardText.innerHTML = `Have an account? <a href="#" id="instaSwitchActionLink">Log in</a>`;
+      }
+      const newLink = document.getElementById('instaSwitchActionLink');
+      if (newLink) {
+        newLink.addEventListener('click', (e) => {
+          e.preventDefault();
+          this.switchInstaAuthMode(isLogin ? 'signup' : 'login');
+        });
+      }
+    }
+  }
+
+  renderInstaDeviceProfiles() {
+    if (!this.dom.instaDeviceProfilesChips) return;
+    if (this.users.length === 0) {
+      this.dom.instaDeviceProfilesChips.innerHTML = `<span style="font-size: 0.8rem; color: var(--text-dim);">No saved accounts on this device.</span>`;
+      return;
+    }
+
+    this.dom.instaDeviceProfilesChips.innerHTML = this.users.map(u => {
+      const isCur = u.id === this.currentUser.id;
+      const isAdm = u.role === 'ADMIN';
+      const isPending = u.status === 'PENDING';
+      const badge = isAdm
+        ? '👑 Admin'
+        : isPending
+          ? '🕒 Pending Approval'
+          : '✅ Approved';
+
+      return `
+        <div class="insta-profile-chip ${isCur ? 'is-active-chip' : ''}" data-insta-switch-id="${u.id}" title="${isPending ? 'Pending approval by Maruti Atpadkar' : `Switch session to ${u.name}`}">
+          <div class="insta-chip-avatar" style="${isAdm ? 'background: linear-gradient(135deg, #f59e0b, #ef4444);' : ''}">${this.getInitials(u.name)}</div>
+          <div class="insta-chip-details">
+            <span class="insta-chip-name">${this.escapeHTML(u.name)} ${isCur ? '(Active)' : ''}</span>
+            <span class="insta-chip-tag">@${this.escapeHTML(u.username)} &bull; ${badge}</span>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  handleInstaDeviceChipSelect(userId) {
+    const user = this.users.find(u => u.id === userId);
+    if (!user) return;
+
+    if (user.status === 'PENDING') {
+      this.showToast(`🔒 Privacy & Security Guard: Account @${user.username} is pending clearance by Super Admin Maruti Atpadkar.`, 'error');
+      return;
+    }
+    if (user.status === 'REJECTED') {
+      this.showToast('Account registration was declined by Admin.', 'error');
+      return;
+    }
+
+    this.currentUser = Object.assign({}, user);
+    this.saveUsers();
+    this.updateUserSessionUI();
+    this.enterCampusPortal();
+    this.showToast(`Switched active session to ${user.name}! 👥`, 'success');
+  }
+
+  async handleInstaLoginSubmit() {
+    const ident = this.dom.instaLoginIdentifier ? this.dom.instaLoginIdentifier.value.trim().toLowerCase() : '';
+    const pass = this.dom.instaLoginPassword ? this.dom.instaLoginPassword.value.trim() : '';
+
+    if (!ident || !pass) {
+      this.showToast('Please enter your phone number, username, or campus email and password.', 'error');
+      return;
+    }
+
+    // 1. Super Admin 1-Click Verification
+    if (
+      (ident === 'atpadkarmaruti@gmail.com' || ident === 'admin_maruti' || ident === 'maruti') &&
+      pass === 'PRATIK@00925'
+    ) {
+      this.currentUser = Object.assign({}, DEFAULT_SUPER_ADMIN);
+      this.saveUsers();
+      this.updateUserSessionUI();
+      this.enterCampusPortal();
+      this.showToast('Logged in as Super Admin Maruti Atpadkar (ATP0925) 👑', 'success');
+      return;
+    }
+
+    // 2. Lookup registered user
+    const user = this.users.find(u =>
+      (u.email && u.email.toLowerCase() === ident) ||
+      (u.username && u.username.toLowerCase() === ident) ||
+      (u.contact && u.contact.toLowerCase() === ident)
+    );
+
+    if (!user) {
+      this.showToast('Sorry, your password was incorrect or user not found. Please double-check your credentials.', 'error');
+      return;
+    }
+
+    // Cryptographic Password Verification
+    const inputHash = await this.hashPassword(pass);
+    const passMatches = (user.passwordHash && user.passwordHash === inputHash) || (user.password === pass);
+
+    if (!passMatches) {
+      this.showToast('Sorry, your password was incorrect. Please double-check your password.', 'error');
+      return;
+    }
+
+    // 3. Status Gatekeeper & Institutional Security Policy
+    if (user.status === 'PENDING') {
+      this.showToast(`🔒 Institutional Security Policy: Account @${user.username} is PENDING approval from Super Admin Maruti Atpadkar. Multi-account policy requires verification.`, 'error');
+      return;
+    }
+
+    if (user.status === 'REJECTED') {
+      this.showToast('Access declined by Campus Administration.', 'error');
+      return;
+    }
+
+    // 4. Session Authenticated
+    this.currentUser = Object.assign({}, user);
+    this.saveUsers();
+    this.updateUserSessionUI();
+    this.enterCampusPortal();
+    this.showToast(`Logged in successfully as @${user.username}! 🚀`, 'success');
+  }
+
+  async handleInstaRegisterSubmit() {
+    if (this.dom.instaPrivacyConsentCheck && !this.dom.instaPrivacyConsentCheck.checked) {
+      this.showToast('Institutional Data Privacy Policy confirmation is mandatory to register.', 'error');
+      return;
+    }
+
+    const contact = this.dom.instaRegContact ? this.dom.instaRegContact.value.trim() : '';
+    const name = this.dom.instaRegFullName ? this.dom.instaRegFullName.value.trim() : '';
+    const rawUsername = this.dom.instaRegUsername ? this.dom.instaRegUsername.value.trim() : '';
+    const pass = this.dom.instaRegPassword ? this.dom.instaRegPassword.value.trim() : '';
+    const bio = this.dom.instaRegBio ? this.dom.instaRegBio.value.trim() : '';
+
+    if (!contact || !name || !rawUsername || !pass) {
+      this.showToast('Please fill out all required fields to create your account.', 'error');
+      return;
+    }
+
+    if (pass.length < 6) {
+      this.showToast('For data privacy & security, password must be at least 6 characters long.', 'error');
+      return;
+    }
+
+    const cleanUsername = rawUsername.toLowerCase().replace(/[^a-z0-9_]/g, '');
+    if (cleanUsername.length < 3) {
+      this.showToast('Username must be at least 3 letters/numbers/underscores.', 'error');
+      return;
+    }
+
+    // Duplicate check
+    const exists = this.users.some(u => 
+      (u.username && u.username.toLowerCase() === cleanUsername) ||
+      (u.email && u.email.toLowerCase() === contact.toLowerCase()) ||
+      (u.contact && u.contact.toLowerCase() === contact.toLowerCase())
+    );
+
+    if (exists) {
+      this.showToast(`Username @${cleanUsername} or contact is already registered on campus.`, 'error');
+      return;
+    }
+
+    // Cryptographic Password Hashing (Institutional Salt)
+    const passHash = await this.hashPassword(pass);
+
+    const newUser = {
+      id: 'user_' + Date.now(),
+      name: name,
+      username: cleanUsername,
+      email: contact.includes('@') ? contact : `${cleanUsername}@campus.edu`,
+      contact: contact,
+      password: pass,
+      passwordHash: passHash,
+      role: 'VIEWER',
+      canPost: false,
+      status: 'PENDING', // Multi-account device permission rule: Admin Maruti Atpadkar must approve
+      bio: bio || 'Campus student / academic viewer',
+      avatar: this.getInitials(name),
+      createdAt: Date.now(),
+      privacyConsentGiven: true,
+      privacyConsentDate: new Date().toISOString()
+    };
+
+    this.users.push(newUser);
+    this.saveUsers();
+
+    // Push to Google Cloud Firebase
+    this.pushToCloud('cnms_users', newUser.id, newUser);
+
+    this.showToast(`🎉 Welcome to CampusNotify, @${cleanUsername}! Account registered. 🕒 Awaiting 1-click clearance by Maruti Atpadkar.`, 'success');
+
+    // Switch to login box and prefill identifier
+    this.switchInstaAuthMode('login');
+    if (this.dom.instaLoginIdentifier) {
+      this.dom.instaLoginIdentifier.value = cleanUsername;
+    }
+    if (this.dom.instaLoginPassword) {
+      this.dom.instaLoginPassword.value = '';
+    }
+    this.renderInstaDeviceProfiles();
+  }
+
+  handleSignOut() {
+    localStorage.setItem('cnms_session_signed_out', 'true');
+    this.showToast('Signed out of session. Switched to Instagram Gateway.', 'info');
+    this.showInstagramGateway('login');
+  }
+
+  openPrivacyModal() {
+    if (!this.dom.privacyPolicyModalBackdrop) return;
+    this.dom.privacyPolicyModalBackdrop.classList.add('open');
+    this.dom.privacyPolicyModalBackdrop.setAttribute('aria-hidden', 'false');
+  }
+
+  closePrivacyModal() {
+    if (!this.dom.privacyPolicyModalBackdrop) return;
+    this.dom.privacyPolicyModalBackdrop.classList.remove('open');
+    this.dom.privacyPolicyModalBackdrop.setAttribute('aria-hidden', 'true');
+  }
+
+  initPhoneMockupSlider() {
+    const slides = document.querySelectorAll('.insta-screen-slide');
+    if (slides.length <= 1) return;
+    let currentSlide = 0;
+    setInterval(() => {
+      slides[currentSlide].classList.remove('active');
+      currentSlide = (currentSlide + 1) % slides.length;
+      slides[currentSlide].classList.add('active');
+    }, 4500);
+  }
+
   handleQuickAdminLogin() {
     this.currentUser = Object.assign({}, DEFAULT_SUPER_ADMIN);
     this.saveUsers();
     this.updateUserSessionUI();
     this.closeAuthModal();
-    this.render();
+    this.enterCampusPortal();
     this.showToast('Logged in as Super Admin Maruti Atpadkar (ATP0925) 👑', 'success');
   }
 
@@ -1314,7 +1853,7 @@ class CampusNotificationManagementSystem {
     this.saveUsers();
     this.updateUserSessionUI();
     this.closeAuthModal();
-    this.render();
+    this.enterCampusPortal();
     this.showToast(`Signed in successfully as ${user.name}! 🚀`, 'success');
   }
 

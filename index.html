@@ -6,10 +6,10 @@
   <meta name="description" content="Official Campus Notification Management System (CNMS) - Academic & Administrative Circular Dispatch Portal">
   <title>CampusNotify | Campus Notification Management System</title>
   
-  <!-- Modern Professional Fonts -->
+  <!-- Modern Professional Fonts & Instagram Typography -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Grand+Hotel&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   
   <!-- Google Firebase SDKs (Cloud Firestore Ready) -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -65,11 +65,18 @@
           <span class="btn-text-short">Issue</span>
         </button>
 
-        <!-- Switch Account / Login Button -->
-        <button class="btn btn-secondary btn-sm" id="openAuthModalBtn" title="Login or Switch User Account">
-          <span class="auth-btn-icon">👥</span>
-          <span class="btn-text-full">Accounts</span>
+        <!-- Switch Account / Instagram Login Gateway Button -->
+        <button class="btn btn-secondary btn-sm" id="navInstaAuthBtn" title="Open Instagram-Style Login & Register Gateway">
+          <span class="auth-btn-icon">📱</span>
+          <span class="btn-text-full">Instagram Auth</span>
           <span class="btn-text-short">Login</span>
+        </button>
+
+        <!-- Sign Out Button -->
+        <button class="btn btn-secondary btn-sm" id="navSignOutBtn" title="Sign Out of Session">
+          <span class="auth-btn-icon">🚪</span>
+          <span class="btn-text-full">Sign Out</span>
+          <span class="btn-text-short">Exit</span>
         </button>
 
         <!-- Theme Toggle -->
@@ -89,8 +96,394 @@
     </div>
   </header>
 
+  <!-- ================================================================
+       DEDICATED INSTAGRAM-STYLE AUTHENTICATION & REGISTRATION GATEWAY
+       ================================================================ -->
+  <div id="instagramAuthGateway" class="insta-auth-gateway" style="display: none;">
+    <!-- Top Floating Return/Portal Link if user is already logged in -->
+    <div class="insta-gateway-topbar">
+      <div class="insta-topbar-left">
+        <span class="insta-campus-badge">🏛️ CAMPUS NOTIFICATION MANAGEMENT SYSTEM</span>
+        <span class="insta-sub-tag">INSTITUTIONAL ACCESS PORTAL</span>
+      </div>
+      <div class="insta-topbar-right">
+        <button type="button" class="btn btn-sm btn-secondary" id="instaReturnToPortalBtn" title="Return to Campus Notification Board">
+          <span>Enter Portal as <strong id="instaActiveUserSnippet">Maruti Atpadkar</strong> 🚀</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="insta-auth-container">
+      
+      <!-- LEFT SIDE: REALISTIC SMARTPHONE MOCKUP WITH DYNAMIC CAMPUS PREVIEWS -->
+      <div class="insta-phone-container">
+        <div class="insta-phone-mockup">
+          <div class="insta-phone-speaker"></div>
+          <div class="insta-phone-camera"></div>
+          <div class="insta-phone-screen">
+            <!-- Simulated Screen Content -->
+            <div class="insta-screen-header">
+              <span class="screen-time">09:41</span>
+              <div class="screen-icons"><span>📶</span><span>5G</span><span>🔋</span></div>
+            </div>
+            
+            <div class="insta-screen-app-bar">
+              <span class="screen-app-title">CampusNotify</span>
+              <span class="screen-app-badge">LIVE CIRCULARS</span>
+            </div>
+
+            <!-- Rotating / Sliding Campus Showcase -->
+            <div class="insta-screen-slider">
+              <!-- Showcase Slide: Live Cards -->
+              <div class="insta-screen-slide active">
+                <div class="screen-notice-card">
+                  <div class="screen-card-header">
+                    <span class="screen-tag red-tag">🚨 URGENT</span>
+                    <span class="screen-ref">CNMS/2026/001</span>
+                  </div>
+                  <h4 class="screen-notice-title">Winter 2026 Examination Schedule Released</h4>
+                  <p class="screen-notice-snippet">Departmental semester examination registration forms must be submitted online before the closing date.</p>
+                  <div class="screen-card-footer">
+                    <span>❤️ 142 Likes</span>
+                    <span>💬 38 Queries</span>
+                  </div>
+                </div>
+
+                <div class="screen-notice-card">
+                  <div class="screen-card-header">
+                    <span class="screen-tag blue-tag">📚 ACADEMIC</span>
+                    <span class="screen-ref">CNMS/2026/002</span>
+                  </div>
+                  <h4 class="screen-notice-title">Placement Drive &amp; Industry Internships</h4>
+                  <p class="screen-notice-snippet">Registration open for final year students across all branches.</p>
+                  <div class="screen-card-footer">
+                    <span>❤️ 98 Likes</span>
+                    <span>💬 24 Queries</span>
+                  </div>
+                </div>
+
+                <div class="screen-chat-bubble">
+                  <div class="screen-chat-avatar">MA</div>
+                  <div class="screen-chat-text">
+                    <strong>Maruti Atpadkar (Admin)</strong>
+                    <p>Official circulars verified &amp; synchronized via Google Firebase Cloud.</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Showcase Slide 2: Campus Lounge & File Sharing -->
+              <div class="insta-screen-slide">
+                <div class="screen-notice-card">
+                  <div class="screen-card-header">
+                    <span class="screen-tag green-tag">💬 CAMPUS LOUNGE</span>
+                    <span class="screen-ref">COMMUNITY</span>
+                  </div>
+                  <h4 class="screen-notice-title">Open Discussion &amp; Academic Documents</h4>
+                  <p class="screen-notice-snippet">Students and faculty share lecture summaries, academic notes, and PDF schedules.</p>
+                  <div class="screen-card-footer">
+                    <span>📎 14 Files Shared</span>
+                    <span>⚡ Real-Time Sync</span>
+                  </div>
+                </div>
+
+                <div class="screen-chat-bubble">
+                  <div class="screen-chat-avatar" style="background: linear-gradient(135deg, #10b981, #06b6d4);">ST</div>
+                  <div class="screen-chat-text">
+                    <strong>Priya Sharma (Student)</strong>
+                    <p>Sir, can we submit the project document via the campus lounge?</p>
+                  </div>
+                </div>
+
+                <div class="screen-chat-bubble">
+                  <div class="screen-chat-avatar">MA</div>
+                  <div class="screen-chat-text">
+                    <strong>Maruti Atpadkar (Admin)</strong>
+                    <p>Yes Priya! All file uploads are secured with DPDP Act 2023 compliance.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="insta-screen-bottom-bar">
+              <span>🏠</span><span>🔍</span><span>➕</span><span>💬</span><span>👤</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT SIDE: INSTAGRAM AUTHENTICATION BOXES -->
+      <div class="insta-auth-forms-wrapper">
+        
+        <!-- CARD 1: PRIMARY AUTH FORM (LOGIN & SIGNUP MODES) -->
+        <div class="insta-card insta-main-card">
+          <!-- Instagram Iconic Branding -->
+          <div class="insta-brand-header">
+            <h1 class="insta-logo-text">CampusNotify</h1>
+            <p class="insta-brand-subtitle">Official Campus Gateway &bull; Central Notification Portal</p>
+          </div>
+
+          <!-- =========================
+               MODE A: LOGIN FORM
+               ========================= -->
+          <div id="instaLoginFormBox" class="insta-form-box">
+            <form id="instaLoginForm" class="insta-form" autocomplete="on">
+              <div class="insta-field-group">
+                <input 
+                  type="text" 
+                  id="instaLoginIdentifier" 
+                  class="insta-input" 
+                  placeholder=" " 
+                  required 
+                  autocomplete="username"
+                >
+                <label for="instaLoginIdentifier" class="insta-floating-label">Phone number, username, or campus email</label>
+              </div>
+
+              <div class="insta-field-group insta-password-group">
+                <input 
+                  type="password" 
+                  id="instaLoginPassword" 
+                  class="insta-input" 
+                  placeholder=" " 
+                  required 
+                  autocomplete="current-password"
+                >
+                <label for="instaLoginPassword" class="insta-floating-label">Password</label>
+                <button type="button" class="insta-pass-toggle-btn" id="toggleInstaLoginPassBtn">Show</button>
+              </div>
+
+              <button type="submit" class="insta-btn-primary" id="instaLoginSubmitBtn">
+                <span>Log in</span>
+              </button>
+
+              <div class="insta-divider">
+                <span class="divider-line"></span>
+                <span class="divider-text">OR</span>
+                <span class="divider-line"></span>
+              </div>
+
+              <!-- Quick 1-Click Super Admin Login (Instagram-Style "Log in with Facebook" Replacement) -->
+              <button type="button" class="insta-btn-admin-fb" id="instaQuickAdminLoginBtn">
+                <span class="insta-crown-icon">👑</span>
+                <span>Log in as Super Admin (Maruti Atpadkar)</span>
+              </button>
+
+              <!-- Data Privacy Guarantee Snippet -->
+              <div class="insta-privacy-secure-note">
+                <span class="privacy-lock-icon">🔒</span>
+                <span>Cryptographic Password Privacy &bull; Zero 3rd-Party Tracking</span>
+              </div>
+
+              <div class="insta-help-links">
+                <a href="#" class="insta-forgot-link" id="instaForgotPassLink">Forgot password?</a>
+                <span class="insta-dot">&bull;</span>
+                <a href="#" class="insta-forgot-link" id="instaAdminApprovalHelpLink">Admin Approval Status</a>
+              </div>
+            </form>
+          </div>
+
+          <!-- =========================
+               MODE B: SIGN UP FORM (INSTAGRAM STYLE)
+               ========================= -->
+          <div id="instaSignupFormBox" class="insta-form-box" style="display: none;">
+            <p class="insta-signup-lead">
+              Sign up to view verified campus notifications, engage with official circulars, and participate in community discussions.
+            </p>
+
+            <button type="button" class="insta-btn-admin-fb" id="instaSignupAdminShortcutBtn">
+              <span class="insta-crown-icon">👑</span>
+              <span>Log in with Admin (Maruti Atpadkar)</span>
+            </button>
+
+            <div class="insta-divider">
+              <span class="divider-line"></span>
+              <span class="divider-text">OR</span>
+              <span class="divider-line"></span>
+            </div>
+
+            <form id="instaSignupForm" class="insta-form" autocomplete="on">
+              <div class="insta-field-group">
+                <input 
+                  type="text" 
+                  id="instaRegContact" 
+                  class="insta-input" 
+                  placeholder=" " 
+                  required 
+                  autocomplete="email"
+                >
+                <label for="instaRegContact" class="insta-floating-label">Mobile Number or Campus Email</label>
+              </div>
+
+              <div class="insta-field-group">
+                <input 
+                  type="text" 
+                  id="instaRegFullName" 
+                  class="insta-input" 
+                  placeholder=" " 
+                  required 
+                  autocomplete="name"
+                >
+                <label for="instaRegFullName" class="insta-floating-label">Full Name</label>
+              </div>
+
+              <div class="insta-field-group">
+                <input 
+                  type="text" 
+                  id="instaRegUsername" 
+                  class="insta-input" 
+                  placeholder=" " 
+                  required 
+                  autocomplete="username"
+                >
+                <label for="instaRegUsername" class="insta-floating-label">Username (letters, numbers, _)</label>
+              </div>
+
+              <div class="insta-field-group insta-password-group">
+                <input 
+                  type="password" 
+                  id="instaRegPassword" 
+                  class="insta-input" 
+                  placeholder=" " 
+                  required 
+                  autocomplete="new-password"
+                >
+                <label for="instaRegPassword" class="insta-floating-label">Password (Min. 6 chars)</label>
+                <button type="button" class="insta-pass-toggle-btn" id="toggleInstaRegPassBtn">Show</button>
+              </div>
+
+              <!-- Live Password Security Strength Indicator -->
+              <div class="insta-pass-strength-bar" id="instaPassStrengthBar">
+                <div class="strength-track"><div class="strength-fill" id="instaStrengthFill"></div></div>
+                <span class="strength-text" id="instaStrengthText">Data Privacy Security: Protected</span>
+              </div>
+
+              <div class="insta-field-group">
+                <textarea 
+                  id="instaRegBio" 
+                  class="insta-input insta-textarea" 
+                  rows="2" 
+                  maxlength="160" 
+                  placeholder=" "
+                ></textarea>
+                <label for="instaRegBio" class="insta-floating-label">Profile Bio (e.g. Computer Engg &bull; Batch 2026)</label>
+              </div>
+
+              <!-- DATA PRIVACY & INSTITUTIONAL SAFEGUARD AGREEMENT -->
+              <div class="insta-privacy-agreement-card">
+                <p class="insta-terms-text">
+                  People who use our service may view your verified username and bio. 
+                  Learn more in our <button type="button" class="insta-policy-trigger" id="policyTrigger1">Data Policy</button>.
+                </p>
+                <p class="insta-terms-text">
+                  By tapping <strong>Sign up</strong>, you agree to our 
+                  <button type="button" class="insta-policy-trigger" id="policyTrigger2">Terms</button>, 
+                  <button type="button" class="insta-policy-trigger" id="policyTrigger3">Data Privacy Policy</button> and 
+                  <button type="button" class="insta-policy-trigger" id="policyTrigger4">Institutional Governance</button>. 
+                  All passwords and credentials are cryptographically protected.
+                </p>
+                <div class="insta-checkbox-row">
+                  <input type="checkbox" id="instaPrivacyConsentCheck" required checked>
+                  <label for="instaPrivacyConsentCheck">
+                    I confirm that I am an authorized campus member and agree to the institutional data privacy regulations.
+                  </label>
+                </div>
+              </div>
+
+              <button type="submit" class="insta-btn-primary" id="instaRegSubmitBtn">
+                <span>Sign up</span>
+              </button>
+            </form>
+          </div>
+
+        </div>
+
+        <!-- CARD 2: SWITCHER CARD (LOGIN <-> SIGNUP) -->
+        <div class="insta-card insta-switch-card">
+          <p id="instaSwitchCardText">
+            Don't have an account? <a href="#" id="instaSwitchActionLink">Sign up</a>
+          </p>
+        </div>
+
+        <!-- CARD 3: SAVED DEVICE PROFILES -->
+        <div class="insta-card insta-device-profiles-card" id="instaSavedProfilesCard">
+          <div class="device-card-header">
+            <span class="device-icon">💻</span>
+            <span>Accounts on this Device:</span>
+          </div>
+          <div class="device-profiles-chips" id="instaDeviceProfilesChips">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+
+        <!-- CARD 4: DATA PRIVACY & INSTITUTIONAL TRUST GUARANTEE -->
+        <div class="insta-card insta-privacy-pillar-card">
+          <div class="privacy-pillar-header">
+            <span class="pillar-shield-icon">🛡️</span>
+            <div>
+              <strong>Campus Data Privacy &amp; Platform Protection</strong>
+              <p>Built-in security for students, faculty &amp; administrative records</p>
+            </div>
+          </div>
+          <div class="privacy-pillar-grid">
+            <div class="privacy-item">
+              <span class="p-icon">🔐</span>
+              <div>
+                <strong>Cryptographic Protection</strong>
+                <span>Passwords salted &amp; hashed. Zero raw plaintext storage.</span>
+              </div>
+            </div>
+            <div class="privacy-item">
+              <span class="p-icon">🚫</span>
+              <div>
+                <strong>Zero 3rd-Party Tracking</strong>
+                <span>No commercial advertising, profiling, or data brokerage.</span>
+              </div>
+            </div>
+            <div class="privacy-item">
+              <span class="p-icon">👑</span>
+              <div>
+                <strong>Admin Approval Shield</strong>
+                <span>Unauthorized bot accounts blocked from campus feeds.</span>
+              </div>
+            </div>
+            <div class="privacy-item">
+              <span class="p-icon">🗑️</span>
+              <div>
+                <strong>Right to Erasure</strong>
+                <span>Users can request account &amp; comment deletion at any time.</span>
+              </div>
+            </div>
+          </div>
+          <button type="button" class="insta-full-policy-btn" id="openFullPrivacyModalBtn">
+            View Complete Institutional Data Privacy Manifesto 📜
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- INSTAGRAM-STYLE INSTITUTIONAL FOOTER -->
+    <footer class="insta-footer">
+      <div class="insta-footer-links">
+        <a href="#" class="policy-link-trigger">About</a>
+        <a href="#" class="policy-link-trigger">Help Desk</a>
+        <a href="#" class="policy-link-trigger">API Docs</a>
+        <a href="#" class="policy-link-trigger">Jobs / Placement</a>
+        <a href="#" class="policy-link-trigger">Data Privacy</a>
+        <a href="#" class="policy-link-trigger">Terms of Service</a>
+        <a href="#" class="policy-link-trigger">Security Standards</a>
+        <a href="#" class="policy-link-trigger">Admin Protocol</a>
+        <a href="#" class="policy-link-trigger">English (India)</a>
+      </div>
+      <div class="insta-footer-copyright">
+        &copy; 2026 CAMPUSNOTIFY FROM MARUTI ATPADKAR (ATP0925) &bull; JAVA MINI PROJECT &bull; FERPA &amp; DPDP 2023 COMPLIANT
+      </div>
+    </footer>
+  </div>
+
   <!-- Main System Layout -->
-  <div class="system-layout">
+  <div class="system-layout" id="systemMainLayout">
     
     <!-- Top System Metrics Bar -->
     <section class="metrics-grid">
@@ -847,6 +1240,62 @@
         <button type="button" class="btn btn-secondary" id="closeAuthModalFooterBtn">Close</button>
       </div>
 
+    </div>
+  </div>
+
+  <!-- Modal: Institutional Data Privacy & Rights Policy Manifesto -->
+  <div class="modal-backdrop" id="privacyPolicyModalBackdrop" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="dialog" aria-modal="true" aria-labelledby="privacyHeading">
+      <div class="modal-header">
+        <div class="modal-header-text">
+          <span class="modal-dept-badge">CAMPUS DATA GOVERNANCE &amp; SECURITY PROTOCOL</span>
+          <h3 class="modal-title" id="privacyHeading">Institutional Data Privacy &amp; User Protection Manifesto</h3>
+          <p class="modal-subtitle">Legal guidelines, privacy safeguards for students &amp; faculty, and protection of campus intellectual property</p>
+        </div>
+        <button class="modal-close-btn" id="closePrivacyModalBtn" title="Close modal">&times;</button>
+      </div>
+
+      <div class="modal-body privacy-modal-body">
+        
+        <div class="privacy-section-block">
+          <h4 class="privacy-section-title">1. User Data Privacy &amp; Confidentiality Rights (Students &amp; Faculty)</h4>
+          <p>CampusNotify is built on uncompromising principles of user data dignity. All personal information collected (Full Name, Username, Contact, Password, and Profile Bio) is governed by strict technical controls:</p>
+          <ul class="privacy-rules-list">
+            <li><strong>Cryptographic Password Hashing:</strong> Passwords are never stored in raw plaintext. Client-side cryptographic processing (SHA-256 with institutional salting) ensures that even administrators or databases cannot inspect your true password.</li>
+            <li><strong>Data Minimization Principle:</strong> We only collect information strictly necessary for academic circular distribution and community collaboration. No private biometric data, financial information, or off-campus location tracking is collected.</li>
+            <li><strong>Zero Commercial Monetization / No Third-Party Trackers:</strong> Student and faculty data is never sold, leased, rented, or distributed to advertisers, data brokers, or marketing networks.</li>
+            <li><strong>Right to Erasure &amp; Rectification:</strong> Every user holds the fundamental right to edit their profile bio at any moment and request complete account purging or comment deletion through the Super Admin desk.</li>
+          </ul>
+        </div>
+
+        <div class="privacy-section-block">
+          <h4 class="privacy-section-title">2. Company &amp; Campus Intellectual Property Protection (Our Platform)</h4>
+          <p>To safeguard our institution, protect students from misinformation, and ensure institutional reliability:</p>
+          <ul class="privacy-rules-list">
+            <li><strong>Anti-Forgery Circular Governance:</strong> Only verified institutional authorities (Super Admin Maruti Atpadkar or explicitly delegated faculty) hold circular issuance clearance. This prevents forged or fabricated notices from circulating.</li>
+            <li><strong>Multi-Account Device Approval Shield:</strong> While multiple accounts can be created on a single device, newly registered accounts are quarantined under <em>Pending Approval</em> until approved by Super Admin Maruti Atpadkar to prevent spam bots and impersonation attacks.</li>
+            <li><strong>Institutional Moderation Authority:</strong> The Super Admin holds exclusive restriction authority to moderate and delete any abusive or non-compliant comments or files to protect campus integrity.</li>
+          </ul>
+        </div>
+
+        <div class="privacy-section-block">
+          <h4 class="privacy-section-title">3. Google Cloud Firebase Architecture (Cloud Firestore Security)</h4>
+          <p>When connected to Google Cloud Firebase:</p>
+          <ul class="privacy-rules-list">
+            <li><strong>Strict Role-Based Security Rules (<code>firestore.rules</code>):</strong> Enforces that only authorized accounts can write to official collections, guaranteeing server-side access control.</li>
+            <li><strong>Encrypted Transport (TLS 1.3):</strong> All real-time synchronizations between client browsers and Google Cloud Firestore are encrypted in transit.</li>
+          </ul>
+        </div>
+
+        <div class="privacy-certification-badge">
+          <span>🏛️ VERIFIED INSTITUTIONAL DATA PRIVACY POLICY &bull; COMPLIANT WITH FERPA &amp; DIGITAL PERSONAL DATA PROTECTION (DPDP) STANDARDS &bull; 2026</span>
+        </div>
+
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" id="acknowledgePrivacyBtn">I Acknowledge &amp; Understand</button>
+      </div>
     </div>
   </div>
 
