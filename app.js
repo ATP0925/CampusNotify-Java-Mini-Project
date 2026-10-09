@@ -228,29 +228,41 @@ class CampusNotificationManagementSystem {
       return;
     }
 
-    if (!configRaw) {
+    let config = null;
+    if (configRaw) {
+      try {
+        config = JSON.parse(configRaw);
+      } catch (e) {}
+    }
+
+    if (!config || !config.projectId) {
+      config = {
+        apiKey: localStorage.getItem('cnms_firebase_api_key') || '',
+        projectId: 'campnotify-eef91',
+        authDomain: 'campnotify-eef91.firebaseapp.com',
+        storageBucket: 'campnotify-eef91.firebasestorage.app',
+        appId: localStorage.getItem('cnms_firebase_app_id') || ''
+      };
+    }
+
+    // Populate input values in settings card
+    if (document.getElementById('fbApiKey')) document.getElementById('fbApiKey').value = config.apiKey || '';
+    if (document.getElementById('fbProjectId')) document.getElementById('fbProjectId').value = config.projectId || 'campnotify-eef91';
+    if (document.getElementById('fbAuthDomain')) document.getElementById('fbAuthDomain').value = config.authDomain || 'campnotify-eef91.firebaseapp.com';
+    if (document.getElementById('fbAppId')) document.getElementById('fbAppId').value = config.appId || '';
+
+    if (!config.apiKey) {
       if (statusBadge) {
-        statusBadge.textContent = 'Local Standby';
+        statusBadge.textContent = 'Ready (campnotify-eef91)';
         statusBadge.className = 'meta-badge';
       }
       if (engineText) {
-        engineText.textContent = 'Browser LocalStorage (Offline Ready)';
+        engineText.textContent = 'Google Firebase (campnotify-eef91) • Offline Standby';
       }
       return;
     }
 
     try {
-      const config = JSON.parse(configRaw);
-      if (!config.apiKey || !config.projectId) {
-        return;
-      }
-
-      // Populate input values in settings card
-      if (document.getElementById('fbApiKey')) document.getElementById('fbApiKey').value = config.apiKey || '';
-      if (document.getElementById('fbProjectId')) document.getElementById('fbProjectId').value = config.projectId || '';
-      if (document.getElementById('fbAuthDomain')) document.getElementById('fbAuthDomain').value = config.authDomain || '';
-      if (document.getElementById('fbAppId')) document.getElementById('fbAppId').value = config.appId || '';
-
       // Initialize Firebase App instance
       if (!firebase.apps.length) {
         this.firebaseApp = firebase.initializeApp(config);
@@ -259,6 +271,16 @@ class CampusNotificationManagementSystem {
       }
 
       this.firestoreDb = firebase.firestore();
+      if (firebase.auth) {
+        this.firebaseAuth = firebase.auth();
+        // Setup Auth State Listener
+        this.firebaseAuth.onAuthStateChanged((firebaseUser) => {
+          if (firebaseUser) {
+            console.log('[Firebase Auth] Active user:', firebaseUser.email || firebaseUser.phoneNumber || firebaseUser.uid);
+            this.syncFirebaseUserToLocal(firebaseUser);
+          }
+        });
+      }
       this.firebaseConnected = true;
 
       if (statusBadge) {
@@ -272,7 +294,7 @@ class CampusNotificationManagementSystem {
       // Attach Firestore Real-time Snapshot Listeners
       this.setupFirestoreListeners();
 
-      console.log('Firebase Cloud Firestore successfully initialized for project:', config.projectId);
+      console.log('Firebase Cloud Firestore & Auth successfully initialized for project:', config.projectId);
     } catch (err) {
       console.warn('Firebase initialization note:', err);
       if (statusBadge) {
@@ -596,7 +618,19 @@ class CampusNotificationManagementSystem {
       openFullPrivacyModalBtn: document.getElementById('openFullPrivacyModalBtn'),
       privacyPolicyModalBackdrop: document.getElementById('privacyPolicyModalBackdrop'),
       closePrivacyModalBtn: document.getElementById('closePrivacyModalBtn'),
-      acknowledgePrivacyBtn: document.getElementById('acknowledgePrivacyBtn')
+      acknowledgePrivacyBtn: document.getElementById('acknowledgePrivacyBtn'),
+
+      // Firebase Authentication Buttons & Drawers
+      firebaseGoogleLoginBtn: document.getElementById('firebaseGoogleLoginBtn'),
+      firebaseGoogleSignupBtn: document.getElementById('firebaseGoogleSignupBtn'),
+      firebasePhoneLoginToggleBtn: document.getElementById('firebasePhoneLoginToggleBtn'),
+      firebasePhoneDrawer: document.getElementById('firebasePhoneDrawer'),
+      firebasePhoneNumberInput: document.getElementById('firebasePhoneNumberInput'),
+      firebaseSendOtpBtn: document.getElementById('firebaseSendOtpBtn'),
+      firebaseOtpInput: document.getElementById('firebaseOtpInput'),
+      firebaseVerifyOtpBtn: document.getElementById('firebaseVerifyOtpBtn'),
+      phoneStep1: document.getElementById('phoneStep1'),
+      phoneStep2: document.getElementById('phoneStep2')
     };
   }
 
@@ -1065,6 +1099,35 @@ class CampusNotificationManagementSystem {
       this.dom.instaSignupAdminShortcutBtn.addEventListener('click', () => {
         this.handleQuickAdminLogin();
         this.enterCampusPortal();
+      });
+    }
+
+    // Firebase Auth: Google Sign-In & Sign-Up
+    if (this.dom.firebaseGoogleLoginBtn) {
+      this.dom.firebaseGoogleLoginBtn.addEventListener('click', () => {
+        this.handleFirebaseGoogleSignIn();
+      });
+    }
+    if (this.dom.firebaseGoogleSignupBtn) {
+      this.dom.firebaseGoogleSignupBtn.addEventListener('click', () => {
+        this.handleFirebaseGoogleSignIn();
+      });
+    }
+
+    // Firebase Auth: Phone (SMS OTP) Toggle & Verification
+    if (this.dom.firebasePhoneLoginToggleBtn) {
+      this.dom.firebasePhoneLoginToggleBtn.addEventListener('click', () => {
+        this.toggleFirebasePhoneDrawer();
+      });
+    }
+    if (this.dom.firebaseSendOtpBtn) {
+      this.dom.firebaseSendOtpBtn.addEventListener('click', () => {
+        this.handleFirebaseSendPhoneOtp();
+      });
+    }
+    if (this.dom.firebaseVerifyOtpBtn) {
+      this.dom.firebaseVerifyOtpBtn.addEventListener('click', () => {
+        this.handleFirebaseVerifyPhoneOtp();
       });
     }
 
@@ -2298,6 +2361,155 @@ class CampusNotificationManagementSystem {
 
     this.initFirebase();
     this.showToast('Google Firebase credentials saved! Connecting... 🔥', 'success');
+  }
+
+  /* --------------------------------------------------------------------------
+     FIREBASE AUTHENTICATION (Google, Phone OTP, User Sync)
+     -------------------------------------------------------------------------- */
+  async handleFirebaseGoogleSignIn() {
+    if (!window.firebase || !firebase.auth) {
+      this.showToast('Firebase Auth SDK is not available. Please verify network.', 'warning');
+      return;
+    }
+    if (!this.firebaseAuth) {
+      this.showToast('Please configure Firebase API Key in the settings panel to activate live Google Sign-In.', 'warning');
+      return;
+    }
+
+    try {
+      this.showToast('Opening Google Sign-In popup...', 'info');
+      const provider = new firebase.auth.GoogleAuthProvider();
+      provider.setCustomParameters({ prompt: 'select_account' });
+      const result = await this.firebaseAuth.signInWithPopup(provider);
+      const user = result.user;
+      this.showToast(`Signed in with Google as ${user.displayName || user.email} 🎉`, 'success');
+      await this.syncFirebaseUserToLocal(user);
+      this.closeAuthModal();
+      this.enterCampusPortal();
+    } catch (error) {
+      console.error('Google Sign-In error:', error);
+      if (error.code === 'auth/unauthorized-domain') {
+        this.showToast('Domain not authorized in Firebase Console: Add localhost to Authentication > Settings > Authorized Domains.', 'error');
+      } else if (error.code === 'auth/popup-closed-by-user') {
+        this.showToast('Google sign-in popup closed.', 'warning');
+      } else {
+        this.showToast(`Google Sign-In error: ${error.message}`, 'error');
+      }
+    }
+  }
+
+  toggleFirebasePhoneDrawer() {
+    if (!this.dom.firebasePhoneDrawer) return;
+    const isHidden = this.dom.firebasePhoneDrawer.style.display === 'none';
+    this.dom.firebasePhoneDrawer.style.display = isHidden ? 'block' : 'none';
+  }
+
+  async handleFirebaseSendPhoneOtp() {
+    if (!window.firebase || !firebase.auth) {
+      this.showToast('Firebase Auth SDK not ready.', 'warning');
+      return;
+    }
+    if (!this.firebaseAuth) {
+      this.showToast('Please configure Firebase API Key in the settings panel to send SMS codes.', 'warning');
+      return;
+    }
+
+    const phoneInput = this.dom.firebasePhoneNumberInput ? this.dom.firebasePhoneNumberInput.value.trim() : '';
+    if (!phoneInput || phoneInput.length < 10) {
+      this.showToast('Please enter a valid phone number with country code (e.g. +91 9876543210)', 'warning');
+      return;
+    }
+
+    try {
+      this.showToast('Initiating SMS verification code...', 'info');
+      if (!window.recaptchaVerifier) {
+        window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+          size: 'invisible'
+        });
+      }
+
+      this.phoneConfirmationResult = await this.firebaseAuth.signInWithPhoneNumber(phoneInput, window.recaptchaVerifier);
+      this.showToast('SMS verification code sent! Enter OTP.', 'success');
+      if (this.dom.phoneStep1) this.dom.phoneStep1.style.display = 'none';
+      if (this.dom.phoneStep2) this.dom.phoneStep2.style.display = 'block';
+    } catch (err) {
+      console.error('Phone SMS error:', err);
+      this.showToast(`SMS failed: ${err.message}`, 'error');
+    }
+  }
+
+  async handleFirebaseVerifyPhoneOtp() {
+    if (!this.phoneConfirmationResult) {
+      this.showToast('Please send verification code first.', 'warning');
+      return;
+    }
+    const code = this.dom.firebaseOtpInput ? this.dom.firebaseOtpInput.value.trim() : '';
+    if (!code || code.length < 6) {
+      this.showToast('Please enter the 6-digit OTP code received on SMS.', 'warning');
+      return;
+    }
+
+    try {
+      this.showToast('Verifying SMS code...', 'info');
+      const result = await this.phoneConfirmationResult.confirm(code);
+      const user = result.user;
+      this.showToast(`Phone verified successfully! Logged in as ${user.phoneNumber} 📱`, 'success');
+      await this.syncFirebaseUserToLocal(user);
+      this.closeAuthModal();
+      this.enterCampusPortal();
+    } catch (err) {
+      console.error('OTP confirmation error:', err);
+      this.showToast(`OTP verification failed: ${err.message}`, 'error');
+    }
+  }
+
+  async syncFirebaseUserToLocal(firebaseUser) {
+    const email = (firebaseUser.email || '').toLowerCase();
+    const phone = firebaseUser.phoneNumber || '';
+    const isSuperAdminEmail = email === 'atpadkarmaruti@gmail.com' || email === 'pratikatpadkar@gmail.com';
+    
+    // Check if user already exists in Firestore or local
+    let existing = this.users.find(u => (email && u.email === email) || (phone && u.contact === phone) || u.id === firebaseUser.uid);
+
+    let resolvedRole = isSuperAdminEmail ? 'ADMIN' : (existing ? existing.role : 'VIEWER');
+    let resolvedCanPost = isSuperAdminEmail ? true : (existing ? existing.canPost : false);
+    let resolvedName = firebaseUser.displayName || (existing ? existing.name : (email ? email.split('@')[0] : 'Campus Member'));
+    let resolvedUsername = existing ? existing.username : ((email ? email.split('@')[0] : 'user_' + firebaseUser.uid.substring(0, 5)).toLowerCase());
+    let resolvedAvatar = (resolvedName ? resolvedName.substring(0, 2) : 'CN').toUpperCase();
+
+    const syncedUser = {
+      id: firebaseUser.uid,
+      name: isSuperAdminEmail ? 'Pratik Atpadkar' : resolvedName,
+      username: isSuperAdminEmail ? 'admin_pratik' : resolvedUsername,
+      email: email,
+      contact: phone || email,
+      role: resolvedRole,
+      department: existing ? existing.department : 'General Campus',
+      bio: existing ? existing.bio : 'Campus Member verified via Firebase Auth',
+      avatar: isSuperAdminEmail ? 'PA' : resolvedAvatar,
+      canPost: resolvedCanPost,
+      status: 'APPROVED',
+      firebaseUid: firebaseUser.uid,
+      authProvider: firebaseUser.providerData && firebaseUser.providerData[0] ? firebaseUser.providerData[0].providerId : 'firebase'
+    };
+
+    // Save to local users list
+    const existingIndex = this.users.findIndex(u => u.id === syncedUser.id || (email && u.email === email));
+    if (existingIndex > -1) {
+      this.users[existingIndex] = syncedUser;
+    } else {
+      this.users.push(syncedUser);
+    }
+    this.saveUsers();
+
+    // Push to Firestore cnms_users
+    if (this.firestoreDb) {
+      this.pushToCloud('cnms_users', syncedUser.id, syncedUser);
+    }
+
+    this.currentUser = syncedUser;
+    this.updateUserSessionUI();
+    this.render();
   }
 
   /* --------------------------------------------------------------------------
