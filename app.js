@@ -151,7 +151,9 @@ class CampusNotificationManagementSystem {
 
       // 6. Theme
       const savedTheme = localStorage.getItem('cnms_theme') || 'dark';
-      document.documentElement.setAttribute('data-theme', savedTheme);
+      if (typeof document !== 'undefined' && document.documentElement && document.documentElement.setAttribute) {
+        document.documentElement.setAttribute('data-theme', savedTheme);
+      }
       this.updateThemeIcon(savedTheme);
 
     } catch (e) {
@@ -1552,8 +1554,8 @@ class CampusNotificationManagementSystem {
     if (!this.dom.authModalBackdrop) return;
     this.dom.authModalBackdrop.classList.remove('open');
     this.dom.authModalBackdrop.setAttribute('aria-hidden', 'true');
-    if (this.dom.loginForm) this.dom.loginForm.reset();
-    if (this.dom.registerForm) this.dom.registerForm.reset();
+    if (this.dom.loginForm && typeof this.dom.loginForm.reset === 'function') this.dom.loginForm.reset();
+    if (this.dom.registerForm && typeof this.dom.registerForm.reset === 'function') this.dom.registerForm.reset();
     if (!this.isAuthenticated()) {
       this.showInstagramGateway('login');
     }
@@ -1648,7 +1650,9 @@ class CampusNotificationManagementSystem {
     }
     this.switchInstaAuthMode(mode);
     this.renderInstaDeviceProfiles();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (typeof window !== 'undefined' && typeof window.scrollTo === 'function') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   }
 
   enterCampusPortal() {
@@ -2264,7 +2268,7 @@ class CampusNotificationManagementSystem {
   }
 
   updateThemeIcon(theme) {
-    if (this.dom && this.dom.themeToggleBtn) {
+    if (this.dom && this.dom.themeToggleBtn && typeof this.dom.themeToggleBtn.querySelector === 'function') {
       const iconSpan = this.dom.themeToggleBtn.querySelector('.theme-icon');
       if (iconSpan) {
         iconSpan.textContent = theme === 'dark' ? '🌓' : '☀️';
@@ -2490,7 +2494,7 @@ class CampusNotificationManagementSystem {
     if (!this.dom.newNoticeModalBackdrop) return;
     this.dom.newNoticeModalBackdrop.classList.remove('open');
     this.dom.newNoticeModalBackdrop.setAttribute('aria-hidden', 'true');
-    if (this.dom.newNoticeForm) this.dom.newNoticeForm.reset();
+    if (this.dom.newNoticeForm && typeof this.dom.newNoticeForm.reset === 'function') this.dom.newNoticeForm.reset();
   }
 
   handlePublishCircular() {
@@ -2875,8 +2879,12 @@ class CampusNotificationManagementSystem {
       if (this.dom.emptyStateCard) {
         this.dom.emptyStateCard.style.display = 'block';
 
-        const emptyTitle = this.dom.emptyStateCard.querySelector('.empty-title');
-        const emptyText = this.dom.emptyStateCard.querySelector('.empty-text');
+        const emptyTitle = this.dom.emptyStateCard && typeof this.dom.emptyStateCard.querySelector === 'function'
+          ? this.dom.emptyStateCard.querySelector('.empty-title')
+          : null;
+        const emptyText = this.dom.emptyStateCard && typeof this.dom.emptyStateCard.querySelector === 'function'
+          ? this.dom.emptyStateCard.querySelector('.empty-text')
+          : null;
 
         if (this.searchQuery) {
           if (emptyTitle) emptyTitle.textContent = 'No Matching Circulars Found';

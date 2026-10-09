@@ -6,7 +6,7 @@ import java.util.Scanner;
  * Demonstrates modular design, control flow, user input handling, and OOP principles.
  */
 public class Main {
-    private static User currentUser = new User("ADM-101", "Dr. A. K. Sharma", "Admin", "Dean Office");
+    private static User currentUser = new User("ADMIN-01", "Maruti Atpadkar", "Admin", "Central Administration", "atpadkarmaruti@gmail.com", true);
     private static NotificationManager manager = new NotificationManager();
     private static Scanner scanner = new Scanner(System.in);
 
@@ -138,14 +138,11 @@ public class Main {
     private static void handlePostNotification() {
         System.out.println("\n--- POST NEW ANNOUNCEMENT ---");
 
-        if ("Student".equalsIgnoreCase(currentUser.getRole())) {
-            System.out.println("[!] Notice: Students have read-only access by default.");
-            System.out.print("Do you wish to submit an announcement request? (y/n): ");
-            String ans = scanner.nextLine().trim();
-            if (!ans.equalsIgnoreCase("y")) {
-                System.out.println("Cancelled.");
-                return;
-            }
+        if (!currentUser.canPostNotices()) {
+            System.out.println("[!] Authority Restriction: You do not have circular issuing authority.");
+            System.out.println("    Only Super Admin (Maruti Atpadkar) or users granted publishing authority can post announcements.");
+            System.out.println("    Current profile: " + currentUser);
+            return;
         }
 
         System.out.print("Enter Title: ");
@@ -202,7 +199,7 @@ public class Main {
     private static void handleDeleteNotification() {
         System.out.println("\n--- DELETE ANNOUNCEMENT ---");
         if (!"Admin".equalsIgnoreCase(currentUser.getRole())) {
-            System.out.println("[!] Permission Denied: Only Admin can delete campus announcements.");
+            System.out.println("[!] Authority Restriction: Only Super Admin (Maruti Atpadkar) has authority to delete campus announcements.");
             System.out.println("    Current role: " + currentUser.getRole() + " (Use option 8 to switch role if needed).");
             return;
         }
@@ -230,37 +227,40 @@ public class Main {
     private static void handleSwitchUser() {
         System.out.println("\n--- SWITCH USER PROFILE ---");
         System.out.println("Select Role:");
-        System.out.println("  1. College Admin (Full permissions)");
-        System.out.println("  2. Faculty Member (Can post announcements)");
-        System.out.println("  3. Student (Read-only / announcements viewer)");
+        System.out.println("  1. Super Admin (Maruti Atpadkar - Central Notice Controller)");
+        System.out.println("  2. Authorized Faculty Member (Notice Publishing Authority)");
+        System.out.println("  3. Student / Viewer (Read-only Announcements & Discussions)");
         System.out.print("Choose role (1-3): ");
         String roleChoice = scanner.nextLine().trim();
+
+        if ("1".equals(roleChoice)) {
+            currentUser = new User("ADMIN-01", "Maruti Atpadkar", "Admin", "Central Administration", "atpadkarmaruti@gmail.com", true);
+            System.out.println("\n[✓] Switched to Super Admin: " + currentUser + "\n");
+            return;
+        }
 
         System.out.print("Enter Your Name: ");
         String name = scanner.nextLine().trim();
         if (name.isEmpty()) {
-            name = "Guest User";
+            name = "Campus Member";
         }
 
         System.out.print("Enter Department / Branch: ");
         String dept = scanner.nextLine().trim();
         if (dept.isEmpty()) {
-            dept = "Computer Engineering";
+            dept = "Computer Science & Engineering";
         }
 
         switch (roleChoice) {
-            case "1":
-                currentUser = new User("ADM-101", name, "Admin", dept);
-                break;
             case "2":
-                currentUser = new User("FAC-205", name, "Faculty", dept);
+                System.out.print("Has Super Admin granted notice issuing authority? (y/n) [default: y]: ");
+                String authInput = scanner.nextLine().trim();
+                boolean canPost = !authInput.equalsIgnoreCase("n");
+                currentUser = new User("FAC-" + (int)(Math.random() * 900 + 100), name, "Faculty", dept, name.toLowerCase().replace(" ", "") + "@campus.edu", canPost);
                 break;
             case "3":
-                currentUser = new User("STU-312", name, "Student", dept);
-                break;
             default:
-                System.out.println("[!] Invalid choice. Role set to Student by default.");
-                currentUser = new User("STU-000", name, "Student", dept);
+                currentUser = new User("STU-" + (int)(Math.random() * 900 + 100), name, "Student", dept, name.toLowerCase().replace(" ", "") + "@campus.edu", false);
                 break;
         }
 
