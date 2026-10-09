@@ -117,6 +117,12 @@ class CampusNotificationManagementSystem {
       openNewNoticeBtn: document.getElementById('openNewNoticeBtn'),
       themeToggleBtn: document.getElementById('themeToggleBtn'),
 
+      // Profile Button & Modal
+      openProfileModalBtn: document.getElementById('openProfileModalBtn'),
+      officerProfileModalBackdrop: document.getElementById('officerProfileModalBackdrop'),
+      closeProfileModalBtn: document.getElementById('closeProfileModalBtn'),
+      closeProfileFooterBtn: document.getElementById('closeProfileFooterBtn'),
+
       // KPI Metric Counters
       metricTotalCirculars: document.getElementById('metricTotalCirculars'),
       metricUrgentCirculars: document.getElementById('metricUrgentCirculars'),
@@ -253,6 +259,28 @@ class CampusNotificationManagementSystem {
       this.dom.themeToggleBtn.addEventListener('click', () => this.toggleTheme());
     }
 
+    // Modal: Officer Profile & Governance Open/Close
+    if (this.dom.openProfileModalBtn) {
+      this.dom.openProfileModalBtn.addEventListener('click', () => this.openProfileModal());
+      this.dom.openProfileModalBtn.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          this.openProfileModal();
+        }
+      });
+    }
+    if (this.dom.closeProfileModalBtn) {
+      this.dom.closeProfileModalBtn.addEventListener('click', () => this.closeProfileModal());
+    }
+    if (this.dom.closeProfileFooterBtn) {
+      this.dom.closeProfileFooterBtn.addEventListener('click', () => this.closeProfileModal());
+    }
+    if (this.dom.officerProfileModalBackdrop) {
+      this.dom.officerProfileModalBackdrop.addEventListener('click', (e) => {
+        if (e.target === this.dom.officerProfileModalBackdrop) this.closeProfileModal();
+      });
+    }
+
     // Modal: Issue Circular Open/Close
     if (this.dom.openNewNoticeBtn) {
       this.dom.openNewNoticeBtn.addEventListener('click', () => this.openNewNoticeModal());
@@ -357,6 +385,7 @@ class CampusNotificationManagementSystem {
         this.closeNewNoticeModal();
         this.closeLetterheadModal();
         this.closeDiscussionModal();
+        this.closeProfileModal();
       }
     });
   }
@@ -380,6 +409,21 @@ class CampusNotificationManagementSystem {
         iconSpan.textContent = theme === 'dark' ? '🌓' : '☀️';
       }
     }
+  }
+
+  /* --------------------------------------------------------------------------
+     MODAL: OFFICER PROFILE & SYSTEM GOVERNANCE
+     -------------------------------------------------------------------------- */
+  openProfileModal() {
+    if (!this.dom.officerProfileModalBackdrop) return;
+    this.dom.officerProfileModalBackdrop.classList.add('open');
+    this.dom.officerProfileModalBackdrop.setAttribute('aria-hidden', 'false');
+  }
+
+  closeProfileModal() {
+    if (!this.dom.officerProfileModalBackdrop) return;
+    this.dom.officerProfileModalBackdrop.classList.remove('open');
+    this.dom.officerProfileModalBackdrop.setAttribute('aria-hidden', 'true');
   }
 
   /* --------------------------------------------------------------------------

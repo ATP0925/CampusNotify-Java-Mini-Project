@@ -61,12 +61,12 @@
           <span class="theme-icon">🌓</span>
         </button>
 
-        <!-- Officer Credentials -->
-        <div class="officer-card" title="Logged in Authorized Portal Coordinator">
+        <!-- Officer Credentials (Opens Profile & Governance Modal) -->
+        <div class="officer-card" id="openProfileModalBtn" role="button" tabindex="0" title="Click to view Officer Profile & System Governance">
           <div class="officer-avatar">MA</div>
           <div class="officer-info">
             <span class="officer-name">Maruti Atpadkar</span>
-            <span class="officer-role">Portal Admin &bull; ATP0925</span>
+            <span class="officer-role">Portal Admin &bull; ATP0925 <span class="profile-gear-icon">⚙️</span></span>
           </div>
         </div>
       </div>
@@ -111,10 +111,9 @@
       </div>
     </section>
 
-    <!-- Main Content Area with Sidebar -->
+    <!-- Main Content Area: Centered Primary Feed & Control Desk -->
     <div class="portal-body-grid">
       
-      <!-- Primary Notifications Feed & Control Desk -->
       <main class="portal-main-desk">
         
         <!-- Department Filters Bar -->
@@ -195,14 +194,50 @@
 
       </main>
 
-      <!-- Right Administrative Sidebar -->
-      <aside class="portal-sidebar">
+    </div>
+
+    <!-- Institutional Page Footer -->
+    <footer class="system-page-footer">
+      <p><strong>Campus Notification Management System (CNMS)</strong> &bull; Academic Year 2025 - 2026</p>
+      <p>Designed & Developed by <strong>Maruti Atpadkar (ATP0925)</strong> &bull; Java Mini Project</p>
+    </footer>
+
+  </div>
+
+  <!-- Modal: Officer Profile & System Governance -->
+  <div class="modal-backdrop" id="officerProfileModalBackdrop" aria-hidden="true">
+    <div class="modal-dialog modal-profile" role="dialog" aria-modal="true" aria-labelledby="profileHeading">
+      
+      <div class="modal-header">
+        <div class="modal-header-text">
+          <span class="modal-dept-badge">AUTHORIZED OFFICER PROFILE</span>
+          <h3 class="modal-title" id="profileHeading">Officer Profile &amp; Governance</h3>
+          <p class="modal-subtitle">Official administrator credentials, system governance &amp; architecture</p>
+        </div>
+        <button class="modal-close-btn" id="closeProfileModalBtn" title="Close modal">&times;</button>
+      </div>
+
+      <div class="modal-body profile-modal-body">
         
-        <!-- System Governance Widget -->
+        <!-- Officer Identity Hero Card -->
+        <div class="profile-hero-card">
+          <div class="profile-large-avatar">MA</div>
+          <div class="profile-hero-details">
+            <h4 class="profile-hero-name">Maruti Atpadkar</h4>
+            <p class="profile-hero-role">Lead System Administrator &bull; Portal Coordinator</p>
+            <div class="profile-badge-row">
+              <span class="meta-badge green-badge">● Active Session</span>
+              <span class="ref-no-badge">ID: ATP0925</span>
+              <span class="meta-badge blue-badge">AY 2025-2026</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 1: System Governance -->
         <div class="sidebar-panel">
           <div class="sidebar-panel-header">
             <span class="panel-icon">🛡️</span>
-            <h3 class="sidebar-panel-title">System Governance</h3>
+            <h4 class="sidebar-panel-title">System Governance</h4>
           </div>
           <div class="system-meta-list">
             <div class="meta-row">
@@ -211,7 +246,7 @@
             </div>
             <div class="meta-row">
               <span class="meta-name">Academic Year:</span>
-              <span class="meta-value">2025 - 2026</span>
+              <span class="meta-value">2025 – 2026</span>
             </div>
             <div class="meta-row">
               <span class="meta-name">Dispatch Server:</span>
@@ -224,11 +259,11 @@
           </div>
         </div>
 
-        <!-- Official Circular Guidelines -->
+        <!-- Section 2: Dispatch Protocol -->
         <div class="sidebar-panel">
           <div class="sidebar-panel-header">
             <span class="panel-icon">📜</span>
-            <h3 class="sidebar-panel-title">Dispatch Protocol</h3>
+            <h4 class="sidebar-panel-title">Dispatch Protocol</h4>
           </div>
           <ul class="protocol-checklist">
             <li>
@@ -250,11 +285,11 @@
           </ul>
         </div>
 
-        <!-- Quick Help / Java Project Info -->
+        <!-- Section 3: Project Architecture -->
         <div class="sidebar-panel">
           <div class="sidebar-panel-header">
             <span class="panel-icon">☕</span>
-            <h3 class="sidebar-panel-title">Project Architecture</h3>
+            <h4 class="sidebar-panel-title">Project Architecture</h4>
           </div>
           <p class="sidebar-info-text">
             <strong>CampusNotify Java Mini Project</strong> provides both CLI terminal management (<code class="mono-code">Main.java</code>) 
@@ -264,19 +299,23 @@
             <span class="code-tag">Java OOP</span>
             <span class="code-tag">Encapsulation</span>
             <span class="code-tag">Local Storage</span>
+            <span class="code-tag">JDK 21 Native</span>
           </div>
         </div>
 
-        <!-- Sidebar Footer -->
-        <div class="sidebar-footer">
+        <!-- Footer / Credits inside Profile -->
+        <div class="profile-modal-footer-credits">
           <p><strong>Campus Notification Management System</strong></p>
-          <p>Designed & Developed by <strong>Maruti Atpadkar (ATP0925)</strong></p>
+          <p>Designed &amp; Developed by <strong>Maruti Atpadkar (ATP0925)</strong></p>
         </div>
 
-      </aside>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" id="closeProfileFooterBtn">Close</button>
+      </div>
 
     </div>
-
   </div>
 
   <!-- Modal: Issue New Official Circular -->
