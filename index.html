@@ -396,59 +396,64 @@
           </p>
         </div>
 
-        <!-- CARD 3: SAVED DEVICE PROFILES -->
-        <div class="insta-card insta-device-profiles-card" id="instaSavedProfilesCard">
-          <div class="device-card-header">
-            <span class="device-icon">💻</span>
-            <span>Accounts on this Device:</span>
-          </div>
-          <div class="device-profiles-chips" id="instaDeviceProfilesChips">
-            <!-- Populated dynamically -->
-          </div>
-        </div>
-
-        <!-- CARD 4: DATA PRIVACY & INSTITUTIONAL TRUST GUARANTEE -->
-        <div class="insta-card insta-privacy-pillar-card">
-          <div class="privacy-pillar-header">
-            <span class="pillar-shield-icon">🛡️</span>
-            <div>
-              <strong>Campus Data Privacy &amp; Platform Protection</strong>
-              <p>Built-in security for students, faculty &amp; administrative records</p>
+        <!-- CARD 3: TERMS & CONDITIONS (T&C) & DATA PRIVACY COMPONENT -->
+        <div class="insta-card insta-tc-card" id="instaTermsConditionsCard">
+          <button type="button" class="insta-tc-toggle-btn" id="toggleTermsConditionsBtn" aria-expanded="false" title="Click to view Terms &amp; Conditions and Data Privacy Policy">
+            <div class="tc-btn-content">
+              <span class="tc-icon">📜</span>
+              <span class="tc-label">Terms &amp; Conditions &bull; Privacy Policy</span>
             </div>
-          </div>
-          <div class="privacy-pillar-grid">
-            <div class="privacy-item">
-              <span class="p-icon">🔐</span>
-              <div>
-                <strong>Cryptographic Protection</strong>
-                <span>Passwords salted &amp; hashed. Zero raw plaintext storage.</span>
-              </div>
+            <div class="tc-btn-meta">
+              <span class="tc-badge">T&amp;C</span>
+              <span class="tc-chevron" id="tcChevronIcon">▼</span>
             </div>
-            <div class="privacy-item">
-              <span class="p-icon">🚫</span>
-              <div>
-                <strong>Zero 3rd-Party Tracking</strong>
-                <span>No commercial advertising, profiling, or data brokerage.</span>
-              </div>
-            </div>
-            <div class="privacy-item">
-              <span class="p-icon">👑</span>
-              <div>
-                <strong>Admin Approval Shield</strong>
-                <span>Unauthorized bot accounts blocked from campus feeds.</span>
-              </div>
-            </div>
-            <div class="privacy-item">
-              <span class="p-icon">🗑️</span>
-              <div>
-                <strong>Right to Erasure</strong>
-                <span>Users can request account &amp; comment deletion at any time.</span>
-              </div>
-            </div>
-          </div>
-          <button type="button" class="insta-full-policy-btn" id="openFullPrivacyModalBtn">
-            View Complete Institutional Data Privacy Manifesto 📜
           </button>
+
+          <!-- Hidden Drawer Content (Hidden under T&C button by default) -->
+          <div class="insta-tc-drawer" id="termsConditionsDrawer" style="display: none;">
+            <div class="privacy-pillar-header">
+              <span class="pillar-shield-icon">🛡️</span>
+              <div>
+                <strong>Campus Data Privacy &amp; Platform Protection</strong>
+                <p>Built-in security for students, faculty &amp; administrative records</p>
+              </div>
+            </div>
+            <div class="privacy-pillar-grid">
+              <div class="privacy-item">
+                <span class="p-icon">🔐</span>
+                <div>
+                  <strong>Cryptographic Protection</strong>
+                  <span>Passwords salted &amp; hashed. Zero raw plaintext storage.</span>
+                </div>
+              </div>
+              <div class="privacy-item">
+                <span class="p-icon">🚫</span>
+                <div>
+                  <strong>Zero 3rd-Party Tracking</strong>
+                  <span>No commercial advertising, profiling, or data brokerage.</span>
+                </div>
+              </div>
+              <div class="privacy-item">
+                <span class="p-icon">👑</span>
+                <div>
+                  <strong>Admin Approval Shield</strong>
+                  <span>Unauthorized bot accounts blocked from campus feeds.</span>
+                </div>
+              </div>
+              <div class="privacy-item">
+                <span class="p-icon">🗑️</span>
+                <div>
+                  <strong>Right to Erasure</strong>
+                  <span>Users can request account &amp; comment deletion at any time.</span>
+                </div>
+              </div>
+            </div>
+            <div class="tc-actions-group">
+              <button type="button" class="insta-full-policy-btn" id="openFullPrivacyModalBtn">
+                View Complete Institutional T&amp;C &amp; Privacy Manifesto 📜
+              </button>
+            </div>
+          </div>
         </div>
 
       </div>

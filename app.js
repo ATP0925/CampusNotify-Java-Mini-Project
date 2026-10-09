@@ -580,6 +580,12 @@ class CampusNotificationManagementSystem {
       instaSavedProfilesCard: document.getElementById('instaSavedProfilesCard'),
       instaDeviceProfilesChips: document.getElementById('instaDeviceProfilesChips'),
 
+      // T&C Card & Collapsible Drawer
+      instaTermsConditionsCard: document.getElementById('instaTermsConditionsCard'),
+      toggleTermsConditionsBtn: document.getElementById('toggleTermsConditionsBtn'),
+      termsConditionsDrawer: document.getElementById('termsConditionsDrawer'),
+      tcChevronIcon: document.getElementById('tcChevronIcon'),
+
       // Institutional Data Privacy Manifesto Modal
       openFullPrivacyModalBtn: document.getElementById('openFullPrivacyModalBtn'),
       privacyPolicyModalBackdrop: document.getElementById('privacyPolicyModalBackdrop'),
@@ -1089,6 +1095,13 @@ class CampusNotificationManagementSystem {
         if (targetUserId) {
           this.handleInstaDeviceChipSelect(targetUserId);
         }
+      });
+    }
+
+    // Terms & Conditions (T&C) Collapsible Drawer Toggle
+    if (this.dom.toggleTermsConditionsBtn) {
+      this.dom.toggleTermsConditionsBtn.addEventListener('click', () => {
+        this.toggleTermsConditionsDrawer();
       });
     }
 
@@ -1904,6 +1917,32 @@ class CampusNotificationManagementSystem {
     if (!this.dom.privacyPolicyModalBackdrop) return;
     this.dom.privacyPolicyModalBackdrop.classList.remove('open');
     this.dom.privacyPolicyModalBackdrop.setAttribute('aria-hidden', 'true');
+  }
+
+  toggleTermsConditionsDrawer(forceOpen = null) {
+    if (!this.dom.termsConditionsDrawer) return;
+    const isCurrentlyOpen = this.dom.termsConditionsDrawer.style.display !== 'none';
+    const shouldOpen = forceOpen !== null ? forceOpen : !isCurrentlyOpen;
+
+    if (shouldOpen) {
+      this.dom.termsConditionsDrawer.style.display = 'block';
+      if (this.dom.toggleTermsConditionsBtn) {
+        this.dom.toggleTermsConditionsBtn.setAttribute('aria-expanded', 'true');
+        this.dom.toggleTermsConditionsBtn.classList.add('active');
+      }
+      if (this.dom.tcChevronIcon) {
+        this.dom.tcChevronIcon.textContent = '▲';
+      }
+    } else {
+      this.dom.termsConditionsDrawer.style.display = 'none';
+      if (this.dom.toggleTermsConditionsBtn) {
+        this.dom.toggleTermsConditionsBtn.setAttribute('aria-expanded', 'false');
+        this.dom.toggleTermsConditionsBtn.classList.remove('active');
+      }
+      if (this.dom.tcChevronIcon) {
+        this.dom.tcChevronIcon.textContent = '▼';
+      }
+    }
   }
 
   initPhoneMockupSlider() {

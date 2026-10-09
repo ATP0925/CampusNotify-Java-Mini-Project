@@ -3505,51 +3505,104 @@ button, input, textarea, select {
   text-decoration: underline;
 }
 
-/* Card 3: Saved Device Profiles */
-.insta-device-profiles-card {
-  padding: 14px 18px;
-}
-
-.device-card-header {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 0.72rem;
-  font-weight: 700;
-  color: var(--text-dim);
-  text-transform: uppercase;
-  margin-bottom: 8px;
-}
-
-.device-profiles-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.device-chip-btn {
-  background-color: var(--bg-subtle);
+/* Card 3: Terms & Conditions (T&C) & Data Privacy Component */
+.insta-tc-card {
+  padding: 0;
+  overflow: hidden;
+  transition: all 0.2s ease;
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-full);
-  padding: 4px 10px;
-  font-size: 0.74rem;
-  font-weight: 700;
-  color: var(--text-main);
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  transition: all 0.15s ease;
+  background-color: var(--bg-card);
 }
 
-.device-chip-btn:hover {
-  border-color: var(--brand-primary);
+.insta-tc-toggle-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 13px 16px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--text-main);
+  text-align: left;
+  transition: background-color 0.18s ease;
+  font-family: inherit;
+}
+
+.insta-tc-toggle-btn:hover {
   background-color: var(--bg-card-hover);
 }
 
-.device-chip-btn.is-admin {
-  border-color: rgba(245, 158, 11, 0.4);
-  color: #facc15;
+.tc-btn-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.tc-icon {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.tc-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-main);
+  letter-spacing: 0.01em;
+}
+
+.tc-btn-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.tc-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 7px;
+  border-radius: var(--radius-full);
+  font-size: 0.68rem;
+  font-weight: 700;
+  background-color: rgba(59, 130, 246, 0.14);
+  color: var(--brand-accent);
+  border: 1px solid rgba(59, 130, 246, 0.35);
+  letter-spacing: 0.04em;
+}
+
+.tc-chevron {
+  font-size: 0.65rem;
+  color: var(--text-dim);
+  transition: transform 0.22s ease;
+}
+
+.insta-tc-toggle-btn[aria-expanded="true"] .tc-chevron {
+  transform: rotate(180deg);
+  color: var(--brand-accent);
+}
+
+.insta-tc-drawer {
+  padding: 16px 18px;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.04), rgba(16, 185, 129, 0.04));
+  border-top: 1px solid var(--border-color);
+  animation: tcSlideDown 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes tcSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.tc-actions-group {
+  margin-top: 12px;
 }
 
 /* Card 4: Data Privacy & Institutional Trust Pillars */
