@@ -4,7 +4,7 @@ cls
 echo =================================================================
 echo   CAMPUS NOTIFY - AUTOMATIC FIREBASE SETUP & CLOUD DEPLOYMENT
 echo   Project ID: campnotify-eef91
-echo   Super Administrator: Pratik Atpadkar
+echo   Super Administrator: Institutional System Admin
 echo =================================================================
 echo.
 echo [STEP 1/3] Authorizing Firebase CLI with your Google Account...

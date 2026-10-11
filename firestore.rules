@@ -49,8 +49,9 @@ service cloud.firestore {
 
     function isSuperAdmin() {
       return isAuthenticated() && (
-        request.auth.token.email in ['atpadkarmaruti@gmail.com', 'pratikatpadkar@gmail.com'] ||
-        request.auth.uid == 'admin_pratik'
+        request.auth.token.email == 'admin@campusnotify.edu' ||
+        request.auth.token.role == 'ADMIN' ||
+        request.auth.uid == 'user_admin_001'
       );
     }
 

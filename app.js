@@ -4,22 +4,22 @@
  * Enterprise Academic & Administrative Circular Dispatch Portal Engine
  * Built for Java Mini Project & Institutional Enterprise Governance
  * Integrated with Google Cloud Firebase (Cloud Firestore & Auth) + LocalStorage Fallback
- * Super Administrator & Central Controller: Pratik Atpadkar (ATP0925)
+ * Super Administrator & Central Controller: Institutional Admin Desk
  * ============================================================================
  */
 
 // Official Super Admin Default Account
 const DEFAULT_SUPER_ADMIN = {
-  id: 'user_admin_0925',
-  username: 'admin_pratik',
-  email: 'atpadkarmaruti@gmail.com',
-  password: 'PRATIK@00925',
-  name: 'Pratik Atpadkar',
+  id: 'user_admin_001',
+  username: 'admin',
+  email: 'admin@campusnotify.edu',
+  password: 'AdminPassword@123',
+  name: 'System Administrator',
   role: 'ADMIN',
   canPost: true,
   status: 'APPROVED',
-  bio: 'Chief System Administrator & Central Notice Dispatch Controller (ATP0925)',
-  avatar: 'PA',
+  bio: 'Chief System Administrator & Central Notice Dispatch Controller',
+  avatar: 'SA',
   createdAt: 1740000000000
 };
 
@@ -101,10 +101,10 @@ class CampusNotificationManagementSystem {
       // Ensure Super Admin is always present in users registry & has updated identity
       const adminUser = this.users.find(u => u.email === DEFAULT_SUPER_ADMIN.email || u.id === DEFAULT_SUPER_ADMIN.id || u.role === 'ADMIN');
       if (adminUser) {
-        adminUser.name = 'Pratik Atpadkar';
-        adminUser.avatar = 'PA';
-        if (!adminUser.username || adminUser.username === 'admin_maruti') {
-          adminUser.username = 'admin_pratik';
+        adminUser.name = 'System Administrator';
+        adminUser.avatar = 'SA';
+        if (!adminUser.username) {
+          adminUser.username = 'admin';
         }
       } else {
         this.users.unshift(DEFAULT_SUPER_ADMIN);
@@ -1941,14 +1941,14 @@ class CampusNotificationManagementSystem {
 
     // 1. Super Admin 1-Click Verification
     if (
-      (ident === 'atpadkarmaruti@gmail.com' || ident === 'admin_pratik' || ident === 'admin_maruti' || ident === 'admin' || ident === 'pratikatpadkar@gmail.com') &&
-      pass === 'PRATIK@00925'
+      (ident === 'admin@campusnotify.edu' || ident === 'admin' || ident === 'administrator') &&
+      pass === 'AdminPassword@123'
     ) {
       this.currentUser = Object.assign({}, DEFAULT_SUPER_ADMIN);
       this.saveUsers();
       this.updateUserSessionUI();
       this.enterCampusPortal();
-      this.showToast('Signed in as Super Admin (Pratik Atpadkar).', 'success');
+      this.showToast('Signed in as Super Admin.', 'success');
       return;
     }
 
@@ -2137,14 +2137,14 @@ class CampusNotificationManagementSystem {
     this.updateUserSessionUI();
     this.closeAuthModal();
     this.enterCampusPortal();
-    this.showToast('Signed in as Super Admin (Pratik Atpadkar).', 'success');
+    this.showToast('Signed in as Super Admin.', 'success');
 
     // Attempt Firebase Email/Password Auth Sync in background
     if (this.firebaseAuth) {
-      this.firebaseAuth.signInWithEmailAndPassword('atpadkarmaruti@gmail.com', 'PRATIK@00925')
+      this.firebaseAuth.signInWithEmailAndPassword('admin@campusnotify.edu', 'AdminPassword@123')
         .catch(err => {
           if (err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential') {
-            return this.firebaseAuth.createUserWithEmailAndPassword('atpadkarmaruti@gmail.com', 'PRATIK@00925');
+            return this.firebaseAuth.createUserWithEmailAndPassword('admin@campusnotify.edu', 'AdminPassword@123');
           }
         }).catch(err => {
           console.log('[Firebase Auth] Admin sync note:', err.message);
@@ -2163,8 +2163,8 @@ class CampusNotificationManagementSystem {
 
     // Special Check for Super Admin
     if (
-      (ident === 'atpadkarmaruti@gmail.com' || ident === 'admin_pratik' || ident === 'admin_maruti' || ident === 'admin' || ident === 'pratikatpadkar@gmail.com') &&
-      pass === 'PRATIK@00925'
+      (ident === 'admin@campusnotify.edu' || ident === 'admin' || ident === 'administrator') &&
+      pass === 'AdminPassword@123'
     ) {
       this.handleQuickAdminLogin();
       return;
@@ -2634,7 +2634,7 @@ class CampusNotificationManagementSystem {
   async syncFirebaseUserToLocal(firebaseUser) {
     const email = (firebaseUser.email || '').toLowerCase();
     const phone = firebaseUser.phoneNumber || '';
-    const isSuperAdminEmail = email === 'atpadkarmaruti@gmail.com' || email === 'pratikatpadkar@gmail.com';
+    const isSuperAdminEmail = email === 'admin@campusnotify.edu';
     
     // Check if user already exists in Firestore or local
     let existing = this.users.find(u => (email && u.email === email) || (phone && u.contact === phone) || u.id === firebaseUser.uid);
@@ -2647,14 +2647,14 @@ class CampusNotificationManagementSystem {
 
     const syncedUser = {
       id: firebaseUser.uid,
-      name: isSuperAdminEmail ? 'Pratik Atpadkar' : resolvedName,
-      username: isSuperAdminEmail ? 'admin_pratik' : resolvedUsername,
+      name: isSuperAdminEmail ? 'System Administrator' : resolvedName,
+      username: isSuperAdminEmail ? 'admin' : resolvedUsername,
       email: email,
       contact: phone || email,
       role: resolvedRole,
       department: existing ? existing.department : 'General Campus',
       bio: existing ? existing.bio : 'Campus Member verified via Firebase Auth',
-      avatar: isSuperAdminEmail ? 'PA' : resolvedAvatar,
+      avatar: isSuperAdminEmail ? 'SA' : resolvedAvatar,
       canPost: resolvedCanPost,
       status: 'APPROVED',
       firebaseUid: firebaseUser.uid,

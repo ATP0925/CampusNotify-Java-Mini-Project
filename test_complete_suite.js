@@ -152,12 +152,12 @@ async function runTests() {
 
   // --- TEST PILLAR 2: Super Admin Login ---
   console.log('\n--- PILLAR 2: Super Admin Authentication ---');
-  assert('Default Super Admin email is atpadkarmaruti@gmail.com', DEFAULT_SUPER_ADMIN.email === 'atpadkarmaruti@gmail.com');
-  assert('Default Super Admin password is PRATIK@00925', DEFAULT_SUPER_ADMIN.password === 'PRATIK@00925');
+  assert('Default Super Admin email is admin@campusnotify.edu', DEFAULT_SUPER_ADMIN.email === 'admin@campusnotify.edu');
+  assert('Default Super Admin password is AdminPassword@123', DEFAULT_SUPER_ADMIN.password === 'AdminPassword@123');
 
   // Login as Super Admin
   cnms.handleQuickAdminLogin();
-  assert('Logged in user is Pratik Atpadkar', cnms.currentUser.name === 'Pratik Atpadkar');
+  assert('Logged in user is System Administrator', cnms.currentUser.name === 'System Administrator');
   assert('User role is ADMIN', cnms.currentUser.role === 'ADMIN');
   assert('isAuthenticated() returns true', cnms.isAuthenticated() === true);
   assert('isAdmin() returns true', cnms.isAdmin() === true);
@@ -177,7 +177,7 @@ async function runTests() {
   cnms.dom.noticeDepartment.value = 'IT Administration';
   cnms.dom.noticePriority.value = 'High';
   cnms.dom.noticeAudience.value = 'All Students & Faculty';
-  cnms.dom.noticeSignatory.value = 'Pratik Atpadkar, Central Controller';
+  cnms.dom.noticeSignatory.value = 'Central Administration, Central Controller';
 
   cnms.handlePublishCircular();
   assert('Notice count increased by 1 for Super Admin', cnms.notices.length === initialNoticeCount + 1);
