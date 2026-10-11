@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Problem Statement - Campus Notify - VPPCOE&VA</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Times New Roman', Times, serif;
+      font-size: 12pt;
+      line-height: 1.5;
+      color: #000000;
+      background: #e2e8f0;
+      padding: 20px 0;
+    }
+
+    /* Print Controls Bar */
+    .edit-toolbar {
+      max-width: 210mm;
+      margin: 0 auto 16px auto;
+      background: #000000;
+      color: #ffffff;
+      padding: 10px 18px;
+      border-radius: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-size: 13px;
+    }
+
+    .toolbar-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn-action {
+      background: #ffffff;
+      color: #000000;
+      border: 1px solid #000000;
+      padding: 6px 14px;
+      border-radius: 4px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 12px;
+      transition: background 0.15s;
+    }
+    .btn-action:hover {
+      background: #f1f5f9;
+    }
+    .btn-action.btn-dark {
+      background: #334155;
+      color: #ffffff;
+      border-color: #334155;
+    }
+    .btn-action.btn-dark:hover {
+      background: #475569;
+    }
+
+    .doc-page {
+      width: 210mm;
+      min-height: 297mm;
+      margin: 0 auto 20px auto;
+      background: #ffffff;
+      padding: 22mm 20mm;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      position: relative;
+      outline: none;
+    }
+
+    @media print {
+      body {
+        background: #ffffff;
+        padding: 0;
+      }
+      .doc-page {
+        margin: 0;
+        box-shadow: none;
+        page-break-after: always;
+        break-after: page;
+        min-height: auto;
+        padding: 18mm 18mm;
+      }
+      .no-print {
+        display: none !important;
+      }
+      @page {
+        size: A4 portrait;
+        margin: 0;
+      }
+    }
+
+    /* College Header - Monochrome */
+    .college-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid #000000;
+      padding-bottom: 12px;
+      margin-bottom: 22px;
+    }
+
+    .college-header .logo-box {
+      width: 75px;
+      height: 75px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .college-header .header-text {
+      text-align: center;
+      flex: 1;
+      padding: 0 10px;
+    }
+
+    .college-header h2 {
+      font-family: 'Times New Roman', serif;
+      font-size: 13pt;
+      font-weight: bold;
+      color: #000000;
+      line-height: 1.25;
+      margin-bottom: 2px;
+      text-transform: uppercase;
+    }
+
+    .college-header p {
+      font-size: 9.5pt;
+      color: #000000;
+      line-height: 1.25;
+      margin: 1px 0;
+    }
+
+    .college-header .dept {
+      font-weight: bold;
+      font-size: 10.5pt;
+      margin-top: 3px;
+    }
+
+    .college-header .nba {
+      font-size: 9pt;
+      font-style: italic;
+    }
+
+    .date-row {
+      font-family: 'Times New Roman', serif;
+      font-size: 11.5pt;
+      font-weight: bold;
+      margin-bottom: 26px;
+      color: #000000;
+    }
+
+    .title-block {
+      text-align: center;
+      margin: 30px 0 35px 0;
+    }
+
+    .title-block h1 {
+      font-family: 'Times New Roman', serif;
+      font-size: 15pt;
+      font-weight: bold;
+      color: #000000;
+      margin-bottom: 14px;
+    }
+
+    .title-block h3 {
+      font-family: 'Times New Roman', serif;
+      font-size: 12.5pt;
+      font-weight: bold;
+      color: #000000;
+    }
+
+    .student-roll-block {
+      margin: 40px 0 0 20px;
+      font-family: 'Times New Roman', serif;
+      font-size: 12pt;
+      line-height: 2.2;
+      font-weight: bold;
+      color: #000000;
+    }
+
+    .section-title {
+      font-family: 'Times New Roman', serif;
+      font-size: 12pt;
+      font-weight: bold;
+      color: #000000;
+      margin-top: 18px;
+      margin-bottom: 6px;
+    }
+
+    p.body-text {
+      font-family: 'Times New Roman', serif;
+      font-size: 11.5pt;
+      text-align: justify;
+      line-height: 1.5;
+      margin-bottom: 12px;
+      color: #000000;
+    }
+
+    ul.point-list {
+      margin-left: 24px;
+      margin-bottom: 12px;
+      font-family: 'Times New Roman', serif;
+      font-size: 11.5pt;
+      line-height: 1.5;
+      color: #000000;
+    }
+
+    ul.point-list li {
+      margin-bottom: 4px;
+      text-align: justify;
+    }
+
+    .editable-hint {
+      font-style: italic;
+      color: #64748b;
+      font-size: 11px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Toolbar (Hidden on print) -->
+  <div class="edit-toolbar no-print">
+    <div>
+      <strong>VPPCOE&VA - Problem Statement (Editable Mode)</strong>
+      <span class="editable-hint" style="color: #cbd5e1; margin-left: 8px;">Click anywhere on text to edit/type</span>
+    </div>
+    <div class="toolbar-actions">
+      <button class="btn-action" onclick="saveEdits()">Save Edits</button>
+      <button class="btn-action" onclick="resetEdits()">Reset Original</button>
+      <button class="btn-action btn-dark" onclick="window.print()">Print / Save PDF (Ctrl+P)</button>
+    </div>
+  </div>
+
+  <div id="editable-container" contenteditable="true" spellcheck="false">
+
+    <!-- ================= PAGE 1 ================= -->
+    <div class="doc-page">
+      <div class="college-header">
+        <div class="logo-box">
+          <!-- Monochrome VPP Emblem SVG -->
+          <svg width="70" height="70" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="5" y="5" width="90" height="90" rx="3" stroke="#000000" stroke-width="2.5" fill="#ffffff"/>
+            <circle cx="50" cy="50" r="30" stroke="#000000" stroke-width="2" fill="none"/>
+            <polygon points="50,26 56,42 74,42 60,52 65,68 50,58 35,68 40,52 26,42 44,42" fill="#000000"/>
+            <text x="50" y="88" font-family="'Times New Roman', serif" font-size="7.5" font-weight="bold" fill="#000000" text-anchor="middle">CREATIVITY</text>
+          </svg>
+        </div>
+
+        <div class="header-text">
+          <h2>Vasantdada Patil Pratishthan's<br>College of Engineering and Visual Arts</h2>
+          <p>(An Autonomous Institute)</p>
+          <p>NAAC 'A' Grade Accredited, ISO 9001:2015 Certified</p>
+          <p class="dept">Department of Information Technology</p>
+          <p class="nba">NBA Accredited (Dated 01/07/2024 to 30/06/2027)</p>
+        </div>
+
+        <div class="logo-box">
+          <!-- Monochrome Dept IT Emblem SVG -->
+          <svg width="70" height="70" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="50" cy="50" r="42" stroke="#000000" stroke-width="2.5" fill="#ffffff"/>
+            <circle cx="50" cy="50" r="32" stroke="#000000" stroke-width="1.2" fill="none"/>
+            <ellipse cx="50" cy="50" rx="32" ry="13" stroke="#000000" stroke-width="1" fill="none"/>
+            <ellipse cx="50" cy="50" rx="13" ry="32" stroke="#000000" stroke-width="1" fill="none"/>
+            <text x="50" y="47" font-family="'Times New Roman', serif" font-size="16" font-weight="bold" fill="#000000" text-anchor="middle">IT</text>
+            <text x="50" y="58" font-family="'Times New Roman', serif" font-size="6.5" font-weight="bold" fill="#000000" text-anchor="middle">DEPT</text>
+          </svg>
+        </div>
+      </div>
+
+      <div class="date-row">
+        Date: ____ / ____ / 2026
+      </div>
+
+      <div class="title-block">
+        <h1>Problem Statement for Mini Project</h1>
+        <h3>Submitted By SE IT Div B</h3>
+      </div>
+
+      <div class="student-roll-block">
+        <p>VU4F2425 - ____________________</p>
+        <p>VU4F2425 - ____________________</p>
+        <p>VU4F2425 - ____________________</p>
+        <p>VU4F2425 - ____________________</p>
+      </div>
+    </div>
+
+    <!-- ================= PAGE 2 ================= -->
+    <div class="doc-page">
+      <div class="section-title">1. Title of the Mini Project</div>
+      <p class="body-text">Campus Notify: Institutional Circular & Announcement Management System</p>
+
+      <div class="section-title">2. Problem Definition</div>
+      <p class="body-text">
+        In today's academic campus environment, prompt, reliable, and verified dissemination of official notices and administrative circulars is a fundamental operational necessity. Currently, academic institutions rely heavily on physical wooden notice boards in department corridors, informal WhatsApp chat groups, or cluttered mass email threads.
+      </p>
+      <p class="body-text">
+        This informal communication paradigm creates severe bottlenecks: critical exam timetables, scholarship deadlines, and urgent hall ticket notices frequently get buried beneath unrelated chat messages, students miss crucial deadlines, and unverified or falsified notices circulate without administrative audit trails. Furthermore, students lack a structured mechanism to filter circulars by department or urgency level.
+      </p>
+      <p class="body-text">
+        This problem directly relates to <strong>Sustainable Development Goal 4 (SDG 4): Quality Education</strong>, by ensuring equitable, timely, and organized access to essential educational information and circulars for all students. It also aligns with <strong>Sustainable Development Goal 9 (SDG 9): Industry, Innovation, and Infrastructure</strong>, by modernizing campus digital communication infrastructure with an authentic, role-gated, and resilient software system.
+      </p>
+
+      <div class="section-title">3. Tools and Technologies Used</div>
+      <ul class="point-list">
+        <li><strong>Java Development Kit (JDK):</strong> Java SE 17 LTS / Java SE 21 LTS</li>
+        <li><strong>Integrated Development Environment (IDE):</strong> Visual Studio Code / Eclipse / IntelliJ IDEA</li>
+        <li><strong>Core Java Paradigms:</strong> Object-Oriented Programming (OOP), Collections Framework (<code>List</code>, <code>ArrayList</code>, <code>Iterator</code>), Java File I/O (<code>BufferedReader</code>, <code>PrintWriter</code>)</li>
+        <li><strong>Web Frontend Technologies:</strong> HTML5 Semantic Structure, CSS3 Flexbox/Grid Design System, Vanilla JavaScript (ES6+)</li>
+        <li><strong>Persistence & Cloud Storage:</strong> Local Delimited Flat-File Storage (<code>notifications_data.txt</code>) and Google Firebase (Cloud Firestore & Authentication) with LocalStorage Fallback</li>
+      </ul>
+
+      <div class="section-title">4. Objectives of the Project</div>
+      <p class="body-text">The main objectives of this mini project are:</p>
+      <ul class="point-list">
+        <li>To study and analyze the limitations of manual bulletin boards and unorganized messaging groups in campus announcement delivery.</li>
+        <li>To design a centralized, authoritative campus notification management system based on the Model-View-Controller (MVC) architecture.</li>
+        <li>To apply Core Java object-oriented programming concepts (Encapsulation, Constructor Overloading, Data Abstraction) in system design.</li>
+        <li>To implement strict Role-Based Access Control (RBAC) separating administrative notice publishers from student viewers.</li>
+        <li>To implement file-based persistence using Java File I/O streams ensuring circulars survive application restarts.</li>
+        <li>To build a multi-platform experience featuring both an interactive terminal CLI driver and a modern web dashboard with real-time cloud synchronization.</li>
+      </ul>
+
+      <div class="section-title">5. Scope of the Project</div>
+      <p class="body-text">
+        The scope of the Campus Notify system includes managing student and faculty profiles, publishing categorized circulars (Academic, Examination, Placement, and Events), setting priority levels (Urgent, High, Normal), keyword-based searching, category filtering, and community discussion lounges.
+      </p>
+    </div>
+
+    <!-- ================= PAGE 3 ================= -->
+    <div class="doc-page">
+      <p class="body-text">
+        The project focuses on software-based notice management, audit trails, and role-gated publication. It does not include physical biometric turnstile hardware integration or commercial cellular SMS gateway telephony.
+      </p>
+
+      <div class="section-title">6. Proposed Solution / Approach</div>
+      <p class="body-text">
+        The proposed solution is a modular, multi-tier notification management system developed using Core Java object-oriented principles. Object-Oriented Programming is used to encapsulate domain entities (<code>User</code>, <code>Notification</code>), enforcing private data members and public getter/setter mutators.
+      </p>
+      <p class="body-text">
+        A dedicated business controller (<code>NotificationManager</code>) manages in-memory circular lists using the Java Collections Framework (<code>ArrayList</code>), safe traversal with <code>Iterator</code>, and delimited file persistence (<code>BufferedReader</code> / <code>PrintWriter</code>) to guarantee zero data loss. Role-Based Access Control (RBAC) ensures only authorized administrators and faculty can issue or purge notices, while students enjoy read-only feeds with interactive search and category filtering.
+      </p>
+      <p class="body-text">
+        To bridge laboratory Java concepts with modern industry application, a responsive web dashboard is integrated alongside the terminal CLI, connecting to Google Firebase for real-time cloud sync with automatic offline local storage fallback.
+      </p>
+
+      <div class="section-title">7. Expected Outcome</div>
+      <ul class="point-list">
+        <li>Automated, authentic dissemination of official campus circulars with zero unauthorized notice tampering.</li>
+        <li>Sub-second keyword search and category filtering across hundreds of active announcements.</li>
+        <li>Reliable data persistence surviving system restarts via Java File I/O and cloud synchronization.</li>
+        <li>Clear role segregation between institutional administrators, faculty coordinators, and student viewers.</li>
+        <li>100% verified system reliability validated through an automated 36-test architectural verification suite.</li>
+      </ul>
+
+      <div class="section-title">8. Applications of the Project</div>
+      <ul class="point-list">
+        <li>Engineering colleges and polytechnic campuses for daily circular broadcast.</li>
+        <li>Examination Cells for publishing exam timetables, hall ticket alerts, and revaluation results.</li>
+        <li>Training & Placement (T&P) Cells for recruitment drive notices, eligibility lists, and interview schedules.</li>
+        <li>Student activity councils and technical committees for hackathon, seminar, and festival announcements.</li>
+        <li>Educational demonstration of Core Java OOP, Collections, File I/O, and software engineering principles.</li>
+      </ul>
+
+      <div class="section-title">9. Limitations</div>
+      <ul class="point-list">
+        <li>Terminal CLI driver requires a local Java Runtime Environment (JRE) installed on the machine.</li>
+        <li>Cloud synchronization requires an active internet connection (though local offline mode is fully functional).</li>
+        <li>Current version is limited to text notices and structured metadata; direct large video streaming is not accommodated.</li>
+      </ul>
+
+      <div class="section-title">10. Conclusion</div>
+      <p class="body-text">
+        The Campus Notify system provides an efficient, structured, and authentic digital solution for managing campus circulars and announcements. This mini project successfully demonstrates the practical application of Object-Oriented Programming, Java Collections Framework, File I/O persistence, and role governance in addressing real-world institutional communication bottlenecks.
+      </p>
+    </div>
+
+  </div>
+
+  <script>
+    const storageKey = 'cnms_problem_statement_edits_v1';
+    window.addEventListener('DOMContentLoaded', () => {
+      const saved = localStorage.getItem(storageKey);
+      if (saved) {
+        document.getElementById('editable-container').innerHTML = saved;
+      }
+    });
+
+    function saveEdits() {
+      const content = document.getElementById('editable-container').innerHTML;
+      localStorage.setItem(storageKey, content);
+      alert('Your edits have been saved to browser storage. You can now press Ctrl + P to print or save as PDF.');
+    }
+
+    function resetEdits() {
+      if (confirm('Reset to original template? Any unsaved edits will be cleared.')) {
+        localStorage.removeItem(storageKey);
+        location.reload();
+      }
+    }
+  </script>
+
+</body>
+</html>

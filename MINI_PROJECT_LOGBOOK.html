@@ -1,0 +1,1231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Mini-Project Logbook - Campus Notify - VPPCOE&VA</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Times New Roman', Times, serif;
+      font-size: 11pt;
+      line-height: 1.45;
+      color: #000000;
+      background: #e2e8f0;
+      padding: 20px 0;
+    }
+
+    /* Print Controls Bar */
+    .edit-toolbar {
+      max-width: 210mm;
+      margin: 0 auto 16px auto;
+      background: #000000;
+      color: #ffffff;
+      padding: 10px 18px;
+      border-radius: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-size: 13px;
+    }
+
+    .toolbar-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn-action {
+      background: #ffffff;
+      color: #000000;
+      border: 1px solid #000000;
+      padding: 6px 14px;
+      border-radius: 4px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 12px;
+      transition: background 0.15s;
+    }
+    .btn-action:hover {
+      background: #f1f5f9;
+    }
+    .btn-action.btn-dark {
+      background: #334155;
+      color: #ffffff;
+      border-color: #334155;
+    }
+    .btn-action.btn-dark:hover {
+      background: #475569;
+    }
+
+    .doc-page {
+      width: 210mm;
+      min-height: 297mm;
+      margin: 0 auto 20px auto;
+      background: #ffffff;
+      padding: 20mm 18mm;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      outline: none;
+    }
+
+    @media print {
+      body {
+        background: #ffffff;
+        padding: 0;
+      }
+      .doc-page {
+        margin: 0;
+        box-shadow: none;
+        page-break-after: always;
+        break-after: page;
+        min-height: 297mm;
+        height: 297mm;
+        padding: 16mm 16mm;
+      }
+      .no-print {
+        display: none !important;
+      }
+      @page {
+        size: A4 portrait;
+        margin: 0;
+      }
+    }
+
+    /* College Header - Monochrome */
+    .college-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid #000000;
+      padding-bottom: 10px;
+      margin-bottom: 18px;
+    }
+
+    .college-header .logo-box {
+      width: 70px;
+      height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .college-header .header-text {
+      text-align: center;
+      flex: 1;
+      padding: 0 8px;
+    }
+
+    .college-header h2 {
+      font-family: 'Times New Roman', serif;
+      font-size: 12.5pt;
+      font-weight: bold;
+      color: #000000;
+      line-height: 1.25;
+      text-transform: uppercase;
+    }
+
+    .college-header p {
+      font-size: 9pt;
+      color: #000000;
+      line-height: 1.2;
+      margin: 1px 0;
+    }
+
+    .college-header .dept {
+      font-weight: bold;
+      font-size: 10pt;
+      margin-top: 2px;
+    }
+
+    .college-header .nba {
+      font-size: 8.5pt;
+      font-style: italic;
+    }
+
+    /* Headings */
+    h1.page-title {
+      font-family: 'Times New Roman', serif;
+      font-size: 16pt;
+      font-weight: bold;
+      text-align: center;
+      letter-spacing: 0.5px;
+      margin: 18px 0;
+      text-transform: uppercase;
+      color: #000000;
+    }
+
+    h2.section-header {
+      font-family: 'Times New Roman', serif;
+      font-size: 13pt;
+      font-weight: bold;
+      text-align: center;
+      margin: 14px 0 10px 0;
+      color: #000000;
+    }
+
+    h3.sub-header {
+      font-family: 'Times New Roman', serif;
+      font-size: 11.5pt;
+      font-weight: bold;
+      margin: 12px 0 6px 0;
+      color: #000000;
+    }
+
+    /* Lists */
+    ul.bullet-list {
+      margin-left: 28px;
+      margin-bottom: 12px;
+      font-size: 10.5pt;
+      line-height: 1.45;
+      color: #000000;
+    }
+    ul.bullet-list li {
+      margin-bottom: 5px;
+      text-align: justify;
+    }
+
+    /* Tables */
+    table.academic-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0;
+      font-size: 10pt;
+      color: #000000;
+    }
+
+    table.academic-table th, table.academic-table td {
+      border: 1px solid #000000;
+      padding: 6px 8px;
+      vertical-align: middle;
+      color: #000000;
+    }
+
+    table.academic-table th {
+      background-color: #f8fafc;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .text-center { text-align: center; }
+    .text-left { text-align: left; }
+    .text-justify { text-align: justify; }
+
+    /* Signatures */
+    .sig-row {
+      display: flex;
+      justify-content: space-between;
+      margin-top: auto;
+      padding-top: 30px;
+      font-family: 'Times New Roman', serif;
+      font-size: 10.5pt;
+      font-weight: bold;
+      text-align: center;
+      color: #000000;
+    }
+
+    .sig-block {
+      flex: 1;
+    }
+
+    .sig-line {
+      margin-bottom: 4px;
+    }
+
+    .editable-hint {
+      font-style: italic;
+      color: #cbd5e1;
+      font-size: 11px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Toolbar (Hidden on print) -->
+  <div class="edit-toolbar no-print">
+    <div>
+      <strong>VPPCOE&VA - Mini-Project Logbook (Editable Mode)</strong>
+      <span class="editable-hint" style="margin-left: 8px;">Click anywhere to type or fill blanks</span>
+    </div>
+    <div class="toolbar-actions">
+      <button class="btn-action" onclick="saveEdits()">Save Edits</button>
+      <button class="btn-action" onclick="resetEdits()">Reset Original</button>
+      <button class="btn-action btn-dark" onclick="window.print()">Print / Save PDF (Ctrl+P)</button>
+    </div>
+  </div>
+
+  <div id="editable-container" contenteditable="true" spellcheck="false">
+
+    <!-- ============================================================ -->
+    <!-- PAGE 1: COVER PAGE                                           -->
+    <!-- ============================================================ -->
+    <div class="doc-page">
+      <div class="college-header">
+        <div class="logo-box">
+          <!-- Monochrome VPP Emblem SVG -->
+          <svg width="65" height="65" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="5" y="5" width="90" height="90" rx="3" stroke="#000000" stroke-width="2.5" fill="#ffffff"/>
+            <circle cx="50" cy="50" r="30" stroke="#000000" stroke-width="2" fill="none"/>
+            <polygon points="50,26 56,42 74,42 60,52 65,68 50,58 35,68 40,52 26,42 44,42" fill="#000000"/>
+            <text x="50" y="88" font-family="'Times New Roman', serif" font-size="7.5" font-weight="bold" fill="#000000" text-anchor="middle">CREATIVITY</text>
+          </svg>
+        </div>
+
+        <div class="header-text">
+          <h2>Vasantdada Patil Pratishthan's<br>College of Engineering and Visual Arts</h2>
+          <p>NAAC 'A' Grade Accredited, ISO 9001:2015 Certified Institute</p>
+          <p class="dept">Department of Information Technology</p>
+          <p class="nba">NBA Accredited (Dated 01/07/2024 to 30/06/2027)</p>
+        </div>
+
+        <div class="logo-box">
+          <!-- Monochrome 25 Years of Excellence Seal -->
+          <svg width="65" height="65" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="50" cy="50" r="42" stroke="#000000" stroke-width="2.5" fill="#ffffff"/>
+            <circle cx="50" cy="50" r="36" stroke="#000000" stroke-width="1.2" stroke-dasharray="3 2" fill="none"/>
+            <text x="50" y="44" font-family="'Times New Roman', serif" font-size="16" font-weight="bold" fill="#000000" text-anchor="middle">25</text>
+            <text x="50" y="56" font-family="'Times New Roman', serif" font-size="6.5" font-weight="bold" fill="#000000" text-anchor="middle">YEARS OF</text>
+            <text x="50" y="66" font-family="'Times New Roman', serif" font-size="6.5" font-weight="bold" fill="#000000" text-anchor="middle">EXCELLENCE</text>
+          </svg>
+        </div>
+      </div>
+
+      <h1 class="page-title" style="margin: 25px 0 35px 0; font-size: 18pt;">MINI-PROJECT LOGBOOK</h1>
+
+      <div style="margin: 15px auto; width: 85%;">
+        <h3 style="font-size: 13pt; margin-bottom: 12px; text-align: center; text-transform: uppercase;">Group Members</h3>
+        <table style="width: 100%; border: none; font-size: 11pt; line-height: 2.2;">
+          <tr>
+            <td style="width: 30px; font-weight: bold;">1.</td>
+            <td style="border-bottom: 1px solid #000; padding-left: 8px;">________________________________________ (VU4F2425-________)</td>
+          </tr>
+          <tr>
+            <td style="width: 30px; font-weight: bold;">2.</td>
+            <td style="border-bottom: 1px solid #000; padding-left: 8px;">________________________________________ (VU4F2425-________)</td>
+          </tr>
+          <tr>
+            <td style="width: 30px; font-weight: bold;">3.</td>
+            <td style="border-bottom: 1px solid #000; padding-left: 8px;">________________________________________ (VU4F2425-________)</td>
+          </tr>
+          <tr>
+            <td style="width: 30px; font-weight: bold;">4.</td>
+            <td style="border-bottom: 1px solid #000; padding-left: 8px;">________________________________________ (VU4F2425-________)</td>
+          </tr>
+        </table>
+      </div>
+
+      <div style="text-align: center; margin: 35px 0 25px 0;">
+        <p style="font-size: 13pt; font-weight: bold; margin-bottom: 4px;">Prof. ________________________________________</p>
+        <p style="font-size: 11pt; font-style: italic;">Mini Project Guide</p>
+      </div>
+
+      <div style="text-align: center; margin-top: 15px;">
+        <div style="margin-bottom: 10px;">
+          <!-- Center Emblem -->
+          <svg width="55" height="55" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="10" y="10" width="80" height="80" stroke="#000000" stroke-width="2" fill="#ffffff"/>
+            <circle cx="50" cy="50" r="24" stroke="#000000" stroke-width="1.5" fill="none"/>
+            <text x="50" y="85" font-family="'Times New Roman', serif" font-size="7.5" font-weight="bold" fill="#000000" text-anchor="middle">CREATIVITY</text>
+          </svg>
+        </div>
+
+        <p style="font-size: 12pt; font-weight: bold;">Department of Information Technology</p>
+        <p style="font-size: 10.5pt; margin: 2px 0;">Vasantdada Patil Pratishthan's College of Engineering & Visual Arts, Sion-Mumbai 400022</p>
+        <p style="font-size: 12pt; font-weight: bold; margin: 10px 0 6px 0;">University of Mumbai</p>
+
+        <div style="margin: 8px auto;">
+          <!-- Monochrome University of Mumbai Seal -->
+          <svg width="55" height="55" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="50" cy="50" r="42" stroke="#000000" stroke-width="2" fill="#ffffff"/>
+            <path d="M50 18 L70 34 L70 66 L50 82 L30 66 L30 34 Z" stroke="#000000" stroke-width="1.5" fill="none"/>
+            <text x="50" y="54" font-family="'Times New Roman', serif" font-size="12" font-weight="bold" fill="#000000" text-anchor="middle">MU</text>
+            <text x="50" y="93" font-family="'Times New Roman', serif" font-size="6" font-weight="bold" fill="#000000" text-anchor="middle">शीलवृत्तफला विद्या</text>
+          </svg>
+        </div>
+
+        <p style="font-size: 11pt; font-weight: bold; margin-top: 4px;">(Academic Year 2025-26)</p>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- PAGE 2: VISION & MISSION                                     -->
+    <!-- ============================================================ -->
+    <div class="doc-page">
+      <h2 class="section-header" style="margin-top: 10px;">Vision</h2>
+      <ul class="bullet-list">
+        <li>To provide an environment to educate, encourage and explore students by facilitating innovative research, entrepreneurship, opportunities and employability to achieve social and professional goals.</li>
+      </ul>
+
+      <h2 class="section-header" style="margin-top: 20px;">Mission</h2>
+      <ul class="bullet-list">
+        <li>To foster entrepreneurship & strengthen industry institute interaction to enhance career opportunities for the employability of students</li>
+        <li>To encourage collaborations with industries and academic institutes in terms of projects & internships by creating area for Research and Development</li>
+        <li>To build up appropriate moral and ethical skills and to promote holistic development of students through various academic, technical, social and cultural activities</li>
+      </ul>
+
+      <h2 class="section-header" style="margin-top: 30px;">Department of Information Technology</h2>
+      <h3 class="sub-header" style="text-align: center; margin-bottom: 8px;">Vision</h3>
+      <ul class="bullet-list">
+        <li>To impart quality education in the field of Information Technology to meet the challenging needs of the society and industry.</li>
+      </ul>
+
+      <h3 class="sub-header" style="text-align: center; margin-top: 20px; margin-bottom: 8px;">Mission</h3>
+      <ul class="bullet-list">
+        <li>To provide quality education to students by including Problem Solving, Teamwork and Leadership Skills to achieve their goals in the field of Information Technology.</li>
+        <li>To educate students for global development including entrepreneurship, employability and the ability to apply technology to real life problems.</li>
+        <li>To develop skilled IT professionals with moral principles and empower them in lifelong learning.</li>
+      </ul>
+
+      <h2 class="section-header" style="margin-top: 30px;">Program Educational Objective (PEO)</h2>
+      <ul class="bullet-list">
+        <li>Graduates will be successful with sound foundation in engineering fundamentals, trending technologies and entrepreneurship.</li>
+        <li>Graduates will be able to identify and solve real world problems.</li>
+        <li>Graduates will become ingenious and responsible citizens by demonstrating ethics with nurtured professional attitude</li>
+      </ul>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- PAGE 3: PSO & PO (PO1 - PO11)                                -->
+    <!-- ============================================================ -->
+    <div class="doc-page">
+      <h2 class="section-header" style="margin-top: 10px;">Program Specific Outcomes (PSO)</h2>
+      <ul class="bullet-list">
+        <li>Develop efficient IT based solutions by applying and integrating various domains like Artificial Intelligence, IoT, Computer Networks and Security to solve real time problems.</li>
+        <li>Apply technical knowledge in the field of Information Technology to achieve successful career and to pursue higher studies for future endeavors.</li>
+      </ul>
+
+      <h2 class="section-header" style="margin-top: 25px;">Department of Information Technology Program Outcomes (PO)</h2>
+      <p style="font-weight: bold; margin-bottom: 8px; font-size: 10.5pt;">Engineering Graduates will be able to:</p>
+      <ul class="bullet-list">
+        <li><strong>Basic Engineering Knowledge:</strong> Students should be able to apply the fundamental knowledge in mathematics, science and engineering for solving problems in Information Technology.</li>
+        <li><strong>Problem Analysis:</strong> Students should be able to identify, analyze and interpret data to formulate, design, develop or research various solutions for complex engineering problems in the field of Information Technology.</li>
+        <li><strong>Design / Development of Solution:</strong> Students should be able to design solutions for benefit of the society.</li>
+        <li><strong>Conduct Investigation of Complex problems:</strong> The students should be able to provide solutions to complex problems that may have multiple solutions, may not be having specific constraints / requirements defined.</li>
+        <li><strong>Modern Tool Usage:</strong> Create, select, and apply appropriate techniques, and modern engineering and IT tools, including prediction and modeling to complex engineering activities, with an understating of the limitations.</li>
+        <li><strong>The Engineer and Society:</strong> Student should be able to apply the knowledge to assess social issues and the responsibilities relevant to engineering practices.</li>
+        <li><strong>Environment and sustainability:</strong> Students should be able to understand the impact of engineering solutions in social and environmental context and demonstrate the need of sustainable development.</li>
+        <li><strong>Ethics:</strong> Students should apply ethical principles while handling engineering practice.</li>
+        <li><strong>Individual and Team Work:</strong> Students should be able to function effectively as an individual or as a part of a team in multidisciplinary settings.</li>
+        <li><strong>Communication:</strong> Students should be able to communicate, comprehend and document effectively</li>
+        <li><strong>Project Management and Finance:</strong> Students should be able to demonstrate knowledge and understanding of the engineering and management principles and apply them effectively to manage projects.</li>
+      </ul>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- PAGE 4: PO12                                                 -->
+    <!-- ============================================================ -->
+    <div class="doc-page">
+      <ul class="bullet-list" style="margin-top: 20px;">
+        <li><strong>Lifelong Learning:</strong> The students should be able to select, design, integrate and administers IT based solutions into the organizational environment by enhancing their knowledge & skill sets.</li>
+      </ul>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- PAGE 5: STUDENT INFORMATION                                  -->
+    <!-- ============================================================ -->
+    <div class="doc-page">
+      <h1 class="page-title" style="margin: 20px 0 25px 0;">STUDENT INFORMATION</h1>
+
+      <div style="font-size: 11pt; margin-bottom: 25px; line-height: 1.8;">
+        <p><strong>Project Title:</strong> Campus Notify: Institutional Circular & Announcement Management System</p>
+      </div>
+
+      <table class="academic-table" style="font-size: 10pt;">
+        <thead>
+          <tr>
+            <th style="width: 20%;">Field</th>
+            <th style="width: 20%;">Student 1</th>
+            <th style="width: 20%;">Student 2</th>
+            <th style="width: 20%;">Student 3</th>
+            <th style="width: 20%;">Student 4</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Student ID</strong></td>
+            <td class="text-center">VU4F2425-_____</td>
+            <td class="text-center">VU4F2425-_____</td>
+            <td class="text-center">VU4F2425-_____</td>
+            <td class="text-center">VU4F2425-_____</td>
+          </tr>
+          <tr>
+            <td><strong>Name</strong></td>
+            <td>____________________</td>
+            <td>____________________</td>
+            <td>____________________</td>
+            <td>____________________</td>
+          </tr>
+          <tr>
+            <td><strong>Class with Division</strong></td>
+            <td class="text-center">SE IT Div B</td>
+            <td class="text-center">SE IT Div B</td>
+            <td class="text-center">SE IT Div B</td>
+            <td class="text-center">SE IT Div B</td>
+          </tr>
+          <tr>
+            <td><strong>Contact No.</strong></td>
+            <td class="text-center">________________</td>
+            <td class="text-center">________________</td>
+            <td class="text-center">________________</td>
+            <td class="text-center">________________</td>
+          </tr>
+          <tr>
+            <td><strong>E-mail</strong></td>
+            <td>________________</td>
+            <td>________________</td>
+            <td>________________</td>
+            <td>________________</td>
+          </tr>
+          <tr style="height: 120px;">
+            <td><strong>Address</strong></td>
+            <td style="vertical-align: top;">________________</td>
+            <td style="vertical-align: top;">________________</td>
+            <td style="vertical-align: top;">________________</td>
+            <td style="vertical-align: top;">________________</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- PAGE 6: INSTRUCTIONS TO STUDENTS                             -->
+    <!-- ============================================================ -->
+    <div class="doc-page">
+      <h1 class="page-title" style="margin: 25px 0 35px 0;">INSTRUCTIONS TO STUDENTS:</h1>
+
+      <ol style="margin-left: 32px; font-size: 12pt; line-height: 2;">
+        <li style="margin-bottom: 20px; text-align: justify;">
+          The logbook must be submitted to the Guide or Co-Guide for verification and evaluation of project activities at least once in week.
+        </li>
+        <li style="margin-bottom: 20px; text-align: justify;">
+          Log book duly signed by guide must be submitted with project report for evaluation at the end of semester to the department.
+        </li>
+      </ol>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- PAGE 7: DECLARATION                                          -->
+    <!-- ============================================================ -->
+    <div class="doc-page">
+      <h1 class="page-title" style="margin: 30px 0 35px 0;">DECLARATION</h1>
+
+      <p style="font-size: 11.5pt; text-align: justify; line-height: 1.8; margin-bottom: 50px;">
+        I declare that this project represents my ideas in my own words without plagiarism and wherever others' ideas or words have been included, I have adequately cited and referenced the original sources. I also declare that I have adhered to all principles of academic honesty and integrity and have not misrepresented or fabricated or falsified any idea/data/fact/source in my project work. I promise to maintain minimum 75% attendance, as per the University of Mumbai norms. I understand that any violation of the above will be cause for disciplinary action by the Institute.
+      </p>
+
+      <div style="text-align: right; margin-right: 40px; margin-bottom: 40px;">
+        <p style="font-size: 11pt; font-weight: bold; margin-bottom: 30px;">Yours Faithfully</p>
+        <p style="margin-bottom: 15px;">1. ----------------------------------------</p>
+        <p style="margin-bottom: 15px;">2. ----------------------------------------</p>
+        <p style="margin-bottom: 15px;">3. ----------------------------------------</p>
+        <p style="margin-bottom: 25px;">4. ----------------------------------------</p>
+        <p style="font-size: 11pt; font-weight: bold;">(Date & Signature of Students)</p>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- PAGE 8: LETTER OF ACCEPTANCE                                 -->
+    <!-- ============================================================ -->
+    <div class="doc-page">
+      <h1 class="page-title" style="margin: 30px 0 35px 0;">Letter of Acceptance</h1>
+
+      <p style="font-size: 11.5pt; text-align: justify; line-height: 2; margin-bottom: 40px;">
+        I undersigned, Prof. <strong style="text-decoration: underline;">________________________________________</strong> working in Information Technology Department, willing to guide the project titled <strong style="text-decoration: underline;">Campus Notify: Institutional Circular & Announcement Management System</strong> for the Mini Project – 1 A: Semester III respectively for the Academic Year 2025-26.
+      </p>
+
+      <div style="margin-left: 20px; font-size: 11.5pt; line-height: 2.2; margin-bottom: 60px;">
+        <p style="font-weight: bold; margin-bottom: 10px;">The names of the students are:</p>
+        <p>1. ________________________________________</p>
+        <p>2. ________________________________________</p>
+        <p>3. ________________________________________</p>
+        <p>4. ________________________________________</p>
+      </div>
+
+      <div class="sig-row" style="margin-top: auto; padding-bottom: 25px;">
+        <div class="sig-block">
+          <p class="sig-line">___________________________</p>
+          <p>(Project Guide)</p>
+        </div>
+        <div class="sig-block">
+          <p class="sig-line">___________________________</p>
+          <p>(Mini-Project Coordinator)</p>
+        </div>
+        <div class="sig-block">
+          <p class="sig-line">___________________________</p>
+          <p>(HOD-Information Technology)</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- PAGE 9: SCHEDULE FOR MINI PROJECT                            -->
+    <!-- ============================================================ -->
+    <div class="doc-page">
+      <h1 class="page-title" style="margin: 15px 0 20px 0; font-size: 15pt;">SCHEDULE FOR MINI PROJECT</h1>
+
+      <table class="academic-table" style="font-size: 8.5pt;">
+        <thead>
+          <tr>
+            <th style="width: 14%;">Date</th>
+            <th style="width: 8%;">Week</th>
+            <th style="width: 50%;">Contents</th>
+            <th style="width: 18%;">Remark</th>
+            <th style="width: 10%;">Guide Sign</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="text-center">15/07/2025</td>
+            <td class="text-center">1</td>
+            <td>Problem formulation, study of campus circular dissemination issues & feasibility check.</td>
+            <td>Approved topic</td>
+            <td class="text-center">&#10004;</td>
+          </tr>
+          <tr>
+            <td class="text-center">22/07/2025</td>
+            <td class="text-center">2</td>
+            <td>Requirement gathering, defining user personas (Admin, Faculty, Student) & drafting SRS.</td>
+            <td>Scope clarified</td>
+            <td class="text-center">&#10004;</td>
+          </tr>
+          <tr>
+            <td class="text-center">29/07/2025</td>
+            <td class="text-center">3</td>
+            <td>Architecture planning: Model-View-Controller (MVC) pattern & modular component breakdown.</td>
+            <td>Good architecture</td>
+            <td class="text-center">&#10004;</td>
+          </tr>
+          <tr>
+            <td class="text-center">05/08/2025</td>
+            <td class="text-center">4</td>
+            <td>UML Modeling: Class Diagrams, Use Case Diagrams & Data Flow Diagrams (Level 0 and 1).</td>
+            <td>UML verified</td>
+            <td class="text-center">&#10004;</td>
+          </tr>
+          <tr>
+            <td class="text-center">12/08/2025</td>
+            <td class="text-center">5</td>
+            <td>Entity Implementation: Coded User.java & Notification.java with strict encapsulation.</td>
+            <td>Clean code</td>
+            <td class="text-center">&#10004;</td>
+          </tr>
+          <tr>
+            <td class="text-center">19/08/2025</td>
+            <td class="text-center">6</td>
+            <td>Controller Logic: Implemented NotificationManager.java using Java Collections Framework.</td>
+            <td>Safe iteration</td>
+            <td class="text-center">&#10004;</td>
+          </tr>
+          <tr>
+            <td class="text-center">26/08/2025</td>
+            <td class="text-center">7</td>
+            <td>Persistence Layer: Added File I/O streams with delimited flat-file serialization logic.</td>
+            <td>Persistence ok</td>
+            <td class="text-center">&#10004;</td>
+          </tr>
+          <tr>
+            <td class="text-center">02/09/2025</td>
+            <td class="text-center">8</td>
+            <td>CLI Driver: Built Main.java interactive console with 9-choice menu & role switching.</td>
+            <td>CLI operational</td>
+            <td class="text-center">&#10004;</td>
+          </tr>
+          <tr>
+            <td class="text-center">09/09/2025</td>
+            <td class="text-center">9</td>
+            <td>Web GUI: Scaffolded modern HTML5/CSS3 dashboard with KPI strips and card feeds.</td>
+            <td>Responsive design</td>
+            <td class="text-center">&#10004;</td>
+          </tr>
+          <tr>
+            <td class="text-center">16/09/2025</td>
+            <td class="text-center">10</td>
+            <td>Cloud Gateway: Integrated Firebase Firestore & Auth with LocalStorage fallback sync.</td>
+            <td>Hybrid sync ok</td>
+            <td class="text-center">&#10004;</td>
+          </tr>
+          <tr>
+            <td class="text-center">23/09/2025</td>
+            <td class="text-center">11</td>
+            <td>Testing Suite: Executed 36 automated verification tests across 9 architectural pillars.</td>
+            <td>100% tests passed</td>
+            <td class="text-center">&#10004;</td>
+          </tr>
+          <tr>
+            <td class="text-center">30/09/2025</td>
+            <td class="text-center">12</td>
+            <td>Refactoring & Humanization: Sanitized credentials, removed emojis & polished UI vectors.</td>
+            <td>Standards met</td>
+            <td class="text-center">&#10004;</td>
+          </tr>
+          <tr>
+            <td class="text-center">07/10/2025</td>
+            <td class="text-center">13</td>
+            <td>Final Documentation: Compiled Academic Project Report, Logbook & prepared viva demo.</td>
+            <td>Ready for review</td>
+            <td class="text-center">&#10004;</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- PAGE 10: PROGRESS / ATTENDANCE REPORT (WEEKS 1 - 4)          -->
+    <!-- ============================================================ -->
+    <div class="doc-page">
+      <h1 class="page-title" style="margin: 15px 0 20px 0; font-size: 15pt;">PROGRESS/ATTENDANCE REPORT</h1>
+
+      <div style="font-size: 10pt; line-height: 1.6; margin-bottom: 12px; border: 1px solid #000; padding: 10px;">
+        <p><strong>Title of the Project:</strong> Campus Notify: Institutional Circular & Announcement Management System</p>
+        <div style="display: flex; justify-content: space-between; margin-top: 6px;">
+          <div><strong>Group No:</strong> SE-IT-B-_____</div>
+          <div><strong>Name of Supervisor/Guide:</strong> Prof. ________________________________________</div>
+        </div>
+        <div style="margin-top: 6px; font-size: 9.5pt;">
+          <span><strong>Student 1:</strong> ____________________ | </span>
+          <span><strong>Student 2:</strong> ____________________ | </span>
+          <span><strong>Student 3:</strong> ____________________ | </span>
+          <span><strong>Student 4:</strong> ____________________</span>
+        </div>
+      </div>
+
+      <table class="academic-table" style="font-size: 8.5pt;">
+        <thead>
+          <tr>
+            <th rowspan="2" style="width: 6%;">Sr. No</th>
+            <th rowspan="2" style="width: 14%;">Date</th>
+            <th colspan="4" style="width: 20%;">Attendance</th>
+            <th rowspan="2" style="width: 60%;">Progress/Suggestion</th>
+          </tr>
+          <tr>
+            <th style="width: 5%;">1</th>
+            <th style="width: 5%;">2</th>
+            <th style="width: 5%;">3</th>
+            <th style="width: 5%;">4</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="height: 90px;">
+            <td class="text-center">1</td>
+            <td class="text-center">15/07/2025</td>
+            <td class="text-center">P</td>
+            <td class="text-center">P</td>
+            <td class="text-center">P</td>
+            <td class="text-center">P</td>
+            <td>
+              <strong>Progress:</strong> Carried out literature review on existing physical notice boards and chat groups. Identified critical communication bottlenecks.<br>
+              <strong>Suggestion:</strong> Focus on role segregation between teachers and students to prevent unverified circular posting.
+            </td>
+          </tr>
+          <tr style="height: 90px;">
+            <td class="text-center">2</td>
+            <td class="text-center">22/07/2025</td>
+            <td class="text-center">P</td>
+            <td class="text-center">P</td>
+            <td class="text-center">P</td>
+            <td class="text-center">P</td>
+            <td>
+              <strong>Progress:</strong> Formulated functional and non-functional specifications. Prepared Software Requirements Specification (SRS) draft.<br>
+              <strong>Suggestion:</strong> Ensure offline local persistence is considered so notices are readable without internet connectivity.
+            </td>
+          </tr>
+          <tr style="height: 90px;">
+            <td class="text-center">3</td>
+            <td class="text-center">29/07/2025</td>
+            <td class="text-center">P</td>
+            <td class="text-center">P</td>
+            <td class="text-center">P</td>
+            <td class="text-center">P</td>
+            <td>
+              <strong>Progress:</strong> Designed Model-View-Controller architecture. Mapped out modular interactions between entities, controller, and UI layers.<br>
+              <strong>Suggestion:</strong> Keep domain models strictly decoupled from presentation logic for maintainability.
+            </td>
+          </tr>
+          <tr style="height: 90px;">
+            <td class="text-center">4</td>
+            <td class="text-center">05/08/2025</td>
+            <td class="text-center">P</td>
+            <td class="text-center">P</td>
+            <td class="text-center">P</td>
+            <td class="text-center">P</td>
+            <td>
+              <strong>Progress:</strong> Created UML Class Diagram and Data Flow Diagrams (Level 0 and 1). Defined entity attributes and method signatures.<br>
+              <strong>Suggestion:</strong> Use private fields and strongly typed getters/setters to ensure encapsulation standards.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- PAGE 11: PROGRESS / ATTENDANCE REPORT (WEEKS 5 - 13)         -->
+    <!-- ============================================================ -->
+    <div class="doc-page">
+      <table class="academic-table" style="font-size: 8pt; margin-top: 10px;">
+        <thead>
+          <tr>
+            <th rowspan="2" style="width: 5%;">Sr. No</th>
+            <th rowspan="2" style="width: 12%;">Date</th>
+            <th colspan="4" style="width: 16%;">Attendance</th>
+            <th rowspan="2" style="width: 67%;">Progress/Suggestion</th>
+          </tr>
+          <tr>
+            <th style="width: 4%;">1</th>
+            <th style="width: 4%;">2</th>
+            <th style="width: 4%;">3</th>
+            <th style="width: 4%;">4</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="height: 48px;">
+            <td class="text-center">5</td>
+            <td class="text-center">12/08/2025</td>
+            <td class="text-center">P</td>
+            <td class="text-center">P</td>
+            <td class="text-center">P</td>
+            <td class="text-center">P</td>
+            <td><strong>Progress:</strong> Developed User.java and Notification.java. <strong>Suggestion:</strong> Add overloaded constructors for flexibility.</td>
+          </tr>
+          <tr style="height: 48px;">
+            <td class="text-center">6</td>
+            <td class="text-center">19/08/2025</td>
+            <td class="text-center">P</td>
+            <td class="text-center">P</td>
+            <td class="text-center">P</td>
+            <td class="text-center">P</td>
+            <td><strong>Progress:</strong> Built NotificationManager.java using List and ArrayList. <strong>Suggestion:</strong> Use Iterator.remove() for safe deletion.</td>
+          </tr>
+          <tr style="height: 48px;">
+            <td class="text-center">7</td>
+            <td class="text-center">26/08/2025</td>
+            <td class="text-center">P</td>
+            <td class="text-center">P</td>
+            <td class="text-center">P</td>
+            <td class="text-center">P</td>
+            <td><strong>Progress:</strong> Added BufferedReader and PrintWriter file persistence. <strong>Suggestion:</strong> Handle IOException cleanly.</td>
+          </tr>
+          <tr style="height: 48px;">
+            <td class="text-center">8</td>
+            <td class="text-center">02/09/2025</td>
+            <td class="text-center">P</td>
+            <td class="text-center">P</td>
+            <td class="text-center">P</td>
+            <td class="text-center">P</td>
+            <td><strong>Progress:</strong> Created Main.java console menu with 9 options. <strong>Suggestion:</strong> Implement role switching to test RBAC.</td>
+          </tr>
+          <tr style="height: 48px;">
+            <td class="text-center">9</td>
+            <td class="text-center">09/09/2025</td>
+            <td class="text-center">P</td>
+            <td class="text-center">P</td>
+            <td class="text-center">P</td>
+            <td class="text-center">P</td>
+            <td><strong>Progress:</strong> Created web UI with KPI metric cards. <strong>Suggestion:</strong> Check color contrast and responsive mobile view.</td>
+          </tr>
+          <tr style="height: 48px;">
+            <td class="text-center">10</td>
+            <td class="text-center">16/09/2025</td>
+            <td class="text-center">P</td>
+            <td class="text-center">P</td>
+            <td class="text-center">P</td>
+            <td class="text-center">P</td>
+            <td><strong>Progress:</strong> Integrated Firebase Firestore and Auth sync. <strong>Suggestion:</strong> Maintain local fallback for zero-network resilience.</td>
+          </tr>
+          <tr style="height: 48px;">
+            <td class="text-center">11</td>
+            <td class="text-center">23/09/2025</td>
+            <td class="text-center">P</td>
+            <td class="text-center">P</td>
+            <td class="text-center">P</td>
+            <td class="text-center">P</td>
+            <td><strong>Progress:</strong> Ran automated verification suite (36/36 tests passed). <strong>Suggestion:</strong> Ensure unauthenticated wall is impenetrable.</td>
+          </tr>
+          <tr style="height: 48px;">
+            <td class="text-center">12</td>
+            <td class="text-center">30/09/2025</td>
+            <td class="text-center">P</td>
+            <td class="text-center">P</td>
+            <td class="text-center">P</td>
+            <td class="text-center">P</td>
+            <td><strong>Progress:</strong> Removed all emoji symbols, replaced with crisp SVG icons. <strong>Suggestion:</strong> Ensure code documentation is humanized.</td>
+          </tr>
+          <tr style="height: 48px;">
+            <td class="text-center">13</td>
+            <td class="text-center">07/10/2025</td>
+            <td class="text-center">P</td>
+            <td class="text-center">P</td>
+            <td class="text-center">P</td>
+            <td class="text-center">P</td>
+            <td><strong>Progress:</strong> Compiled final report, logbook, and presentation deck. <strong>Suggestion:</strong> Practice live system demonstration.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div style="margin-top: auto; padding-top: 30px; text-align: right; padding-right: 30px;">
+        <p style="font-weight: bold; font-size: 11pt;">__________________________________________</p>
+        <p style="font-weight: bold; font-size: 10.5pt; margin-top: 4px;">Name, Date & Sign of the Supervisor/Guide</p>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- PAGE 12: REVIEW-I FORM                                       -->
+    <!-- ============================================================ -->
+    <div class="doc-page">
+      <h1 class="page-title" style="margin: 15px 0 20px 0; font-size: 16pt;">REVIEW-I FORM</h1>
+
+      <div style="font-size: 10.5pt; line-height: 1.8; margin-bottom: 16px;">
+        <p><strong>Group No:</strong> SE-IT-B-_____</p>
+        <p><strong>Title of Mini-Project:</strong> Campus Notify: Institutional Circular & Announcement Management System</p>
+        <p><strong>Date of Review-I:</strong> 12/08/2025</p>
+        <p><strong>No. of students in project team:</strong> 4</p>
+      </div>
+
+      <p style="font-size: 10.5pt; font-weight: bold; margin-bottom: 6px;">Student Mini-Project Performance Analysis (Put Tick as per your Observation)</p>
+
+      <table class="academic-table" style="font-size: 9.5pt;">
+        <thead>
+          <tr>
+            <th style="width: 8%;">Sr. No.</th>
+            <th style="width: 62%;">Observation</th>
+            <th style="width: 10%;">Excellent (3)</th>
+            <th style="width: 10%;">Very Good (2)</th>
+            <th style="width: 10%;">Good (1)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="text-center">1</td>
+            <td>Quality of problem and Clarity</td>
+            <td class="text-center">&#10004;</td>
+            <td class="text-center"></td>
+            <td class="text-center"></td>
+          </tr>
+          <tr>
+            <td class="text-center">2</td>
+            <td>Literature Survey</td>
+            <td class="text-center"></td>
+            <td class="text-center">&#10004;</td>
+            <td class="text-center"></td>
+          </tr>
+          <tr>
+            <td class="text-center">3</td>
+            <td>Innovativeness in solutions</td>
+            <td class="text-center">&#10004;</td>
+            <td class="text-center"></td>
+            <td class="text-center"></td>
+          </tr>
+          <tr>
+            <td class="text-center">4</td>
+            <td>Feasibility Of the Project</td>
+            <td class="text-center">&#10004;</td>
+            <td class="text-center"></td>
+            <td class="text-center"></td>
+          </tr>
+          <tr>
+            <td class="text-center">5</td>
+            <td>Usage of technology</td>
+            <td class="text-center">&#10004;</td>
+            <td class="text-center"></td>
+            <td class="text-center"></td>
+          </tr>
+          <tr>
+            <td class="text-center">6</td>
+            <td>Cost effectiveness and Societal impact</td>
+            <td class="text-center">&#10004;</td>
+            <td class="text-center"></td>
+            <td class="text-center"></td>
+          </tr>
+          <tr>
+            <td class="text-center">7</td>
+            <td>Overall Presentation & Performance</td>
+            <td class="text-center">&#10004;</td>
+            <td class="text-center"></td>
+            <td class="text-center"></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div style="border: 1px solid #000; padding: 10px; margin: 15px 0; min-height: 100px; font-size: 10pt;">
+        <p><strong>Comments:</strong></p>
+        <p style="margin-top: 6px; text-align: justify; line-height: 1.5;">
+          The problem definition is very well articulated, addressing genuine administrative and communication delays in campus circular dissemination. Object-oriented architecture is clearly planned with strong encapsulation. The team has shown excellent understanding of Java Collections and File I/O. Approved to proceed with controller and storage implementation.
+        </p>
+      </div>
+
+      <div style="margin-top: 25px;">
+        <p style="font-weight: bold; font-size: 10pt; margin-bottom: 25px;">Project Guide & Panel Members Signatures</p>
+        <p style="font-size: 10pt; line-height: 2;">1) __________________________________________________</p>
+        <p style="font-size: 10pt; line-height: 2;">2) __________________________________________________</p>
+        <p style="font-size: 10pt; line-height: 2;">3) __________________________________________________</p>
+      </div>
+
+      <div class="sig-row" style="margin-top: auto; padding-bottom: 20px;">
+        <div class="sig-block">
+          <p class="sig-line">___________________________</p>
+          <p>Name, Date & Signature<br><strong>Project Coordinator</strong></p>
+        </div>
+        <div class="sig-block">
+          <p class="sig-line">___________________________</p>
+          <p>Name, Date & Signature<br><strong>HOD-Information Technology</strong></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- PAGE 13: REVIEW-II FORM                                      -->
+    <!-- ============================================================ -->
+    <div class="doc-page">
+      <h1 class="page-title" style="margin: 15px 0 20px 0; font-size: 16pt;">REVIEW-II FORM</h1>
+
+      <div style="font-size: 10.5pt; line-height: 1.8; margin-bottom: 16px;">
+        <p><strong>Group No:</strong> SE-IT-B-_____</p>
+        <p><strong>Title of Mini-Project:</strong> Campus Notify: Institutional Circular & Announcement Management System</p>
+        <p><strong>Date of Review-II:</strong> 23/09/2025</p>
+        <p><strong>No. of students in project team:</strong> 4</p>
+      </div>
+
+      <p style="font-size: 10.5pt; font-weight: bold; margin-bottom: 6px;">Student Mini-Project Performance Analysis (Put Tick as per your Observation)</p>
+
+      <table class="academic-table" style="font-size: 9.5pt;">
+        <thead>
+          <tr>
+            <th style="width: 8%;">Sr. No.</th>
+            <th style="width: 62%;">Observation</th>
+            <th style="width: 10%;">Excellent (3)</th>
+            <th style="width: 10%;">Very Good (2)</th>
+            <th style="width: 10%;">Good (1)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="text-center">1</td>
+            <td>Usage of effective skill sets</td>
+            <td class="text-center">&#10004;</td>
+            <td class="text-center"></td>
+            <td class="text-center"></td>
+          </tr>
+          <tr>
+            <td class="text-center">2</td>
+            <td>Design and Implementation</td>
+            <td class="text-center">&#10004;</td>
+            <td class="text-center"></td>
+            <td class="text-center"></td>
+          </tr>
+          <tr>
+            <td class="text-center">3</td>
+            <td>Testing and Analysis</td>
+            <td class="text-center">&#10004;</td>
+            <td class="text-center"></td>
+            <td class="text-center"></td>
+          </tr>
+          <tr>
+            <td class="text-center">4</td>
+            <td>Use of standard engineering norms</td>
+            <td class="text-center">&#10004;</td>
+            <td class="text-center"></td>
+            <td class="text-center"></td>
+          </tr>
+          <tr>
+            <td class="text-center">5</td>
+            <td>Cost effectiveness and Societal impact</td>
+            <td class="text-center">&#10004;</td>
+            <td class="text-center"></td>
+            <td class="text-center"></td>
+          </tr>
+          <tr>
+            <td class="text-center">6</td>
+            <td>Contribution of an individual member in team</td>
+            <td class="text-center">&#10004;</td>
+            <td class="text-center"></td>
+            <td class="text-center"></td>
+          </tr>
+          <tr>
+            <td class="text-center">7</td>
+            <td>Overall Presentation & Performance</td>
+            <td class="text-center">&#10004;</td>
+            <td class="text-center"></td>
+            <td class="text-center"></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div style="border: 1px solid #000; padding: 10px; margin: 15px 0; min-height: 100px; font-size: 10pt;">
+        <p><strong>Comments:</strong></p>
+        <p style="margin-top: 6px; text-align: justify; line-height: 1.5;">
+          Complete working prototype successfully demonstrated in both CLI terminal mode and responsive web mode. The 36 automated verification tests cover zero-access barriers, administrative privilege delegation, and persistent file storage effectively. Individual student contributions are well-balanced and substantiated by git commit logs. Recommended for final semester submission.
+        </p>
+      </div>
+
+      <div style="margin-top: 25px;">
+        <p style="font-weight: bold; font-size: 10pt; margin-bottom: 25px;">Project Guide & Panel Members Signatures</p>
+        <p style="font-size: 10pt; line-height: 2;">1) __________________________________________________</p>
+        <p style="font-size: 10pt; line-height: 2;">2) __________________________________________________</p>
+        <p style="font-size: 10pt; line-height: 2;">3) __________________________________________________</p>
+      </div>
+
+      <div class="sig-row" style="margin-top: auto; padding-bottom: 20px;">
+        <div class="sig-block">
+          <p class="sig-line">___________________________</p>
+          <p>Name, Date & Signature<br><strong>Project Coordinator</strong></p>
+        </div>
+        <div class="sig-block">
+          <p class="sig-line">___________________________</p>
+          <p>Name, Date & Signature<br><strong>HOD-Information Technology</strong></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- PAGE 14: EXAMINER'S FEEDBACK FORM                            -->
+    <!-- ============================================================ -->
+    <div class="doc-page">
+      <h1 class="page-title" style="margin: 15px 0 20px 0; font-size: 16pt;">EXAMINER'S FEEDBACK FORM</h1>
+
+      <div style="font-size: 10pt; line-height: 1.7; margin-bottom: 12px;">
+        <p><strong>Name of External examiner:</strong> Prof. Dr. ________________________________________</p>
+        <p><strong>College of External examiner:</strong> ________________________________________</p>
+        <p><strong>Name of Internal examiner:</strong> Prof. ________________________________________</p>
+        <div style="display: flex; justify-content: space-between; margin-top: 4px;">
+          <div><strong>Date of Examination:</strong> ____ / ____ / 2026</div>
+          <div><strong>No. of students in project team:</strong> 4</div>
+          <div><strong>Availability of separate lab:</strong> Yes</div>
+        </div>
+      </div>
+
+      <p style="font-size: 10pt; font-weight: bold; margin-bottom: 6px;">Student Performance Analysis (Put Tick as per your Observation)</p>
+
+      <table class="academic-table" style="font-size: 8.5pt;">
+        <thead>
+          <tr>
+            <th style="width: 7%;">Sr. No.</th>
+            <th style="width: 63%;">Observation</th>
+            <th style="width: 10%;">Excellent (3)</th>
+            <th style="width: 10%;">Very Good (2)</th>
+            <th style="width: 10%;">Good (1)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="text-center">1</td>
+            <td>Quality of problem and Clarity</td>
+            <td class="text-center">&#10004;</td>
+            <td class="text-center"></td>
+            <td class="text-center"></td>
+          </tr>
+          <tr>
+            <td class="text-center">2</td>
+            <td>Innovativeness in solutions</td>
+            <td class="text-center">&#10004;</td>
+            <td class="text-center"></td>
+            <td class="text-center"></td>
+          </tr>
+          <tr>
+            <td class="text-center">3</td>
+            <td>Cost effectiveness and Societal impact</td>
+            <td class="text-center">&#10004;</td>
+            <td class="text-center"></td>
+            <td class="text-center"></td>
+          </tr>
+          <tr>
+            <td class="text-center">4</td>
+            <td>Full functioning of working model as per stated requirements</td>
+            <td class="text-center">&#10004;</td>
+            <td class="text-center"></td>
+            <td class="text-center"></td>
+          </tr>
+          <tr>
+            <td class="text-center">5</td>
+            <td>Effective use of skill sets</td>
+            <td class="text-center">&#10004;</td>
+            <td class="text-center"></td>
+            <td class="text-center"></td>
+          </tr>
+          <tr>
+            <td class="text-center">6</td>
+            <td>Effective use of standard engineering norms</td>
+            <td class="text-center">&#10004;</td>
+            <td class="text-center"></td>
+            <td class="text-center"></td>
+          </tr>
+          <tr>
+            <td class="text-center">7</td>
+            <td>Contribution of an individual's as member or leader</td>
+            <td class="text-center">&#10004;</td>
+            <td class="text-center"></td>
+            <td class="text-center"></td>
+          </tr>
+          <tr>
+            <td class="text-center">8</td>
+            <td>Clarity in written and oral communication</td>
+            <td class="text-center">&#10004;</td>
+            <td class="text-center"></td>
+            <td class="text-center"></td>
+          </tr>
+          <tr>
+            <td class="text-center">9</td>
+            <td>Overall performance</td>
+            <td class="text-center">&#10004;</td>
+            <td class="text-center"></td>
+            <td class="text-center"></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div style="font-size: 9.5pt; line-height: 1.5; margin: 10px 0;">
+        <p style="margin-bottom: 6px;">
+          <strong>Can same mini project extend to next semester by adding new objectives/ideas?</strong> <u>Yes</u>
+        </p>
+        <p style="margin-bottom: 4px;">
+          <strong>If yes, suggest new Innovative Technique/Idea/ objectives related to this project:</strong>
+        </p>
+        <p style="padding-left: 12px; font-style: italic;">
+          1. Implement native mobile push notifications (FCM) on Android/iOS.<br>
+          2. Introduce cryptographic digital signatures (PKI) on circular PDF attachments.<br>
+          3. Migrate flat-file persistence to relational JDBC connection pooling with PostgreSQL.
+        </p>
+      </div>
+
+      <div style="margin-top: auto; padding-bottom: 25px;">
+        <div style="margin-bottom: 20px;">
+          <p style="font-size: 10pt;">Name, Date & Signature External Examiner: _____________________________________________</p>
+        </div>
+        <div>
+          <p style="font-size: 10pt;">Name, Date & Signature Internal Examiner: _____________________________________________</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const storageKey = 'cnms_logbook_edits_v1';
+    window.addEventListener('DOMContentLoaded', () => {
+      const saved = localStorage.getItem(storageKey);
+      if (saved) {
+        document.getElementById('editable-container').innerHTML = saved;
+      }
+    });
+
+    function saveEdits() {
+      const content = document.getElementById('editable-container').innerHTML;
+      localStorage.setItem(storageKey, content);
+      alert('Your logbook edits have been saved to browser storage. You can now press Ctrl + P to print or save as PDF.');
+    }
+
+    function resetEdits() {
+      if (confirm('Reset logbook to original template? Any unsaved edits will be cleared.')) {
+        localStorage.removeItem(storageKey);
+        location.reload();
+      }
+    }
+  </script>
+
+</body>
+</html>

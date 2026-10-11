@@ -19,21 +19,22 @@
 <br>
 
 **Submitted By:**  
-**Student Name:** `[Your Name]`  
-**Roll No. / Seat No.:** `[Your Roll Number]`  
-**Division / Batch:** `[Your Division / Batch, e.g., SE-IT / TE-IT]`  
+**Name:** ______________________________  
+**Roll No:** ____________________  
+**Class / Division:** SE IT Div B  
 **Department:** Department of Information Technology  
 
 <br>
 
 **Under the Guidance of:**  
-**Project Guide / Faculty Mentor:** `[Faculty Guide / Mentor Name]`  
+**Project Guide:** Prof. ______________________________  
 **Designation:** Assistant Professor / Associate Professor  
 
 <br>
 
 **Institutional Affiliation:**  
-`[Your College / Institute Name, Mumbai / University of Mumbai]`  
+**Vasantdada Patil Pratishthan's College of Engineering & Visual Arts, Sion-Mumbai 400022**  
+**University of Mumbai**  
 **Academic Year 2025–2026**
 
 </div>
@@ -44,7 +45,7 @@
 
 ## CERTIFICATE OF APPROVAL
 
-This is to certify that the mini-project titled **"Campus Notify: Institutional Circular & Announcement Management System"** is a bonafide record of work carried out by **`[Your Name]` (Roll No: `[Your Roll Number]`)** under my supervision and guidance, in partial fulfillment of the requirements for the **Java Programming Laboratory** course during the Academic Year **2025–2026**.
+This is to certify that the mini-project titled **"Campus Notify: Institutional Circular & Announcement Management System"** is a bonafide record of work carried out by **______________________________ (Roll No: ____________________)** under my supervision and guidance, in partial fulfillment of the requirements for the **Java Programming Laboratory** course during the Academic Year **2025–2026**.
 
 To the best of my knowledge, the project work embodies original effort and adheres to academic integrity standards.
 
@@ -56,7 +57,7 @@ _____________________________ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&n
 <br><br>
 
 _____________________________ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; _____________________________  
-**Head of Department (IT/CS)** &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; **Principal / Dean**  
+**Head of Department (Information Technology)** &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; **Principal**  
 
 ---
 
