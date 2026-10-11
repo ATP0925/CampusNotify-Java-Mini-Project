@@ -369,8 +369,17 @@ class CampusNotificationManagementSystem {
               const data = doc.data();
               cloudUsers.push(Object.assign({ id: doc.id }, data));
             });
-            // Merge with local users ensuring super admin always remains
-            const merged = [...cloudUsers];
+            // Merge with local users while preserving credentials and ensuring super admin remains
+            const mergedMap = new Map();
+            this.users.forEach(u => mergedMap.set(u.id || u.email, u));
+            cloudUsers.forEach(cu => {
+              const key = cu.id || cu.email;
+              const local = mergedMap.get(key);
+              mergedMap.set(key, Object.assign({}, local || {}, cu, {
+                password: (local && local.password) || cu.password || ''
+              }));
+            });
+            const merged = Array.from(mergedMap.values());
             if (!merged.some(u => u.email === DEFAULT_SUPER_ADMIN.email)) {
               merged.unshift(DEFAULT_SUPER_ADMIN);
             }
@@ -386,11 +395,16 @@ class CampusNotificationManagementSystem {
     }
   }
 
-  // Push record to Firestore if connected
+  // Push record to Firestore if connected (safely stripped of sensitive passwords)
   async pushToCloud(collectionName, docId, data) {
     if (this.firestoreDb) {
       try {
-        await this.firestoreDb.collection(collectionName).doc(docId).set(data, { merge: true });
+        let payload = data;
+        if (collectionName === 'cnms_users' && data && data.password) {
+          payload = Object.assign({}, data);
+          delete payload.password;
+        }
+        await this.firestoreDb.collection(collectionName).doc(docId).set(payload, { merge: true });
       } catch (e) {
         console.warn(`Firestore sync note for ${collectionName}/${docId}:`, e.message);
       }

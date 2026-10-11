@@ -23,11 +23,11 @@ To protect campus intellectual property and student privacy:
 - **Dedicated Institutional Auth Gateway**: Supports phone/username/email sign-in and new account registration with bio and avatar generation.
 - **Multi-Account Device Governance**: Per campus security policy, any newly registered account on a device is flagged as `PENDING` and requires 1-click clearance by Super Admin Pratik Atpadkar before gaining portal access.
 
-### 👑 Super Admin Credentials
+### 👑 Super Admin Governance
 - **Email:** `atpadkarmaruti@gmail.com`
 - **Username:** `admin_pratik`
-- **Password:** `PRATIK@00925`
-- **Super Administrator:** Pratik Atpadkar (ATP0925)
+- **Super Administrator:** Pratik Atpadkar
+- **Authentication:** Protected institutional credential access via Firebase Auth & encrypted hash gating
 
 ---
 

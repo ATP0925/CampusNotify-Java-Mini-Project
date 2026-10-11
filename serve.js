@@ -20,10 +20,12 @@ const server = http.createServer((req, res) => {
   let reqPath = req.url.split('?')[0];
   if (reqPath === '/') reqPath = '/index.html';
   
-  const filePath = path.join(ROOT, decodeURIComponent(reqPath));
+  const safeReqPath = path.normalize(decodeURIComponent(reqPath)).replace(/^(\.\.[\/\\])+/, '');
+  const filePath = path.join(ROOT, safeReqPath);
+  const relative = path.relative(ROOT, filePath);
   
-  // Security check: ensure within ROOT
-  if (!filePath.startsWith(ROOT)) {
+  // Security check: ensure strictly within ROOT
+  if (relative.startsWith('..') || path.isAbsolute(relative)) {
     res.statusCode = 403;
     res.end('Forbidden');
     return;
@@ -40,7 +42,10 @@ const server = http.createServer((req, res) => {
     const contentType = MIME_TYPES[ext] || 'application/octet-stream';
     res.writeHead(200, {
       'Content-Type': contentType,
-      'Cache-Control': 'no-cache, no-store, must-revalidate'
+      'Cache-Control': 'no-cache, no-store, must-revalidate',
+      'X-Content-Type-Options': 'nosniff',
+      'X-Frame-Options': 'SAMEORIGIN',
+      'Referrer-Policy': 'strict-origin-when-cross-origin'
     });
     fs.createReadStream(filePath).pipe(res);
   });
