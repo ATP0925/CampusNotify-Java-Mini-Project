@@ -188,17 +188,26 @@ class CampusNotificationManagementSystem {
 
   saveNotices() {
     try {
-      localStorage.setItem('cnms_official_notices', JSON.stringify(this.notices));
+      // Offline LocalStorage Cache: Keep latest 50 notices to prevent quota overflow
+      const cached = Array.isArray(this.notices) ? this.notices.slice(0, 50) : [];
+      localStorage.setItem('cnms_official_notices', JSON.stringify(cached));
     } catch (e) {
-      console.error('Failed saving notices to localStorage:', e);
+      console.warn('LocalStorage cache note for notices:', e.message);
     }
   }
 
   saveLoungeMessages() {
     try {
-      localStorage.setItem('cnms_community_messages', JSON.stringify(this.loungeMessages));
+      // Offline LocalStorage Cache: Keep latest 50 messages & strip heavy dataUrl to avoid browser 5MB storage quota exhaustion
+      const cached = Array.isArray(this.loungeMessages) ? this.loungeMessages.slice(-50).map(m => {
+        if (m.file && m.file.dataUrl && m.file.dataUrl.length > 50000) {
+          return Object.assign({}, m, { file: Object.assign({}, m.file, { dataUrl: '' }) });
+        }
+        return m;
+      }) : [];
+      localStorage.setItem('cnms_community_messages', JSON.stringify(cached));
     } catch (e) {
-      console.error('Failed saving lounge messages to localStorage:', e);
+      console.warn('LocalStorage cache note (5MB quota safeguarded):', e.message);
     }
   }
 
@@ -325,8 +334,9 @@ class CampusNotificationManagementSystem {
     if (!this.firestoreDb) return;
 
     try {
-      // 1. Synchronize Notices Collection
+      // 1. Synchronize Notices Collection (Capped at 50 most recent for high-scale network & read efficiency)
       const unsubNotices = this.firestoreDb.collection('cnms_notices')
+        .limit(50)
         .onSnapshot((snapshot) => {
           if (!snapshot.empty) {
             const cloudNotices = [];
@@ -343,8 +353,9 @@ class CampusNotificationManagementSystem {
         }, (err) => console.warn('Firestore notices listener:', err));
       this.unsubscribers.push(unsubNotices);
 
-      // 2. Synchronize Community Lounge Messages Collection
+      // 2. Synchronize Community Lounge Messages Collection (Capped at 100 most recent for low latency live chat)
       const unsubLounge = this.firestoreDb.collection('cnms_community_messages')
+        .limit(100)
         .onSnapshot((snapshot) => {
           if (!snapshot.empty) {
             const cloudMsgs = [];
@@ -360,8 +371,9 @@ class CampusNotificationManagementSystem {
         }, (err) => console.warn('Firestore lounge listener:', err));
       this.unsubscribers.push(unsubLounge);
 
-      // 3. Synchronize Users Collection
+      // 3. Synchronize Users Collection (Capped at 100 for campus directory & admin governance)
       const unsubUsers = this.firestoreDb.collection('cnms_users')
+        .limit(100)
         .onSnapshot((snapshot) => {
           if (!snapshot.empty) {
             const cloudUsers = [];
@@ -395,7 +407,7 @@ class CampusNotificationManagementSystem {
     }
   }
 
-  // Push record to Firestore if connected (safely stripped of sensitive passwords)
+  // Push record to Firestore if connected (safely stripped of sensitive passwords & 1MB limit protected)
   async pushToCloud(collectionName, docId, data) {
     if (this.firestoreDb) {
       try {
@@ -403,6 +415,15 @@ class CampusNotificationManagementSystem {
         if (collectionName === 'cnms_users' && data && data.password) {
           payload = Object.assign({}, data);
           delete payload.password;
+        }
+        // Protect against Firestore 1MB document limit for file attachments in high-traffic lounges
+        if (collectionName === 'cnms_community_messages' && payload && payload.file && payload.file.dataUrl) {
+          if (payload.file.dataUrl.length > 900000) {
+            console.warn('Attachment exceeds Firestore 1MB document limit, trimming dataUrl for cloud sync.');
+            payload = Object.assign({}, payload, {
+              file: Object.assign({}, payload.file, { dataUrl: '' })
+            });
+          }
         }
         await this.firestoreDb.collection(collectionName).doc(docId).set(payload, { merge: true });
       } catch (e) {
@@ -1424,6 +1445,50 @@ class CampusNotificationManagementSystem {
     if (dangerousExtensions.includes(ext)) {
       this.showToast('Security Alert: Executable and script files cannot be shared on campus network.', 'error');
       e.target.value = '';
+      return;
+    }
+
+    // Auto-compress heavy images to stay within Firestore 1MB doc limits & optimize data usage
+    if (file.type && file.type.startsWith('image/') && file.size > 500 * 1024) {
+      const imgReader = new FileReader();
+      imgReader.onload = (event) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+          const maxDim = 1200;
+          if (width > maxDim || height > maxDim) {
+            if (width > height) {
+              height = Math.round((height * maxDim) / width);
+              width = maxDim;
+            } else {
+              width = Math.round((width * maxDim) / height);
+              height = maxDim;
+            }
+          }
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+          const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.75);
+
+          this.currentAttachedFile = {
+            name: file.name,
+            size: Math.round(compressedDataUrl.length * 0.75),
+            type: 'image/jpeg',
+            dataUrl: compressedDataUrl
+          };
+
+          if (this.dom.loungeFilePreviewBox) this.dom.loungeFilePreviewBox.style.display = 'flex';
+          if (this.dom.previewFileName) this.dom.previewFileName.textContent = file.name;
+          if (this.dom.previewFileSize) this.dom.previewFileSize.textContent = this.formatFileSize(this.currentAttachedFile.size);
+          if (this.dom.previewFileIcon) this.dom.previewFileIcon.textContent = '🖼️';
+          this.showToast(`Optimized image attached: ${file.name} 📎`);
+        };
+        img.src = event.target.result;
+      };
+      imgReader.readAsDataURL(file);
       return;
     }
 
