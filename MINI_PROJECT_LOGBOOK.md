@@ -1,16 +1,24 @@
+<div align="center">
+
+<img src="assets/college_logo.png" alt="College Logo" width="100">
+
 # VASANTDADA PATIL PRATISHTHAN'S COLLEGE OF ENGINEERING AND VISUAL ARTS
 ### Department of Information Technology
 **NAAC 'A' Grade Accredited, ISO 9001:2015 Certified Institute**  
 *NBA Accredited (Dated 01/07/2024 to 30/06/2027)*  
 **Sion, Mumbai - 400022 | University of Mumbai**  
 
----
+<br>
+
+<img src="assets/university_crest.jpg" alt="University of Mumbai Emblem" width="90">
 
 # MINI-PROJECT LOGBOOK
 
 ### Academic Year: 2025–2026
 **Course:** Mini Project – 1 A: Semester III  
 **Class & Division:** SE IT Div B  
+
+</div>
 
 ---
 

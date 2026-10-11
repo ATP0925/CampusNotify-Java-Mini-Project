@@ -1,8 +1,14 @@
+<div align="center">
+
+<img src="assets/college_logo.png" alt="College Logo" width="100">
+
 # VASANTDADA PATIL PRATISHTHAN'S COLLEGE OF ENGINEERING AND VISUAL ARTS
 ### (An Autonomous Institute)
 **NAAC 'A' Grade Accredited, ISO 9001:2015 Certified**  
 **Department of Information Technology**  
-*NBA Accredited (Dated 01/07/2024 to 30/06/2027)*  
+*NBA Accredited (Dated 01/07/2024 to 30/06/2027)*
+
+</div>  
 
 ---
 

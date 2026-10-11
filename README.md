@@ -114,16 +114,17 @@ Or double-click **`run.bat`** on Windows.
 
 ---
 
-## Academic Lab Submission Documents (Editable Formats)
+## Academic Lab Submission Documents (with Official College Logo)
 
-The repository includes complete, university-standard academic documentation for laboratory submission (Department of Information Technology, University of Mumbai pattern). All documents are provided in **fully editable Microsoft Word (`.docx`)**, **in-browser editable HTML (`.html`)**, and **Markdown (`.md`)** formats. Unknown student roll numbers, IDs, and faculty names are left as clean blanks (`____________________` / `VU4F2425-________`) for easy completion prior to final submission.
+The repository includes complete, university-standard academic documentation for laboratory submission (Department of Information Technology, University of Mumbai pattern) featuring the **official VPPCOE&VA college logo** and **University of Mumbai crest**. All documents are provided in **Direct PDF (`.pdf`)**, **Microsoft Word (`.docx`)**, **In-Browser Editable HTML (`.html`)**, and **Markdown (`.md`)** formats. Unknown student roll numbers, IDs, and faculty names are left as clean blanks (`____________________` / `VU4F2425-________`) for easy completion prior to final submission.
 
-| Document | Microsoft Word (.docx) | Browser Editable (.html) | Markdown (.md) | Purpose |
-| :--- | :--- | :--- | :--- | :--- |
-| **Problem Statement & Synopsis** | [`CampusNotify_Problem_Statement_Synopsis.docx`](CampusNotify_Problem_Statement_Synopsis.docx) | [`PROBLEM_STATEMENT.html`](PROBLEM_STATEMENT.html) | [`PROBLEM_STATEMENT.md`](PROBLEM_STATEMENT.md) | VPPCOE&VA approved format with SDG 4/9 alignment, tools, objectives, and signature matrix. |
-| **Mini-Project Logbook** | [`CampusNotify_Mini_Project_Logbook.docx`](CampusNotify_Mini_Project_Logbook.docx) | [`MINI_PROJECT_LOGBOOK.html`](MINI_PROJECT_LOGBOOK.html) | [`MINI_PROJECT_LOGBOOK.md`](MINI_PROJECT_LOGBOOK.md) | 14-page logbook with 13-week schedule, weekly diary logs, PEO/PSO/PO matrices, and Review I/II evaluation sheets. |
-| **Project Report** | [`CampusNotify_Project_Report.docx`](CampusNotify_Project_Report.docx) | [`PROJECT_REPORT.html`](PROJECT_REPORT.html) | [`PROJECT_REPORT.md`](PROJECT_REPORT.md) | Complete 8-chapter academic report including Certificate of Approval, UML diagrams, MVC implementation, and test suites. |
+| Document | Ready-to-Print PDF (.pdf) | Microsoft Word (.docx) | Browser Editable (.html) | Markdown (.md) | Purpose |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Problem Statement & Synopsis** | [`CampusNotify_Problem_Statement_Synopsis.pdf`](CampusNotify_Problem_Statement_Synopsis.pdf) | [`CampusNotify_Problem_Statement_Synopsis.docx`](CampusNotify_Problem_Statement_Synopsis.docx) | [`PROBLEM_STATEMENT.html`](PROBLEM_STATEMENT.html) | [`PROBLEM_STATEMENT.md`](PROBLEM_STATEMENT.md) | VPPCOE&VA approved format with college header logos, SDG 4/9 alignment, tools, objectives, and signature matrix. |
+| **Mini-Project Logbook** | [`CampusNotify_Mini_Project_Logbook.pdf`](CampusNotify_Mini_Project_Logbook.pdf) | [`CampusNotify_Mini_Project_Logbook.docx`](CampusNotify_Mini_Project_Logbook.docx) | [`MINI_PROJECT_LOGBOOK.html`](MINI_PROJECT_LOGBOOK.html) | [`MINI_PROJECT_LOGBOOK.md`](MINI_PROJECT_LOGBOOK.md) | 14-page logbook with college logo, Mumbai University crest, 13-week schedule, weekly diary logs, PEO/PSO/PO matrices, and Review I/II evaluation sheets. |
+| **Project Report** | [`CampusNotify_Project_Report.pdf`](CampusNotify_Project_Report.pdf) | [`CampusNotify_Project_Report.docx`](CampusNotify_Project_Report.docx) | [`PROJECT_REPORT.html`](PROJECT_REPORT.html) | [`PROJECT_REPORT.md`](PROJECT_REPORT.md) | Complete 8-chapter academic report including cover page college logo, University crest on Certificate of Approval, UML diagrams, MVC implementation, and test suites. |
 
-### How to Edit:
+### How to Use & Edit:
+- **Direct Submission / Print (PDF)**: Open the `.pdf` files to directly view or print the submission-ready copy with the official college logo and university crest.
 - **In Microsoft Word / WPS Office / Google Docs**: Open any of the `.docx` files directly to edit text, fill in student names/roll numbers, adjust page formatting, and export to PDF.
 - **In Any Web Browser**: Double-click any of the `.html` files (e.g., `PROJECT_REPORT.html`). Click anywhere to edit directly on the page, click **"Save Edits"** to persist changes in your browser, and press **Ctrl+P** (Print) to save as a clean black-and-white A4 PDF.

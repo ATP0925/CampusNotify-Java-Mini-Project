@@ -32,6 +32,10 @@
 
 <br>
 
+<img src="assets/college_logo.png" alt="VPPCOE&VA Logo" width="110">
+
+<br><br>
+
 **Institutional Affiliation:**  
 **Vasantdada Patil Pratishthan's College of Engineering & Visual Arts, Sion-Mumbai 400022**  
 **University of Mumbai**  
@@ -43,7 +47,13 @@
 
 ---
 
+<div align="center">
+
+<img src="assets/university_crest.jpg" alt="University of Mumbai Emblem" width="95">
+
 ## CERTIFICATE OF APPROVAL
+
+</div>
 
 This is to certify that the mini-project titled **"Campus Notify: Institutional Circular & Announcement Management System"** is a bonafide record of work carried out by **______________________________ (Roll No: ____________________)** under my supervision and guidance, in partial fulfillment of the requirements for the **Java Programming Laboratory** course during the Academic Year **2025–2026**.
 
