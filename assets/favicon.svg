@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" fill="none">
+  <!-- Standard 2-Color Favicon: Deep Navy (#0F2744) & Pure White (#FFFFFF) -->
+  <rect width="32" height="32" rx="8" fill="#0F2744" stroke="#1E3A8A" stroke-width="1" />
+  <g transform="translate(1, 0)">
+    <path d="M15 7 L23 11 L15 15 L7 11 Z" fill="#FFFFFF" />
+    <path d="M10 16 L10 21 C10 23.8 12.2 26 15 26 C17.8 26 20 23.8 20 21 L20 16" 
+          stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+    <circle cx="15" cy="20" r="2" fill="#FFFFFF" />
+  </g>
+</svg>

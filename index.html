@@ -19,6 +19,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-analytics-compat.js"></script>
 
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -29,7 +30,7 @@
       
       <!-- Brand & Institutional Identity -->
       <div class="nav-brand">
-        <div class="brand-crest">🏛️</div>
+        <div class="brand-crest"><img src="assets/logo.svg" alt="CampusNotify Logo" class="cnms-brand-mark" width="34" height="34"></div>
         <div class="brand-text">
           <div class="brand-title-wrap">
             <span class="brand-title">Campus<span class="brand-accent">Notify</span></span>
@@ -70,21 +71,21 @@
 
         <!-- Switch Account / Authentication Gateway Button -->
         <button class="btn btn-secondary btn-sm" id="navInstaAuthBtn" title="Open Campus Portal Authentication Gateway">
-          <span class="auth-btn-icon">🔐</span>
+          <span class="auth-btn-icon"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></span>
           <span class="btn-text-full">Portal Auth</span>
           <span class="btn-text-short">Auth</span>
         </button>
 
         <!-- Sign Out Button -->
         <button class="btn btn-secondary btn-sm" id="navSignOutBtn" title="Sign Out of Session">
-          <span class="auth-btn-icon">🚪</span>
+          <span class="auth-btn-icon"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg></span>
           <span class="btn-text-full">Sign Out</span>
           <span class="btn-text-short">Exit</span>
         </button>
 
         <!-- Theme Toggle -->
         <button class="icon-btn" id="themeToggleBtn" title="Toggle Dark/Light Mode" aria-label="Toggle Theme">
-          <span class="theme-icon">🌓</span>
+          <span class="theme-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line></svg></span>
         </button>
 
         <!-- Officer Credentials (Opens Profile & Governance Modal) -->
@@ -92,7 +93,7 @@
           <div class="officer-avatar" id="navUserAvatar">PA</div>
           <div class="officer-info">
             <span class="officer-name" id="navUserName">Pratik Atpadkar</span>
-            <span class="officer-role" id="navUserRole">👑 Admin &bull; Central Controller <span class="profile-gear-icon">⚙️</span></span>
+            <span class="officer-role" id="navUserRole">Admin &bull; Central Controller <span class="profile-gear-icon"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06-.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg></span></span>
           </div>
         </div>
       </div>
@@ -106,12 +107,12 @@
     <!-- Top Floating Return/Portal Link if user is already logged in -->
     <div class="insta-gateway-topbar">
       <div class="insta-topbar-left">
-        <span class="insta-campus-badge">🏛️ CAMPUS NOTIFICATION MANAGEMENT SYSTEM</span>
+        <span class="insta-campus-badge"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-1px;margin-right:5px;"><path d="M3 21h18"></path><path d="M5 21V9"></path><path d="M19 21V9"></path><path d="M9 21V9"></path><path d="M15 21V9"></path><path d="M2 9l10-6 10 6"></path></svg>CAMPUS NOTIFICATION MANAGEMENT SYSTEM</span>
         <span class="insta-sub-tag">INSTITUTIONAL ACCESS PORTAL</span>
       </div>
       <div class="insta-topbar-right">
         <button type="button" class="btn btn-sm btn-secondary" id="instaReturnToPortalBtn" style="display: none;" title="Return to Campus Notification Board">
-          <span>Enter Portal as <strong id="instaActiveUserSnippet">User</strong> 🚀</span>
+          <span>Enter Portal as <strong id="instaActiveUserSnippet">User</strong></span>
         </button>
       </div>
     </div>
@@ -127,7 +128,7 @@
             <!-- Simulated Screen Content -->
             <div class="insta-screen-header">
               <span class="screen-time">09:41</span>
-              <div class="screen-icons"><span>📶</span><span>5G</span><span>🔋</span></div>
+              <div class="screen-icons"><span style="font-size:10px;">●●●</span><span style="font-weight:700;">5G</span><span style="font-size:10px;border:1px solid currentColor;border-radius:2px;padding:0 2px;">100%</span></div>
             </div>
             
             <div class="insta-screen-app-bar">
@@ -141,27 +142,27 @@
               <div class="insta-screen-slide active">
                 <div class="screen-notice-card">
                   <div class="screen-card-header">
-                    <span class="screen-tag red-tag">🔒 SECURED PORTAL</span>
+                    <span class="screen-tag red-tag">SECURED PORTAL</span>
                     <span class="screen-ref">RESTRICTED</span>
                   </div>
                   <h4 class="screen-notice-title">Central Circular Board Locked</h4>
                   <p class="screen-notice-snippet">Official semester examination timetables, departmental schedules, and academic circulars require student or faculty authentication.</p>
                   <div class="screen-card-footer">
-                    <span>🔐 256-Bit Cryptography</span>
-                    <span>🏛️ Campus Verified</span>
+                    <span>256-Bit Cryptography</span>
+                    <span>Campus Verified</span>
                   </div>
                 </div>
 
                 <div class="screen-notice-card">
                   <div class="screen-card-header">
-                    <span class="screen-tag blue-tag">🛡️ ZERO-ACCESS WALL</span>
+                    <span class="screen-tag blue-tag">ZERO-ACCESS WALL</span>
                     <span class="screen-ref">PROTECTED</span>
                   </div>
                   <h4 class="screen-notice-title">Data Privacy &amp; Access Controls</h4>
                   <p class="screen-notice-snippet">Zero third-party tracking. All accounts require institutional credentials and admin verification before unlocking notices.</p>
                   <div class="screen-card-footer">
-                    <span>👑 Admin Governed</span>
-                    <span>🛡️ DPDP 2023</span>
+                    <span>Admin Governed</span>
+                    <span>DPDP 2023</span>
                   </div>
                 </div>
 
@@ -178,14 +179,14 @@
               <div class="insta-screen-slide">
                 <div class="screen-notice-card">
                   <div class="screen-card-header">
-                    <span class="screen-tag green-tag">💬 CAMPUS LOUNGE</span>
+                    <span class="screen-tag green-tag">CAMPUS LOUNGE</span>
                     <span class="screen-ref">RESTRICTED</span>
                   </div>
                   <h4 class="screen-notice-title">Academic Discussion &amp; Document Vault</h4>
                   <p class="screen-notice-snippet">Engage in university discussions, ask academic questions, and exchange PDF documents with verified peers.</p>
                   <div class="screen-card-footer">
-                    <span>📎 File Sharing</span>
-                    <span>⚡ Real-Time Sync</span>
+                    <span>File Vault</span>
+                    <span>Real-Time Sync</span>
                   </div>
                 </div>
 
@@ -200,7 +201,7 @@
             </div>
 
             <div class="insta-screen-bottom-bar">
-              <span>🏠</span><span>🔍</span><span>➕</span><span>💬</span><span>👤</span>
+              <span><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg></span><span><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></span><span><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></span><span><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></span><span><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></span>
             </div>
           </div>
         </div>
@@ -270,7 +271,7 @@
 
               <!-- Firebase Phone OTP Authentication -->
               <button type="button" class="insta-btn-phone" id="firebasePhoneLoginToggleBtn">
-                <span class="phone-auth-icon">📱</span>
+                <span class="phone-auth-icon"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg></span>
                 <span>Sign in with Phone (SMS OTP)</span>
               </button>
 
@@ -301,13 +302,13 @@
 
               <!-- Quick 1-Click Super Admin Login -->
               <button type="button" class="insta-btn-admin-fb" id="instaQuickAdminLoginBtn">
-                <span class="insta-crown-icon">👑</span>
+                <span class="insta-crown-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="m2 4 3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14"></path></svg></span>
                 <span>Institutional Administrator Sign In</span>
               </button>
 
               <!-- Data Privacy Guarantee Snippet -->
               <div class="insta-privacy-secure-note">
-                <span class="privacy-lock-icon">🔒</span>
+                <span class="privacy-lock-icon"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></span>
                 <span>Cryptographic Password Privacy &bull; Zero 3rd-Party Tracking</span>
               </div>
 
@@ -339,7 +340,7 @@
             </button>
 
             <button type="button" class="insta-btn-admin-fb" id="instaSignupAdminShortcutBtn">
-              <span class="insta-crown-icon">👑</span>
+              <span class="insta-crown-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="m2 4 3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14"></path></svg></span>
               <span>Administrator Sign In</span>
             </button>
 
@@ -456,7 +457,7 @@
         <div class="insta-card insta-tc-card" id="instaTermsConditionsCard">
           <button type="button" class="insta-tc-toggle-btn" id="toggleTermsConditionsBtn" aria-expanded="false" title="Click to view Terms &amp; Conditions and Data Privacy Policy">
             <div class="tc-btn-content">
-              <span class="tc-icon">📜</span>
+              <span class="tc-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg></span>
               <span class="tc-label">Terms &amp; Conditions &bull; Privacy Policy</span>
             </div>
             <div class="tc-btn-meta">
@@ -468,7 +469,7 @@
           <!-- Hidden Drawer Content (Hidden under T&C button by default) -->
           <div class="insta-tc-drawer" id="termsConditionsDrawer" style="display: none;">
             <div class="privacy-pillar-header">
-              <span class="pillar-shield-icon">🛡️</span>
+              <span class="pillar-shield-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg></span>
               <div>
                 <strong>Campus Data Privacy &amp; Platform Protection</strong>
                 <p>Built-in security for students, faculty &amp; administrative records</p>
@@ -476,28 +477,28 @@
             </div>
             <div class="privacy-pillar-grid">
               <div class="privacy-item">
-                <span class="p-icon">🔐</span>
+                <span class="p-icon"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></span>
                 <div>
                   <strong>Cryptographic Protection</strong>
                   <span>Passwords salted &amp; hashed. Zero raw plaintext storage.</span>
                 </div>
               </div>
               <div class="privacy-item">
-                <span class="p-icon">🚫</span>
+                <span class="p-icon"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line></svg></span>
                 <div>
                   <strong>Zero 3rd-Party Tracking</strong>
                   <span>No commercial advertising, profiling, or data brokerage.</span>
                 </div>
               </div>
               <div class="privacy-item">
-                <span class="p-icon">👑</span>
+                <span class="p-icon"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><path d="m2 4 3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14"></path></svg></span>
                 <div>
                   <strong>Admin Approval Shield</strong>
                   <span>Unauthorized bot accounts blocked from campus feeds.</span>
                 </div>
               </div>
               <div class="privacy-item">
-                <span class="p-icon">🗑️</span>
+                <span class="p-icon"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path></svg></span>
                 <div>
                   <strong>Right to Erasure</strong>
                   <span>Users can request account &amp; comment deletion at any time.</span>
@@ -506,7 +507,7 @@
             </div>
             <div class="tc-actions-group">
               <button type="button" class="insta-full-policy-btn" id="openFullPrivacyModalBtn">
-                View Complete Institutional T&amp;C &amp; Privacy Manifesto 📜
+                View Complete Institutional T&amp;C &amp; Privacy Manifesto
               </button>
             </div>
           </div>
@@ -541,7 +542,7 @@
     <!-- Top System Metrics Bar -->
     <section class="metrics-grid">
       <div class="metric-card">
-        <div class="metric-icon blue-icon">📋</div>
+        <div class="metric-icon blue-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg></div>
         <div class="metric-details">
           <span class="metric-value" id="metricTotalCirculars">0</span>
           <span class="metric-label">Total Circulars Issued</span>
@@ -549,7 +550,7 @@
       </div>
 
       <div class="metric-card">
-        <div class="metric-icon red-icon">🚨</div>
+        <div class="metric-icon red-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg></div>
         <div class="metric-details">
           <span class="metric-value" id="metricUrgentCirculars">0</span>
           <span class="metric-label">Urgent & Critical Alerts</span>
@@ -557,7 +558,7 @@
       </div>
 
       <div class="metric-card">
-        <div class="metric-icon purple-icon">🏛️</div>
+        <div class="metric-icon purple-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18"></path><path d="M5 21V9"></path><path d="M19 21V9"></path><path d="M9 21V9"></path><path d="M15 21V9"></path><path d="M2 9l10-6 10 6"></path></svg></div>
         <div class="metric-details">
           <span class="metric-value" id="metricDepartmentsCount">6</span>
           <span class="metric-label">Active Campus Departments</span>
@@ -565,7 +566,7 @@
       </div>
 
       <div class="metric-card">
-        <div class="metric-icon green-icon">✅</div>
+        <div class="metric-icon green-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg></div>
         <div class="metric-details">
           <span class="metric-value" id="metricAcknowledgedCount">0</span>
           <span class="metric-label">Receipts Acknowledged</span>
@@ -576,12 +577,12 @@
     <!-- Portal Primary View Switcher: Official Circulars vs Community Lounge -->
     <div class="view-mode-tabs-wrap">
       <button class="view-mode-tab active" id="tabCircularsViewBtn">
-        <span class="tab-icon">📋</span>
+        <span class="tab-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg></span>
         <span class="tab-title">Official Circulars Board</span>
         <span class="tab-badge" id="circularsTabBadge">0 Records</span>
       </button>
       <button class="view-mode-tab" id="tabCommunityLoungeBtn">
-        <span class="tab-icon">💬</span>
+        <span class="tab-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></span>
         <span class="tab-title">Campus Lounge &amp; Files Group</span>
         <span class="tab-badge green-badge" id="loungeTabBadge">Live Open Channel</span>
       </button>
@@ -605,12 +606,12 @@
             
             <div class="dept-pills-row" id="departmentPills">
               <button class="dept-pill-btn active" data-dept="ALL">All Departments</button>
-              <button class="dept-pill-btn" data-dept="Examination Cell">📝 Examination Cell</button>
-              <button class="dept-pill-btn" data-dept="Academic Affairs">📚 Academic Affairs</button>
-              <button class="dept-pill-btn" data-dept="Training & Placement">💼 Training & Placement</button>
-              <button class="dept-pill-btn" data-dept="Dean's Office">🏛️ Dean's Office / Admin</button>
-              <button class="dept-pill-btn" data-dept="Student Welfare">🎉 Student Welfare</button>
-              <button class="dept-pill-btn" data-dept="Sports Directorate">🏆 Sports Directorate</button>
+              <button class="dept-pill-btn" data-dept="Examination Cell">Examination Cell</button>
+              <button class="dept-pill-btn" data-dept="Academic Affairs">Academic Affairs</button>
+              <button class="dept-pill-btn" data-dept="Training & Placement">Training & Placement</button>
+              <button class="dept-pill-btn" data-dept="Dean's Office">Dean's Office / Admin</button>
+              <button class="dept-pill-btn" data-dept="Student Welfare">Student Welfare</button>
+              <button class="dept-pill-btn" data-dept="Sports Directorate">Sports Directorate</button>
             </div>
 
             <!-- Sub-filters: Priority & Audience -->
@@ -619,9 +620,9 @@
                 <label class="control-label">Priority:</label>
                 <select id="priorityFilterSelect" class="control-select">
                   <option value="ALL">All Priorities</option>
-                  <option value="Urgent">🚨 Urgent Only</option>
-                  <option value="High">⚠️ High Priority</option>
-                  <option value="Routine">ℹ️ Routine Announcements</option>
+                  <option value="Urgent">Urgent Priority</option>
+                  <option value="High">High Priority</option>
+                  <option value="Routine">Routine Announcements</option>
                 </select>
               </div>
 
@@ -639,10 +640,10 @@
 
               <div class="filter-actions-group">
                 <button class="btn btn-sm btn-secondary" id="toggleBookmarkedOnlyBtn">
-                  <span>🔖 Saved Circulars</span>
+                  <span>Saved Circulars</span>
                 </button>
                 <button class="btn btn-sm btn-secondary" id="printBoardBtn" title="Print Active Notice Board">
-                  <span>🖨️ Print Board</span>
+                  <span>Print Notice Board</span>
                 </button>
               </div>
             </div>
@@ -661,14 +662,14 @@
 
           <!-- Empty State (Clean zero-data presentation) -->
           <div class="empty-state-card" id="emptyStateCard" style="display: none;">
-            <div class="empty-crest">🏛️</div>
+            <div class="empty-crest"><img src="assets/logo.svg" width="48" height="48" alt="Campus"></div>
             <h3 class="empty-title">No Official Circulars on Record</h3>
             <p class="empty-text">
               The Campus Notification Management repository is currently empty and synchronized. 
               Authorized officers can issue an official academic circular or notification using the button below.
             </p>
             <button class="btn btn-primary btn-lg" id="emptyStateCreateBtn">
-              <span>➕ Issue First Official Notification</span>
+              <span>Issue First Official Notification</span>
             </button>
           </div>
         </section>
@@ -683,7 +684,7 @@
                 <span class="pulse-indicator"></span>
                 <span>CAMPUS ALL-MEMBERS GROUP</span>
               </div>
-              <h2 class="lounge-title">💬 Campus Community Lounge &amp; Resource Hub</h2>
+              <h2 class="lounge-title">Campus Community Lounge &amp; Resource Hub</h2>
               <p class="lounge-subtitle">
                 Open collaborative channel where all students, faculty members, and administrators can converse, discuss academic events, and share study files, PDF circulars, and notes.
               </p>
@@ -710,7 +711,7 @@
             <!-- Selected File Preview Bar (shown when file is picked) -->
             <div class="file-attachment-preview" id="loungeFilePreviewBox" style="display: none;">
               <div class="file-preview-info">
-                <span class="file-preview-icon" id="previewFileIcon">📎</span>
+                <span class="file-preview-icon" id="previewFileIcon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg></span>
                 <div class="file-preview-meta">
                   <strong class="file-preview-name" id="previewFileName">filename.pdf</strong>
                   <span class="file-preview-size" id="previewFileSize">1.2 MB</span>
@@ -732,25 +733,23 @@
               <div class="lounge-composer-toolbar">
                 <!-- Emoji shelf shortcuts -->
                 <div class="emoji-shortcuts-bar">
-                  <span class="emoji-bar-label">Emoji:</span>
-                  <button type="button" class="quick-emoji-btn" data-emoji="👍">👍</button>
-                  <button type="button" class="quick-emoji-btn" data-emoji="🔥">🔥</button>
-                  <button type="button" class="quick-emoji-btn" data-emoji="❤️">❤️</button>
-                  <button type="button" class="quick-emoji-btn" data-emoji="🎉">🎉</button>
-                  <button type="button" class="quick-emoji-btn" data-emoji="📚">📚</button>
-                  <button type="button" class="quick-emoji-btn" data-emoji="💡">💡</button>
-                  <button type="button" class="quick-emoji-btn" data-emoji="📌">📌</button>
+                  <span class="emoji-bar-label">Quick Tag:</span>
+                  <button type="button" class="quick-emoji-btn" data-emoji="[Urgent]">Urgent</button>
+                  <button type="button" class="quick-emoji-btn" data-emoji="[Notice]">Notice</button>
+                  <button type="button" class="quick-emoji-btn" data-emoji="[Academic]">Academic</button>
+                  <button type="button" class="quick-emoji-btn" data-emoji="[Exam]">Exam</button>
+                  <button type="button" class="quick-emoji-btn" data-emoji="[Clarification]">Clarification</button>
                 </div>
 
                 <div class="lounge-action-buttons">
                   <!-- File Upload Input (Hidden) & Trigger Button -->
                   <input type="file" id="loungeFileInput" style="display: none;" accept=".pdf,.doc,.docx,.txt,.png,.jpg,.jpeg,.zip,.ppt,.pptx">
                   <button type="button" class="btn btn-secondary btn-sm" id="triggerLoungeFileBtn" title="Attach Document, PDF or Image">
-                    <span>📎 Share File</span>
+                    <span>Share File</span>
                   </button>
 
                   <button type="submit" class="btn btn-primary btn-sm" id="loungeSendBtn">
-                    <span>Send 🚀</span>
+                    <span>Send Message</span>
                   </button>
                 </div>
               </div>
@@ -793,13 +792,13 @@
             <div class="profile-badge-row">
               <span class="meta-badge green-badge" id="profileHeroStatusBadge">● Active Session</span>
               <span class="ref-no-badge" id="profileHeroIdBadge">ID: ATP0925</span>
-              <span class="meta-badge blue-badge" id="profileHeroAuthorityBadge">👑 Super Admin</span>
+              <span class="meta-badge blue-badge" id="profileHeroAuthorityBadge">Super Admin</span>
             </div>
             
             <!-- Official Profile Bio Card -->
             <div class="profile-bio-box">
               <div class="bio-header-line">
-                <span class="bio-label">📝 Profile Bio:</span>
+                <span class="bio-label">Profile Bio:</span>
                 <button type="button" class="btn-text-action" id="toggleEditBioBtn">Edit Bio</button>
               </div>
               <p class="bio-text" id="profileHeroBioText">Chief System Administrator &amp; Central Notice Dispatch Controller (ATP0925)</p>
@@ -822,7 +821,7 @@
              ================================================================ -->
         <div class="sidebar-panel admin-only-panel" id="adminUserManagementPanel">
           <div class="sidebar-panel-header">
-            <span class="panel-icon">🛡️</span>
+            <span class="panel-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg></span>
             <div class="panel-title-with-badge">
               <h4 class="sidebar-panel-title">Campus User Accounts &amp; Notice Authority Desk</h4>
               <span class="panel-count-tag" id="pendingApprovalsBadge">0 Pending</span>
@@ -842,7 +841,7 @@
              ================================================================ -->
         <div class="sidebar-panel">
           <div class="sidebar-panel-header">
-            <span class="panel-icon">🔥</span>
+            <span class="panel-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path></svg></span>
             <div class="panel-title-with-badge">
               <h4 class="sidebar-panel-title">Google Firebase Cloud Database Sync</h4>
               <span class="meta-badge" id="firebaseStatusBadge">Local / Standby</span>
@@ -860,7 +859,7 @@
 
             <!-- Firebase Config Collapsible -->
             <details class="firebase-details-collapsible">
-              <summary class="firebase-summary-btn">⚙️ Configure Firebase Project Credentials</summary>
+              <summary class="firebase-summary-btn">Configure Cloud Project Credentials</summary>
               <div class="firebase-form-body">
                 <div class="form-group">
                   <label for="fbApiKey">Firebase API Key:</label>
@@ -880,7 +879,7 @@
                 </div>
                 <div class="firebase-btn-row">
                   <button type="button" class="btn btn-sm btn-primary" id="saveFirebaseConfigBtn">
-                    <span>🔥 Connect to Firebase Cloud</span>
+                    <span>Connect Cloud Database</span>
                   </button>
                   <button type="button" class="btn btn-sm btn-secondary" id="syncToFirebaseBtn">
                     <span>Cloud Sync</span>
@@ -894,7 +893,7 @@
         <!-- Section C: System Governance -->
         <div class="sidebar-panel">
           <div class="sidebar-panel-header">
-            <span class="panel-icon">🏛️</span>
+            <span class="panel-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18"></path><path d="M5 21V9"></path><path d="M19 21V9"></path><path d="M9 21V9"></path><path d="M15 21V9"></path><path d="M2 9l10-6 10 6"></path></svg></span>
             <h4 class="sidebar-panel-title">System Governance</h4>
           </div>
           <div class="system-meta-list">
@@ -920,24 +919,24 @@
         <!-- Section D: Dispatch Protocol -->
         <div class="sidebar-panel">
           <div class="sidebar-panel-header">
-            <span class="panel-icon">📜</span>
+            <span class="panel-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg></span>
             <h4 class="sidebar-panel-title">Dispatch &amp; Moderation Protocol</h4>
           </div>
           <ul class="protocol-checklist">
             <li>
-              <span class="chk-icon">👑</span>
+              <span class="chk-icon"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="m2 4 3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14"></path></svg></span>
               <span><strong>Admin Notice Authority:</strong> Only Admin or Admin-authorized delegates can publish circulars.</span>
             </li>
             <li>
-              <span class="chk-icon">🗑️</span>
+              <span class="chk-icon"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path></svg></span>
               <span><strong>Central Moderation:</strong> Admin has full authority to delete any comment across the system.</span>
             </li>
             <li>
-              <span class="chk-icon">❤️</span>
+              <span class="chk-icon"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></span>
               <span><strong>Viewers &amp; Reactions:</strong> All campus members can comment, like, and react with emojis.</span>
             </li>
             <li>
-              <span class="chk-icon">💬</span>
+              <span class="chk-icon"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></span>
               <span><strong>Community Lounge:</strong> Open group channel with file sharing (PDF, docs, images).</span>
             </li>
           </ul>
@@ -946,7 +945,7 @@
         <!-- Section E: Project Architecture -->
         <div class="sidebar-panel">
           <div class="sidebar-panel-header">
-            <span class="panel-icon">☕</span>
+            <span class="panel-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg></span>
             <h4 class="sidebar-panel-title">Project Architecture</h4>
           </div>
           <p class="sidebar-info-text">
@@ -1031,8 +1030,8 @@
             <label for="noticePriority">Priority Level <span class="req">*</span></label>
             <select id="noticePriority" required>
               <option value="Routine">Routine Announcement</option>
-              <option value="High">⚠️ High Priority</option>
-              <option value="Urgent">🚨 Urgent (Immediate Action Required)</option>
+              <option value="High">High Priority</option>
+              <option value="Urgent">Urgent Priority (Immediate Action Required)</option>
             </select>
           </div>
 
@@ -1104,7 +1103,7 @@
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" id="closeLetterheadBtn">Close</button>
         <button type="button" class="btn btn-primary" id="printLetterheadBtn">
-          <span>🖨️ Print / Save as PDF</span>
+          <span>Print / Save as PDF</span>
         </button>
       </div>
     </div>
@@ -1155,9 +1154,9 @@
 
       <!-- Auth Tab Switcher -->
       <div class="auth-tabs-row">
-        <button class="auth-tab-btn active" id="authTabLoginBtn">🔑 Sign In</button>
-        <button class="auth-tab-btn" id="authTabRegisterBtn">✨ Create Account</button>
-        <button class="auth-tab-btn" id="authTabSwitchBtn">👥 Switch Account</button>
+        <button class="auth-tab-btn active" id="authTabLoginBtn">Sign In</button>
+        <button class="auth-tab-btn" id="authTabRegisterBtn">Create Account</button>
+        <button class="auth-tab-btn" id="authTabSwitchBtn">Switch Account</button>
       </div>
 
       <div class="modal-body auth-modal-body">
@@ -1167,7 +1166,7 @@
           <!-- Quick Admin Sign-in Banner -->
           <div class="admin-quick-login-card">
             <div class="admin-quick-info">
-              <span class="admin-crown">👑</span>
+              <span class="admin-crown"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="m2 4 3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14"></path></svg></span>
               <div>
                 <strong>Super Admin Access</strong>
                 <p>Central Administration Portal</p>
@@ -1207,7 +1206,7 @@
 
             <div class="modal-footer" style="padding: 0; margin-top: 18px;">
               <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">
-                <span>Sign In to Campus Portal 🚀</span>
+                <span>Sign In to Campus Portal</span>
               </button>
             </div>
           </form>
@@ -1216,7 +1215,7 @@
         <!-- TAB 2: REGISTER -->
         <div id="authPaneRegister" class="auth-pane" style="display: none;">
           <div class="auth-helper-banner">
-            <span class="helper-icon">🛡️</span>
+            <span class="helper-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg></span>
             <div>
               <strong>Multi-Account Device Rule:</strong>
               <p>You can create multiple accounts on this device. Newly registered accounts require <strong>Admin approval</strong> before activation.</p>
@@ -1341,7 +1340,7 @@
         </div>
 
         <div class="privacy-certification-badge">
-          <span>🏛️ VERIFIED INSTITUTIONAL DATA PRIVACY POLICY &bull; COMPLIANT WITH FERPA &amp; DIGITAL PERSONAL DATA PROTECTION (DPDP) STANDARDS &bull; 2026</span>
+          <span>VERIFIED INSTITUTIONAL DATA PRIVACY POLICY &bull; COMPLIANT WITH FERPA &amp; DIGITAL PERSONAL DATA PROTECTION (DPDP) STANDARDS &bull; 2026</span>
         </div>
 
       </div>
@@ -1355,6 +1354,7 @@
   <!-- Toast Notification Container -->
   <div class="toast-container" id="toastContainer" aria-live="polite"></div>
 
+  <script src="icons.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

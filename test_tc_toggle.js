@@ -31,4 +31,4 @@ assert.strictEqual(drawerContent.includes('Admin Approval Shield'), true, 'Drawe
 assert.strictEqual(drawerContent.includes('Right to Erasure'), true, 'Drawer contains Right to Erasure');
 console.log('✔ Check 4: Privacy pillars & protections are neatly contained inside the hidden drawer');
 
-console.log('\nALL T&C TESTS PASSED SUCCESSFULLY! 🚀');
+console.log('\nALL T&C TESTS PASSED SUCCESSFULLY!');

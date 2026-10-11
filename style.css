@@ -3770,10 +3770,12 @@ button, input, textarea, select {
 }
 
 .privacy-rules-list li::before {
-  content: '🛡️';
+  content: '•';
   position: absolute;
-  left: 0;
-  font-size: 0.8rem;
+  left: 4px;
+  color: var(--primary);
+  font-size: 1rem;
+  line-height: 1.1;
 }
 
 .privacy-certification-badge {
@@ -3948,6 +3950,8 @@ button, input, textarea, select {
 
 .phone-auth-icon {
   font-size: 1.1rem;
+  display: inline-flex;
+  align-items: center;
 }
 
 .firebase-phone-drawer {
@@ -3958,6 +3962,93 @@ button, input, textarea, select {
   margin-top: 10px;
   margin-bottom: 8px;
   animation: fadeIn 0.25s ease;
+}
+
+/* ============================================================================
+   ENTERPRISE VECTOR ICONOGRAPHY & BRAND STYLING
+   ============================================================================ */
+.cnms-svg-icon {
+  display: inline-block;
+  vertical-align: -0.15em;
+  stroke-width: 2;
+  transition: transform 0.15s ease, stroke 0.15s ease, color 0.15s ease;
+}
+
+.cnms-brand-logo-wrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+
+.cnms-brand-mark {
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  box-shadow: 0 2px 10px rgba(79, 70, 229, 0.35);
+  display: block;
+  flex-shrink: 0;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cnms-brand-logo-wrapper:hover .cnms-brand-mark {
+  transform: scale(1.05);
+}
+
+.status-indicator-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 6px;
+  background-color: #94A3B8;
+  vertical-align: middle;
+}
+
+.status-indicator-dot.online {
+  background-color: #10B981;
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.7);
+}
+
+.reaction-btn-modern {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  padding: 5px 12px;
+  border-radius: 20px;
+  background: var(--bg-subtle, rgba(255, 255, 255, 0.04));
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+  color: var(--text-secondary, #94A3B8);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reaction-btn-modern:hover {
+  background: rgba(99, 102, 241, 0.12);
+  border-color: rgba(99, 102, 241, 0.3);
+  color: #818CF8;
+  transform: translateY(-1px);
+}
+
+.reaction-btn-modern.active {
+  background: rgba(99, 102, 241, 0.2);
+  border-color: #6366F1;
+  color: #A5B4FC;
+}
+
+.locked-metric-wrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #94A3B8;
+}
+
+.btn-icon-wrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
 

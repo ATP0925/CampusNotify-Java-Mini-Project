@@ -91,8 +91,13 @@ global.crypto = {
 };
 global.TextEncoder = require('util').TextEncoder;
 
-// 2. Load app.js
+// 2. Load icons.js & app.js
 const vm = require('vm');
+const iconsJsPath = path.join(__dirname, 'icons.js');
+const iconsCode = fs.readFileSync(iconsJsPath, 'utf8');
+vm.runInThisContext(iconsCode);
+global.CNMS_ICONS = CNMS_ICONS;
+
 const appJsPath = path.join(__dirname, 'app.js');
 const appCode = fs.readFileSync(appJsPath, 'utf8');
 
@@ -130,8 +135,8 @@ async function runTests() {
 
   // Calling render() in unauthenticated state
   cnms.render();
-  assert('KPI Metric total circulars shows lock icon 🔒', cnms.dom.metricTotalCirculars.textContent === '🔒');
-  assert('KPI Metric urgent circulars shows lock icon 🔒', cnms.dom.metricUrgentCirculars.textContent === '🔒');
+  assert('KPI Metric total circulars shows locked status', cnms.dom.metricTotalCirculars.textContent === 'Locked' || cnms.dom.metricTotalCirculars.textContent === '🔒');
+  assert('KPI Metric urgent circulars shows locked status', cnms.dom.metricUrgentCirculars.textContent === 'Locked' || cnms.dom.metricUrgentCirculars.textContent === '🔒');
   assert('Shield card mentions Official Campus Circulars Restricted', cnms.dom.noticesContainer.innerHTML.includes('Official Campus Circulars Restricted'));
 
   // Verify interactions are blocked when unauthenticated
@@ -160,7 +165,7 @@ async function runTests() {
 
   // Render when logged in
   cnms.render();
-  assert('KPI metrics display active circulars count', cnms.dom.metricTotalCirculars.textContent !== '🔒');
+  assert('KPI metrics display active circulars count', cnms.dom.metricTotalCirculars.textContent !== 'Locked' && cnms.dom.metricTotalCirculars.textContent !== '🔒');
   assert('Notices list renders actual circulars', !cnms.dom.noticesContainer.innerHTML.includes('auth-gate-shield-card'));
 
   // --- TEST PILLAR 3: Notice Posting Authority ---
@@ -291,7 +296,7 @@ async function runTests() {
   // Admin approves account
   registeredUser.status = 'APPROVED';
   let loginSuccess = false;
-  cnms.showToast = (msg, type) => { if (type === 'success' && msg.includes('Logged in successfully')) loginSuccess = true; };
+  cnms.showToast = (msg, type) => { if (type === 'success' && (msg.includes('Logged in successfully') || msg.includes('Signed in successfully'))) loginSuccess = true; };
   await cnms.handleInstaLoginSubmit();
   assert('Approved account logs in successfully', loginSuccess && cnms.currentUser.username === 'pooja_verma');
 

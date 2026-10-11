@@ -307,7 +307,7 @@ class CampusNotificationManagementSystem {
       this.firebaseConnected = true;
 
       if (statusBadge) {
-        statusBadge.textContent = '🟢 Cloud Connected';
+        statusBadge.textContent = '● Cloud Connected';
         statusBadge.className = 'meta-badge green-badge';
       }
       if (engineText) {
@@ -443,10 +443,9 @@ class CampusNotificationManagementSystem {
     }
   }
 
-  // Manual batch push of all local data to Firebase
-  async syncAllToFirebase() {
+  async syncLocalToCloud() {
     if (!this.firestoreDb) {
-      this.showToast('Please configure your Firebase credentials first.', 'error');
+      this.showToast('Firestore is not connected yet.', 'warning');
       return;
     }
 
@@ -468,7 +467,7 @@ class CampusNotificationManagementSystem {
         await this.pushToCloud('cnms_community_messages', msg.id, msg);
       }
 
-      this.showToast('Successfully synchronized with Google Cloud Firestore! 🔥', 'success');
+      this.showToast('Successfully synchronized with Google Cloud Firestore.', 'success');
     } catch (err) {
       this.showToast('Sync error: ' + err.message, 'error');
     }
@@ -1239,7 +1238,7 @@ class CampusNotificationManagementSystem {
     if (this.dom.acknowledgePrivacyBtn) {
       this.dom.acknowledgePrivacyBtn.addEventListener('click', () => {
         this.closePrivacyModal();
-        this.showToast('Institutional Data Privacy Policy acknowledged. 🛡️', 'success');
+        this.showToast('Institutional Data Privacy Policy acknowledged.', 'success');
       });
     }
 
@@ -1300,9 +1299,9 @@ class CampusNotificationManagementSystem {
   updateUserSessionUI() {
     if (!this.isAuthenticated()) {
       if (this.dom.navUserName) this.dom.navUserName.textContent = 'Guest / Unverified';
-      if (this.dom.navUserAvatar) this.dom.navUserAvatar.textContent = '🔒';
+      if (this.dom.navUserAvatar) this.dom.navUserAvatar.innerHTML = '<span class="avatar-lock">CN</span>';
       if (this.dom.navUserRole) {
-        this.dom.navUserRole.innerHTML = `🔒 Restricted &bull; Sign in required <span class="profile-gear-icon">🔐</span>`;
+        this.dom.navUserRole.innerHTML = `Restricted &bull; Sign in required <span class="profile-gear-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="cnms-svg-icon icon-lock"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></span>`;
       }
       if (this.dom.openNewNoticeBtn) {
         this.dom.openNewNoticeBtn.style.display = 'none';
@@ -1312,7 +1311,7 @@ class CampusNotificationManagementSystem {
       }
       if (this.dom.globalSearchInput) {
         this.dom.globalSearchInput.disabled = true;
-        this.dom.globalSearchInput.placeholder = '🔒 Sign in required to search official notices...';
+        this.dom.globalSearchInput.placeholder = 'Sign in required to search official notices...';
       }
       if (this.dom.adminUserManagementPanel) {
         this.dom.adminUserManagementPanel.style.display = 'none';
@@ -1335,11 +1334,11 @@ class CampusNotificationManagementSystem {
     if (this.dom.navUserAvatar) this.dom.navUserAvatar.textContent = this.getInitials(this.currentUser.name);
     if (this.dom.navUserRole) {
       if (isAdm) {
-        this.dom.navUserRole.innerHTML = `👑 Admin &bull; ${this.currentUser.username || 'ATP0925'} <span class="profile-gear-icon">⚙️</span>`;
+        this.dom.navUserRole.innerHTML = `Admin &bull; ${this.currentUser.username || 'ATP0925'} <span class="profile-gear-icon"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg></span>`;
       } else if (canPost) {
-        this.dom.navUserRole.innerHTML = `📢 Publisher &bull; @${this.currentUser.username} <span class="profile-gear-icon">⚙️</span>`;
+        this.dom.navUserRole.innerHTML = `Publisher &bull; @${this.currentUser.username} <span class="profile-gear-icon"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg></span>`;
       } else {
-        this.dom.navUserRole.innerHTML = `👁️ Viewer &bull; @${this.currentUser.username} <span class="profile-gear-icon">⚙️</span>`;
+        this.dom.navUserRole.innerHTML = `Viewer &bull; @${this.currentUser.username} <span class="profile-gear-icon"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg></span>`;
       }
     }
 
@@ -1353,7 +1352,7 @@ class CampusNotificationManagementSystem {
       } else {
         this.dom.openNewNoticeBtn.style.opacity = '0.7';
         this.dom.openNewNoticeBtn.title = 'Authority Restricted: Only Admin or authorized officers can issue notices';
-        if (this.dom.newNoticeBtnLabel) this.dom.newNoticeBtnLabel.textContent = '🔒 View Only';
+        if (this.dom.newNoticeBtnLabel) this.dom.newNoticeBtnLabel.textContent = 'View Only';
       }
     }
 
@@ -1377,13 +1376,13 @@ class CampusNotificationManagementSystem {
     }
     if (this.dom.profileHeroAuthorityBadge) {
       if (isAdm) {
-        this.dom.profileHeroAuthorityBadge.textContent = '👑 Super Admin';
+        this.dom.profileHeroAuthorityBadge.textContent = 'Super Admin';
         this.dom.profileHeroAuthorityBadge.className = 'meta-badge blue-badge';
       } else if (canPost) {
-        this.dom.profileHeroAuthorityBadge.textContent = '📢 Circular Publisher';
+        this.dom.profileHeroAuthorityBadge.textContent = 'Circular Publisher';
         this.dom.profileHeroAuthorityBadge.className = 'meta-badge green-badge';
       } else {
-        this.dom.profileHeroAuthorityBadge.textContent = '👁️ Viewer Only';
+        this.dom.profileHeroAuthorityBadge.textContent = 'Viewer Only';
         this.dom.profileHeroAuthorityBadge.className = 'meta-badge';
       }
     }
@@ -1483,8 +1482,8 @@ class CampusNotificationManagementSystem {
           if (this.dom.loungeFilePreviewBox) this.dom.loungeFilePreviewBox.style.display = 'flex';
           if (this.dom.previewFileName) this.dom.previewFileName.textContent = file.name;
           if (this.dom.previewFileSize) this.dom.previewFileSize.textContent = this.formatFileSize(this.currentAttachedFile.size);
-          if (this.dom.previewFileIcon) this.dom.previewFileIcon.textContent = '🖼️';
-          this.showToast(`Optimized image attached: ${file.name} 📎`);
+          if (this.dom.previewFileIcon) this.dom.previewFileIcon.innerHTML = CNMS_ICONS.image;
+          this.showToast(`Image attached: ${file.name}`);
         };
         img.src = event.target.result;
       };
@@ -1508,7 +1507,7 @@ class CampusNotificationManagementSystem {
       if (this.dom.previewFileSize) this.dom.previewFileSize.textContent = this.formatFileSize(file.size);
       if (this.dom.previewFileIcon) this.dom.previewFileIcon.textContent = this.getFileIcon(file.name);
 
-      this.showToast(`Attached file: ${file.name} 📎`);
+      this.showToast(`File attached: ${file.name}`);
     };
     reader.readAsDataURL(file);
   }
@@ -1563,7 +1562,7 @@ class CampusNotificationManagementSystem {
 
     this.renderCommunityLounge();
     this.scrollLoungeToBottom();
-    this.showToast('Message sent to Campus Lounge! 🚀', 'success');
+    this.showToast('Message posted to Campus Lounge.', 'success');
   }
 
   handleDeleteLoungeMessage(msgId) {
@@ -1599,29 +1598,29 @@ class CampusNotificationManagementSystem {
     if (!this.dom.loungeMessagesFeed) return;
 
     if (!this.isAuthenticated()) {
-      if (this.dom.loungeMessagesCount) this.dom.loungeMessagesCount.textContent = '🔒';
-      if (this.dom.loungeFilesCount) this.dom.loungeFilesCount.textContent = '🔒';
+      if (this.dom.loungeMessagesCount) this.dom.loungeMessagesCount.textContent = '—';
+      if (this.dom.loungeFilesCount) this.dom.loungeFilesCount.textContent = '—';
       if (this.dom.loungeTextInput) {
         this.dom.loungeTextInput.disabled = true;
-        this.dom.loungeTextInput.placeholder = '🔒 Sign in required to participate in community discussions...';
+        this.dom.loungeTextInput.placeholder = 'Sign in required to participate in community discussions...';
       }
       if (this.dom.loungeSendBtn) this.dom.loungeSendBtn.disabled = true;
       if (this.dom.loungeAttachBtn) this.dom.loungeAttachBtn.disabled = true;
 
       this.dom.loungeMessagesFeed.innerHTML = `
         <div class="auth-gate-shield-card" style="margin: 32px auto; max-width: 480px;">
-          <div class="gate-shield-icon">💬</div>
+          <div class="gate-shield-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="cnms-svg-icon"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></div>
           <h3 class="gate-shield-title">Campus Lounge Discussion Restricted</h3>
           <p class="gate-shield-desc">
             Campus discussion channels, academic queries, and peer document sharing are strictly reserved for verified students and faculty.
           </p>
           <div class="gate-action-buttons">
             <button type="button" class="btn btn-primary btn-sm" id="gateLoungeLoginPromptBtn">
-              <span>Sign In to Join Discussion 🔑</span>
+              <span>Sign In to Join Discussion</span>
             </button>
           </div>
           <div class="gate-privacy-badge">
-            <span>🛡️ Institutional Verification Required</span>
+            <span>Institutional Verification Required</span>
           </div>
         </div>
       `;
@@ -1651,7 +1650,7 @@ class CampusNotificationManagementSystem {
     if (totalMsgs === 0) {
       this.dom.loungeMessagesFeed.innerHTML = `
         <div style="text-align: center; margin: auto; padding: 40px 16px; color: var(--text-dim);">
-          <div style="font-size: 2.2rem; margin-bottom: 8px;">💬</div>
+          <div style="margin-bottom: 8px; color: var(--primary);"><svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="cnms-svg-icon"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></div>
           <h4 style="color: var(--text-muted); margin-bottom: 4px;">Campus Community Lounge is Ready</h4>
           <p style="font-size: 0.85rem; max-width: 440px; margin: 0 auto;">
             No messages posted yet. All campus students, faculty, and administrators can start a discussion or share academic files here.
@@ -1666,8 +1665,8 @@ class CampusNotificationManagementSystem {
       const isMe = Boolean(this.currentUser && msg.senderId === this.currentUser.id);
       const canDelete = this.isAdmin() || isMe;
       const roleBadge = isAdm
-        ? `<span class="comment-role-tag comment-role-admin">👑 Admin</span>`
-        : `<span class="comment-role-tag comment-role-viewer">🎓 Member</span>`;
+        ? `<span class="comment-role-tag comment-role-admin">Admin</span>`
+        : `<span class="comment-role-tag comment-role-viewer">Member</span>`;
 
       return `
         <div class="lounge-msg-item" id="msg_${msg.id}">
@@ -1685,7 +1684,7 @@ class CampusNotificationManagementSystem {
                 <span class="lounge-msg-time">${this.formatDate(msg.timestamp)}</span>
                 ${canDelete ? `
                   <button type="button" class="comment-delete-btn lounge-msg-del-btn" data-msg-id="${msg.id}" title="${this.isAdmin() ? 'Super Admin: Delete message' : 'Delete your message'}">
-                    🗑️
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="cnms-svg-icon"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
                   </button>
                 ` : ''}
               </div>
@@ -1811,7 +1810,7 @@ class CampusNotificationManagementSystem {
         return { score: 3, text: 'Strong (SHA-256 Cryptographic Shield)', percent: 80, color: '#10b981' };
       case 5:
       default:
-        return { score: 4, text: 'Maximum (Enterprise Vault Grade 🛡️)', percent: 100, color: '#0095f6' };
+        return { score: 4, text: 'Maximum (Enterprise Vault Grade)', percent: 100, color: '#0095f6' };
     }
   }
 
@@ -1894,10 +1893,10 @@ class CampusNotificationManagementSystem {
       const isAdm = u.role === 'ADMIN';
       const isPending = u.status === 'PENDING';
       const badge = isAdm
-        ? '👑 Admin'
+        ? 'Admin'
         : isPending
-          ? '🕒 Pending Approval'
-          : '✅ Approved';
+          ? 'Pending Approval'
+          : 'Approved';
 
       return `
         <div class="insta-profile-chip ${isCur ? 'is-active-chip' : ''}" data-insta-switch-id="${u.id}" title="${isPending ? 'Pending clearance by Campus Administration' : `Switch session to ${u.name}`}">
@@ -1916,7 +1915,7 @@ class CampusNotificationManagementSystem {
     if (!user) return;
 
     if (user.status === 'PENDING') {
-      this.showToast(`🔒 Privacy & Security Guard: Account @${user.username} is pending clearance by Campus Administration.`, 'error');
+      this.showToast(`Privacy & Security Notice: Account @${user.username} is pending clearance by Campus Administration.`, 'error');
       return;
     }
     if (user.status === 'REJECTED') {
@@ -1928,7 +1927,7 @@ class CampusNotificationManagementSystem {
     this.saveUsers();
     this.updateUserSessionUI();
     this.enterCampusPortal();
-    this.showToast(`Switched active session to ${user.name}! 👥`, 'success');
+    this.showToast(`Switched active session to ${user.name}.`, 'success');
   }
 
   async handleInstaLoginSubmit() {
@@ -1949,7 +1948,7 @@ class CampusNotificationManagementSystem {
       this.saveUsers();
       this.updateUserSessionUI();
       this.enterCampusPortal();
-      this.showToast('Logged in as Super Admin (Pratik Atpadkar) 👑', 'success');
+      this.showToast('Signed in as Super Admin (Pratik Atpadkar).', 'success');
       return;
     }
 
@@ -1976,7 +1975,7 @@ class CampusNotificationManagementSystem {
 
     // 3. Status Gatekeeper & Institutional Security Policy
     if (user.status === 'PENDING') {
-      this.showToast(`🔒 Institutional Security Policy: Account @${user.username} is PENDING approval from Campus Administration. Multi-account policy requires verification.`, 'error');
+      this.showToast(`Institutional Security Policy: Account @${user.username} is PENDING approval from Campus Administration. Multi-account policy requires verification.`, 'error');
       return;
     }
 
@@ -1990,7 +1989,7 @@ class CampusNotificationManagementSystem {
     this.saveUsers();
     this.updateUserSessionUI();
     this.enterCampusPortal();
-    this.showToast(`Logged in successfully as @${user.username}! 🚀`, 'success');
+    this.showToast(`Signed in successfully as @${user.username}.`, 'success');
   }
 
   async handleInstaRegisterSubmit() {
@@ -2060,7 +2059,7 @@ class CampusNotificationManagementSystem {
     // Push to Google Cloud Firebase
     this.pushToCloud('cnms_users', newUser.id, newUser);
 
-    this.showToast(`🎉 Welcome to CampusNotify, @${cleanUsername}! Account registered. 🕒 Awaiting clearance by Campus Administration.`, 'success');
+    this.showToast(`Welcome to CampusNotify, @${cleanUsername}! Account registered. Awaiting clearance by Campus Administration.`, 'success');
 
     // Switch to login box and prefill identifier
     this.switchInstaAuthMode('login');
@@ -2138,7 +2137,7 @@ class CampusNotificationManagementSystem {
     this.updateUserSessionUI();
     this.closeAuthModal();
     this.enterCampusPortal();
-    this.showToast('Logged in as Super Admin (Pratik Atpadkar) 👑', 'success');
+    this.showToast('Signed in as Super Admin (Pratik Atpadkar).', 'success');
 
     // Attempt Firebase Email/Password Auth Sync in background
     if (this.firebaseAuth) {
@@ -2186,7 +2185,7 @@ class CampusNotificationManagementSystem {
             await this.syncFirebaseUserToLocal(fbRes.user);
             this.closeAuthModal();
             this.enterCampusPortal();
-            this.showToast(`Signed in via Firebase Auth as ${fbRes.user.email}! 🚀`, 'success');
+            this.showToast(`Signed in via Firebase Auth as ${fbRes.user.email}.`, 'success');
             return;
           }
         } catch (fbErr) {
@@ -2218,7 +2217,7 @@ class CampusNotificationManagementSystem {
     this.updateUserSessionUI();
     this.closeAuthModal();
     this.enterCampusPortal();
-    this.showToast(`Signed in successfully as ${user.name}! 🚀`, 'success');
+    this.showToast(`Signed in successfully as ${user.name}.`, 'success');
 
     // Sync to Firebase Auth in background
     if (this.firebaseAuth && user.email) {
@@ -2299,7 +2298,7 @@ class CampusNotificationManagementSystem {
     // Push to Google Firebase Cloud
     this.pushToCloud('cnms_users', newUser.id, newUser);
 
-    this.showToast(`Account @${cleanUsername} registered! 🕒 Awaiting Admin approval.`, 'info');
+    this.showToast(`Account @${cleanUsername} registered. Awaiting administrative review.`, 'info');
     this.switchAuthTab('switch');
   }
 
@@ -2316,10 +2315,10 @@ class CampusNotificationManagementSystem {
       const isAdm = u.role === 'ADMIN';
       const isPending = u.status === 'PENDING';
       const statusBadge = isAdm
-        ? `<span class="meta-badge blue-badge">👑 Admin</span>`
+        ? `<span class="meta-badge blue-badge">Admin</span>`
         : isPending
-          ? `<span class="meta-badge" style="color: #f59e0b; border-color: rgba(245,158,11,0.4);">🕒 Pending Admin Approval</span>`
-          : `<span class="meta-badge green-badge">✅ Approved</span>`;
+          ? `<span class="meta-badge" style="color: #f59e0b; border-color: rgba(245,158,11,0.4);">Pending Admin Approval</span>`
+          : `<span class="meta-badge green-badge">Approved</span>`;
 
       return `
         <div class="saved-account-item ${isCur ? 'is-current' : ''}">
@@ -2365,7 +2364,7 @@ class CampusNotificationManagementSystem {
     this.updateUserSessionUI();
     this.closeAuthModal();
     this.render();
-    this.showToast(`Switched active account to ${user.name}! 👥`, 'success');
+    this.showToast(`Switched active account to ${user.name}.`, 'success');
   }
 
   /* --------------------------------------------------------------------------
@@ -2405,7 +2404,7 @@ class CampusNotificationManagementSystem {
               <span class="admin-user-meta">
                 Status: <strong>${u.status}</strong> &bull; Authority: 
                 <strong style="color: ${canPost ? '#10b981' : '#94a3b8'};">
-                  ${canPost ? '📢 Notice Publisher' : '👁️ Viewer Only'}
+                  ${canPost ? 'Notice Publisher' : 'Viewer Only'}
                 </strong>
               </span>
               ${u.bio ? `<span class="admin-user-bio">Bio: "${this.escapeHTML(u.bio)}"</span>` : ''}
@@ -2414,18 +2413,18 @@ class CampusNotificationManagementSystem {
           <div class="admin-user-actions">
             ${isPending ? `
               <button type="button" class="btn btn-xs btn-primary" data-admin-action="approve" data-user-id="${u.id}" title="Approve account for campus access">
-                ✅ Approve
+                Approve
               </button>
               <button type="button" class="btn btn-xs btn-secondary" data-admin-action="reject" data-user-id="${u.id}" title="Decline account">
-                ❌ Reject
+                Reject
               </button>
             ` : `
               <button type="button" class="btn btn-xs ${canPost ? 'btn-secondary' : 'btn-primary'}" data-admin-action="toggle-posting" data-user-id="${u.id}" title="${canPost ? 'Revoke notice publishing authority' : 'Grant notice publishing authority'}">
-                ${canPost ? '🔒 Revoke Authority' : '📢 Grant Notice Authority'}
+                ${canPost ? 'Revoke Authority' : 'Grant Notice Authority'}
               </button>
             `}
             <button type="button" class="btn btn-xs btn-secondary" data-admin-action="delete-user" data-user-id="${u.id}" title="Remove account from portal">
-              🗑️
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="cnms-svg-icon"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
             </button>
           </div>
         </div>
@@ -2442,7 +2441,7 @@ class CampusNotificationManagementSystem {
     this.pushToCloud('cnms_users', user.id, user);
 
     this.renderAdminUsersList();
-    this.showToast(`Account @${user.username} approved! User can now sign in. ✅`, 'success');
+    this.showToast(`Account @${user.username} approved. User can now sign in.`, 'success');
   }
 
   handleAdminRejectUser(userId) {
@@ -2466,7 +2465,7 @@ class CampusNotificationManagementSystem {
     this.pushToCloud('cnms_users', user.id, user);
 
     this.renderAdminUsersList();
-    const statusMsg = user.canPost ? 'Granted notice issuing authority 📢' : 'Revoked notice issuing authority 🔒';
+    const statusMsg = user.canPost ? 'Granted notice publishing authority' : 'Revoked notice publishing authority';
     this.showToast(`Updated @${user.username}: ${statusMsg}`);
   }
 
@@ -2508,7 +2507,7 @@ class CampusNotificationManagementSystem {
       this.dom.bioEditForm.style.display = 'none';
     }
 
-    this.showToast('Profile bio updated successfully! ✨', 'success');
+    this.showToast('Profile bio updated successfully.', 'success');
   }
 
   /* --------------------------------------------------------------------------
@@ -2529,7 +2528,7 @@ class CampusNotificationManagementSystem {
     localStorage.setItem('cnms_firebase_config', JSON.stringify(config));
 
     this.initFirebase();
-    this.showToast('Google Firebase credentials saved! Connecting... 🔥', 'success');
+    this.showToast('Google Firebase credentials saved. Connecting...', 'success');
   }
 
   /* --------------------------------------------------------------------------
@@ -2551,7 +2550,7 @@ class CampusNotificationManagementSystem {
       provider.setCustomParameters({ prompt: 'select_account' });
       const result = await this.firebaseAuth.signInWithPopup(provider);
       const user = result.user;
-      this.showToast(`Signed in with Google as ${user.displayName || user.email} 🎉`, 'success');
+      this.showToast(`Signed in with Google as ${user.displayName || user.email}.`, 'success');
       await this.syncFirebaseUserToLocal(user);
       this.closeAuthModal();
       this.enterCampusPortal();
@@ -2622,7 +2621,7 @@ class CampusNotificationManagementSystem {
       this.showToast('Verifying SMS code...', 'info');
       const result = await this.phoneConfirmationResult.confirm(code);
       const user = result.user;
-      this.showToast(`Phone verified successfully! Logged in as ${user.phoneNumber} 📱`, 'success');
+      this.showToast(`Phone verified successfully. Signed in as ${user.phoneNumber}.`, 'success');
       await this.syncFirebaseUserToLocal(user);
       this.closeAuthModal();
       this.enterCampusPortal();
@@ -2697,7 +2696,7 @@ class CampusNotificationManagementSystem {
     if (this.dom && this.dom.themeToggleBtn && typeof this.dom.themeToggleBtn.querySelector === 'function') {
       const iconSpan = this.dom.themeToggleBtn.querySelector('.theme-icon');
       if (iconSpan) {
-        iconSpan.textContent = theme === 'dark' ? '🌓' : '☀️';
+        iconSpan.innerHTML = theme === 'dark' ? CNMS_ICONS.moon : CNMS_ICONS.sun;
       }
     }
   }
@@ -2746,7 +2745,7 @@ class CampusNotificationManagementSystem {
       this.showToast('Unliked circular');
     } else {
       notice.likes.push(userId);
-      this.showToast('Liked circular ❤️', 'success');
+      this.showToast('Endorsed circular.', 'success');
     }
 
     this.saveNotices();
@@ -2802,7 +2801,7 @@ class CampusNotificationManagementSystem {
     } else {
       this.acknowledgedSet.add(noticeId);
       notice.acknowledgedCount = (notice.acknowledgedCount || 0) + 1;
-      this.showToast('Official receipt acknowledged & recorded ✅', 'success');
+      this.showToast('Official receipt acknowledged and recorded.', 'success');
     }
 
     this.saveNotices();
@@ -2822,7 +2821,7 @@ class CampusNotificationManagementSystem {
       this.showToast('Removed circular from saved list');
     } else {
       this.bookmarkSet.add(noticeId);
-      this.showToast('Circular pinned to your saved desk 🔖', 'info');
+      this.showToast('Circular pinned to your saved desk.', 'info');
     }
 
     this.saveInteractions();
@@ -2870,7 +2869,7 @@ class CampusNotificationManagementSystem {
 
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(copyText).then(() => {
-        this.showToast('Official circular summary copied to clipboard! 📋');
+        this.showToast('Official circular summary copied to clipboard.');
       }).catch(() => {
         this.showToast('Circular summary ready');
       });
@@ -2977,7 +2976,7 @@ class CampusNotificationManagementSystem {
     this.pushToCloud('cnms_notices', newCircular.id, newCircular);
 
     this.closeNewNoticeModal();
-    this.showToast(`Official Circular [${refNo}] published to campus board! 📢`, 'success');
+    this.showToast(`Official Circular [${refNo}] published to campus board.`, 'success');
     this.render();
   }
 
@@ -2998,7 +2997,7 @@ class CampusNotificationManagementSystem {
     if (this.dom.letterheadDocument) {
       this.dom.letterheadDocument.innerHTML = `
         <div class="lh-college-banner">
-          <div class="lh-crest">🏛️</div>
+          <div class="lh-crest"><img src="assets/logo.svg" width="48" height="48" alt="Campus"></div>
           <h2 class="lh-college-name">CAMPUS INSTITUTE OF ENGINEERING & TECHNOLOGY</h2>
           <p class="lh-college-subhead">Approved by AICTE &bull; Affiliated to University &bull; Directorate of Academic Governance</p>
         </div>
@@ -3097,7 +3096,7 @@ class CampusNotificationManagementSystem {
     if (queries.length === 0) {
       this.dom.commentsListContainer.innerHTML = `
         <div style="text-align: center; padding: 24px 12px; color: var(--text-dim); font-size: 0.88rem;">
-          📑 No official inquiries or doubts logged yet.<br>All students, faculty members and coordinators can submit queries below.
+          No official inquiries or doubts logged yet.<br>All students, faculty members and coordinators can submit queries below.
         </div>
       `;
       return;
@@ -3114,9 +3113,9 @@ class CampusNotificationManagementSystem {
             <div class="comment-author-wrap">
               <span class="comment-author">${this.escapeHTML(q.authorName || q.author)}</span>
               ${isAdmComment ? `
-                <span class="comment-role-tag comment-role-admin">👑 Admin</span>
+                <span class="comment-role-tag comment-role-admin">Admin</span>
               ` : `
-                <span class="comment-role-tag comment-role-viewer">👁️ Member</span>
+                <span class="comment-role-tag comment-role-viewer">Member</span>
               `}
               ${q.authorUsername ? `<span style="font-size: 0.7rem; color: var(--text-dim);">@${this.escapeHTML(q.authorUsername)}</span>` : ''}
             </div>
@@ -3124,7 +3123,7 @@ class CampusNotificationManagementSystem {
               <span class="comment-time">${this.formatDate(q.time)}</span>
               ${canDelete ? `
                 <button type="button" class="comment-delete-btn" data-comment-id="${q.id}" title="${this.isAdmin() ? 'Super Admin: Delete this inquiry' : 'Delete your inquiry'}">
-                  🗑️
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="cnms-svg-icon"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
                 </button>
               ` : ''}
             </div>
@@ -3217,9 +3216,9 @@ class CampusNotificationManagementSystem {
      -------------------------------------------------------------------------- */
   render() {
     if (!this.isAuthenticated()) {
-      if (this.dom.metricTotalCirculars) this.dom.metricTotalCirculars.textContent = '🔒';
-      if (this.dom.metricUrgentCirculars) this.dom.metricUrgentCirculars.textContent = '🔒';
-      if (this.dom.metricAcknowledgedCount) this.dom.metricAcknowledgedCount.textContent = '🔒';
+      if (this.dom.metricTotalCirculars) this.dom.metricTotalCirculars.textContent = 'Locked';
+      if (this.dom.metricUrgentCirculars) this.dom.metricUrgentCirculars.textContent = 'Locked';
+      if (this.dom.metricAcknowledgedCount) this.dom.metricAcknowledgedCount.textContent = 'Locked';
       if (this.dom.circularsTabBadge) this.dom.circularsTabBadge.textContent = 'Restricted';
       if (this.dom.noticesCountBadge) this.dom.noticesCountBadge.textContent = '0 (Sign In Required)';
       if (this.dom.activeFilterAlert) this.dom.activeFilterAlert.style.display = 'none';
@@ -3227,7 +3226,7 @@ class CampusNotificationManagementSystem {
       if (this.dom.noticesContainer) {
         this.dom.noticesContainer.innerHTML = `
           <div class="auth-gate-shield-card">
-            <div class="gate-shield-icon">🔒</div>
+            <div class="gate-shield-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="cnms-svg-icon icon-lock"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></div>
             <h3 class="gate-shield-title">Official Campus Circulars Restricted</h3>
             <p class="gate-shield-desc">
               Official semester circulars, examination schedules, departmental alerts, and institutional files are protected.
@@ -3235,11 +3234,11 @@ class CampusNotificationManagementSystem {
             </p>
             <div class="gate-action-buttons">
               <button type="button" class="btn btn-primary" id="gateLoginPromptBtn">
-                <span>Sign In / Create Account 🚀</span>
+                <span>Sign In / Create Account</span>
               </button>
             </div>
             <div class="gate-privacy-badge">
-              <span>🛡️ 256-Bit Cryptography &bull; DPDP Act 2023 Compliant</span>
+              <span>256-Bit Cryptography &bull; DPDP Act 2023 Compliant</span>
             </div>
           </div>
         `;
@@ -3369,6 +3368,14 @@ class CampusNotificationManagementSystem {
 
     // Emoji reactions
     const standardEmojis = ['👍', '❤️', '🔥', '👏', '📌', '💡'];
+    const reactionSvgMap = {
+      '👍': CNMS_ICONS.thumbUp,
+      '❤️': CNMS_ICONS.heart,
+      '🔥': CNMS_ICONS.flame,
+      '👏': CNMS_ICONS.applause,
+      '📌': CNMS_ICONS.pin,
+      '💡': CNMS_ICONS.bulb
+    };
     const reactionsObj = notice.reactions || {};
 
     const reactionChipsHtml = standardEmojis.map(emoji => {
@@ -3382,9 +3389,9 @@ class CampusNotificationManagementSystem {
           class="reaction-chip ${hasReacted ? 'active-reaction' : ''}" 
           data-notice-id="${notice.id}" 
           data-emoji="${emoji}"
-          title="${hasReacted ? 'Click to remove reaction' : `React with ${emoji}`}"
+          title="${hasReacted ? 'Click to remove reaction' : 'Add reaction'}"
         >
-          <span class="emoji-icon">${emoji}</span>
+          <span class="emoji-icon">${reactionSvgMap[emoji] || ''}</span>
           <span class="reaction-count">${count > 0 ? count : ''}</span>
         </button>
       `;
@@ -3401,7 +3408,7 @@ class CampusNotificationManagementSystem {
           <div class="card-badges-cluster">
             <span class="ref-no-badge">REF: ${this.escapeHTML(notice.refNo)}</span>
             <span class="dept-badge ${deptClass}">${this.escapeHTML(notice.department)}</span>
-            <span class="priority-tag ${priorityClass}">${notice.priority === 'Urgent' ? '🚨 URGENT' : notice.priority}</span>
+            <span class="priority-tag ${priorityClass}">${notice.priority === 'Urgent' ? 'URGENT' : notice.priority}</span>
           </div>
           <span class="card-meta-date" title="${notice.issuedAt}">Issued: ${formattedDate}</span>
         </div>
@@ -3414,10 +3421,10 @@ class CampusNotificationManagementSystem {
 
         <!-- Secondary Meta: Audience & Attachment -->
         <div class="card-secondary-meta">
-          <span class="audience-pill">👥 Target: <strong>${this.escapeHTML(notice.audience)}</strong></span>
+          <span class="audience-pill">Target: <strong>${this.escapeHTML(notice.audience)}</strong></span>
           ${notice.attachment ? `
             <div class="attachment-pill-btn" onclick="cnmsApp.openLetterheadModal('${notice.id}')" title="Preview Attached Circular">
-              <span>📎</span>
+              <span><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="cnms-svg-icon"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg></span>
               <span>${this.escapeHTML(notice.attachment)}</span>
             </div>
           ` : ''}
@@ -3445,7 +3452,7 @@ class CampusNotificationManagementSystem {
               data-id="${notice.id}"
               title="Like circular"
             >
-              <span>${isLiked ? '❤️ Liked' : '🤍 Like'}</span>
+              <span>${isLiked ? 'Liked' : 'Like'}</span>
               <span>(${likesCount})</span>
             </button>
 
@@ -3457,7 +3464,7 @@ class CampusNotificationManagementSystem {
               data-id="${notice.id}"
               title="Record read confirmation"
             >
-              <span>${isAcknowledged ? '✅ Acknowledged' : '☑️ Acknowledge'}</span>
+              <span>${isAcknowledged ? 'Acknowledged' : 'Acknowledge'}</span>
               <span>(${acksCount})</span>
             </button>
 
@@ -3469,7 +3476,7 @@ class CampusNotificationManagementSystem {
               data-id="${notice.id}"
               title="Open formal university circular letterhead with seal"
             >
-              <span>📄 Letterhead</span>
+              <span>Letterhead</span>
             </button>
 
             <!-- Inquiry / Comment Desk -->
@@ -3480,7 +3487,7 @@ class CampusNotificationManagementSystem {
               data-id="${notice.id}"
               title="View or submit questions on this circular"
             >
-              <span>💬 Inquiries (${inquiriesCount})</span>
+              <span>Inquiries (${inquiriesCount})</span>
             </button>
 
             <!-- Bookmark / Save -->
@@ -3491,7 +3498,7 @@ class CampusNotificationManagementSystem {
               data-id="${notice.id}"
               title="Pin to your desk"
             >
-              <span>🔖 ${isBookmarked ? 'Pinned' : 'Save'}</span>
+              <span>${isBookmarked ? 'Pinned' : 'Save'}</span>
             </button>
           </div>
 
@@ -3504,7 +3511,7 @@ class CampusNotificationManagementSystem {
               data-id="${notice.id}" 
               title="Copy Circular Link & Summary"
             >
-              📤
+              ${CNMS_ICONS.share}
             </button>
 
             <!-- Delete Notice (Admin or Issuer Authority) -->
@@ -3516,7 +3523,7 @@ class CampusNotificationManagementSystem {
                 data-id="${notice.id}" 
                 title="${this.isAdmin() ? 'Super Admin: Permanently delete circular' : 'Delete circular'}"
               >
-                🗑️
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="cnms-svg-icon"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
               </button>
             ` : ''}
           </div>
@@ -3537,24 +3544,24 @@ class CampusNotificationManagementSystem {
   }
 
   getFileIcon(filename) {
-    if (!filename) return '📎';
+    if (!filename) return CNMS_ICONS.paperclip;
     const ext = filename.split('.').pop().toLowerCase();
     switch (ext) {
-      case 'pdf': return '📕';
+      case 'pdf': return CNMS_ICONS.filePdf;
       case 'doc':
-      case 'docx': return '📘';
+      case 'docx': return CNMS_ICONS.fileWord;
       case 'xls':
-      case 'xlsx': return '📗';
+      case 'xlsx': return CNMS_ICONS.fileExcel;
       case 'ppt':
-      case 'pptx': return '📙';
+      case 'pptx': return CNMS_ICONS.filePowerPoint;
       case 'png':
       case 'jpg':
       case 'jpeg':
-      case 'gif': return '🖼️';
+      case 'gif': return CNMS_ICONS.image;
       case 'zip':
-      case 'rar': return '📦';
-      case 'txt': return '📄';
-      default: return '📎';
+      case 'rar': return CNMS_ICONS.fileZip;
+      case 'txt': return CNMS_ICONS.document;
+      default: return CNMS_ICONS.paperclip;
     }
   }
 
