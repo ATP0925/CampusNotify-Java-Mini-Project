@@ -14,6 +14,13 @@
 
 Designed to eliminate scattered communication across multiple informal channels, CampusNotify introduces a verified reference numbering system, read receipt acknowledgements, printable official circular letterheads, vector reaction engagement, inquiry threads, a community lounge with file sharing, and a **strict Zero-Access Security Gate** compliant with the **Digital Personal Data Protection (DPDP) Act 2023**.
 
+### 📁 Academic Lab Submission Documents (Editable Word / .docx Formats)
+Complete college submission documentation is provided in **editable Microsoft Word (`.docx`) format** (featuring the official college logo, Mumbai University crest, and blank placeholders for student & guide details):
+
+- 📄 **Project Report:** [`CampusNotify_Project_Report.docx`](CampusNotify_Project_Report.docx) &nbsp;|&nbsp; *(Ready-to-Print PDF: [`CampusNotify_Project_Report.pdf`](CampusNotify_Project_Report.pdf))*
+- 📝 **Problem Statement & Synopsis:** [`CampusNotify_Problem_Statement_Synopsis.docx`](CampusNotify_Problem_Statement_Synopsis.docx) &nbsp;|&nbsp; *(Ready-to-Print PDF: [`CampusNotify_Problem_Statement_Synopsis.pdf`](CampusNotify_Problem_Statement_Synopsis.pdf))*
+- 📓 **Mini-Project Logbook:** [`CampusNotify_Mini_Project_Logbook.docx`](CampusNotify_Mini_Project_Logbook.docx) &nbsp;|&nbsp; *(Ready-to-Print PDF: [`CampusNotify_Mini_Project_Logbook.pdf`](CampusNotify_Mini_Project_Logbook.pdf))*
+
 ---
 
 ## Zero-Access Authentication & Privacy Wall
