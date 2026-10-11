@@ -4,7 +4,10 @@
       "emailPassword": true,
       "googleSignIn": {
         "oAuthBrandDisplayName": "CampusNotify",
-        "supportEmail": "atpadkarmaruti@gmail.com"
+        "supportEmail": "atpadkarmaruti@gmail.com",
+        "authorizedRedirectUris": [
+          "https://campnotify-eef91.firebaseapp.com/__/auth/handler"
+        ]
       }
     }
   },
