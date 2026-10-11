@@ -2,12 +2,10 @@
   "auth": {
     "providers": {
       "emailPassword": true,
+      "phone": true,
       "googleSignIn": {
         "oAuthBrandDisplayName": "CampusNotify",
-        "supportEmail": "atpadkarmaruti@gmail.com",
-        "authorizedRedirectUris": [
-          "https://campnotify-eef91.firebaseapp.com/__/auth/handler"
-        ]
+        "supportEmail": "atpadkarmaruti@gmail.com"
       }
     }
   },
