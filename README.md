@@ -14,9 +14,21 @@
 
 Designed to eliminate scattered communication across multiple informal channels, CampusNotify introduces a verified reference numbering system, read receipt acknowledgements, printable official circular letterheads, vector reaction engagement, inquiry threads, a community lounge with file sharing, and a **strict Zero-Access Security Gate** compliant with the **Digital Personal Data Protection (DPDP) Act 2023**.
 
+### 🌐 Live Cloud Deployment & Hosting Infrastructure
+The project is officially deployed and hosted across enterprise cloud services:
+
+| Component | Hosting / Cloud Platform | Live Endpoint / Resource |
+|---|---|---|
+| **Live Web Portal** | **Google Firebase Hosting** (Global CDN) | 🔗 [**https://campnotify-eef91.web.app**](https://campnotify-eef91.web.app)<br>*(Mirror: [campnotify-eef91.firebaseapp.com](https://campnotify-eef91.firebaseapp.com))* |
+| **Cloud Database** | **Google Cloud Firestore** (NoSQL) | `campnotify-eef91` (Real-time synchronization & audited audit log) |
+| **Authentication Gate** | **Firebase Auth** | Institutional Email/Password, Phone OTP & Google Sign-In |
+| **Code & Submission Repository** | **GitHub** | 🔗 [**ATP0925/CampusNotify-Java-Mini-Project**](https://github.com/ATP0925/CampusNotify-Java-Mini-Project) |
+| **Core Java Engine** | **Java 21 / 17 SE Runtime** | Local Socket & File Dispatch Engine (`run.bat`) |
+
 ### 📁 Academic Lab Submission Documents (Editable Word / .docx Formats)
 Complete college submission documentation is provided in **editable Microsoft Word (`.docx`) format** (featuring the official college logo, Mumbai University crest, and blank placeholders for student & guide details):
 
+- 📦 **All-in-One Submission Archive:** [`CampusNotify_Java_Submission_Documents.zip`](CampusNotify_Java_Submission_Documents.zip) *(Teeno Word docs + teeno PDFs)*
 - 📄 **Project Report:** [`CampusNotify_Project_Report.docx`](CampusNotify_Project_Report.docx) &nbsp;|&nbsp; *(Ready-to-Print PDF: [`CampusNotify_Project_Report.pdf`](CampusNotify_Project_Report.pdf))*
 - 📝 **Problem Statement & Synopsis:** [`CampusNotify_Problem_Statement_Synopsis.docx`](CampusNotify_Problem_Statement_Synopsis.docx) &nbsp;|&nbsp; *(Ready-to-Print PDF: [`CampusNotify_Problem_Statement_Synopsis.pdf`](CampusNotify_Problem_Statement_Synopsis.pdf))*
 - 📓 **Mini-Project Logbook:** [`CampusNotify_Mini_Project_Logbook.docx`](CampusNotify_Mini_Project_Logbook.docx) &nbsp;|&nbsp; *(Ready-to-Print PDF: [`CampusNotify_Mini_Project_Logbook.pdf`](CampusNotify_Mini_Project_Logbook.pdf))*
