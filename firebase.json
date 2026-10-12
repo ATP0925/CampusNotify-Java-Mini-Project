@@ -21,7 +21,19 @@
       "**/node_modules/**",
       "src/**",
       "*.bat",
-      "test_*.js"
+      "*.py",
+      "test_*.js",
+      "*.docx",
+      "*.pdf",
+      "*.zip",
+      "*.md"
+    ],
+    "cleanUrls": true,
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
     ]
   }
 }
