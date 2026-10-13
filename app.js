@@ -2439,19 +2439,36 @@ class CampusNotificationManagementSystem {
         : `<span class="comment-role-tag comment-role-viewer">Member</span>`;
 
       // Decrypt or fallback
+      const cipherToDecrypt = (msg.ciphertext && msg.ciphertext.startsWith('E2EE:AES256GCM:'))
+        ? msg.ciphertext
+        : (msg.text && msg.text.startsWith('E2EE:AES256GCM:') ? msg.text : null);
+
       let displayText = msg.text || '';
-      if (msg.ciphertext && this.e2ee) {
-        const dec = this.e2ee.decryptSync(msg.ciphertext, msg.iv);
-        if (dec) displayText = dec;
+      if (cipherToDecrypt && this.e2ee) {
+        const syncDec = this.e2ee.decryptSync(cipherToDecrypt, msg.iv);
+        if (syncDec && syncDec !== cipherToDecrypt) {
+          displayText = syncDec;
+        } else {
+          displayText = '🔒 Decrypting message...';
+          this.e2ee.decrypt(cipherToDecrypt).then(plain => {
+            if (plain && plain !== cipherToDecrypt) {
+              const bodyEl = document.querySelector(`#msg_${msg.id} .lounge-msg-body`);
+              if (bodyEl) bodyEl.textContent = plain;
+            }
+          }).catch(err => {
+            console.warn('E2EE background decryption error:', err);
+          });
+        }
       }
 
       // Avatar rendering: Custom Photo vs Initials/Emoji (Strictly wrapped in fixed-dimension container)
-      const avatarContent = msg.avatarUrl
-        ? `<img src="${this.escapeHTML(msg.avatarUrl)}" alt="Avatar" class="avatar-msg-img">`
-        : (msg.avatar && msg.avatar.length <= 4 && !msg.avatar.includes('http') ? msg.avatar : this.getInitials(msg.senderName));
+      const effectivePhoto = msg.avatarUrl || (msg.avatar && (msg.avatar.startsWith('http') || msg.avatar.startsWith('data:image/')) ? msg.avatar : '');
+      const avatarContent = effectivePhoto
+        ? `<img src="${this.escapeHTML(effectivePhoto)}" alt="Avatar" class="avatar-msg-img" style="width: 40px !important; height: 40px !important; min-width: 40px !important; max-width: 40px !important; min-height: 40px !important; max-height: 40px !important; border-radius: 50% !important; object-fit: cover !important; display: block !important; flex-shrink: 0 !important; margin: 0 !important;">`
+        : (msg.avatar && msg.avatar.length <= 4 && !msg.avatar.includes('http') && !msg.avatar.includes('data:') ? msg.avatar : this.getInitials(msg.senderName));
 
       const avatarHtml = `
-        <div class="lounge-msg-avatar" style="${isAdm && !msg.avatarUrl ? 'background: linear-gradient(135deg, #f59e0b, #ef4444);' : ''}">
+        <div class="lounge-msg-avatar" style="width: 40px !important; height: 40px !important; min-width: 40px !important; max-width: 40px !important; min-height: 40px !important; max-height: 40px !important; border-radius: 50% !important; overflow: hidden !important; flex-shrink: 0 !important; display: flex !important; align-items: center !important; justify-content: center !important; ${isAdm && !effectivePhoto ? 'background: linear-gradient(135deg, #f59e0b, #ef4444);' : ''}">
           ${avatarContent}
         </div>
       `;
@@ -2465,9 +2482,9 @@ class CampusNotificationManagementSystem {
       ` : '';
 
       return `
-        <div class="lounge-msg-item" id="msg_${msg.id}">
+        <div class="lounge-msg-item" id="msg_${msg.id}" style="display: flex !important; gap: 14px !important; align-items: flex-start !important; width: 100% !important; min-width: 0 !important;">
           ${avatarHtml}
-          <div class="lounge-msg-content">
+          <div class="lounge-msg-content" style="flex: 1 1 0% !important; min-width: 0 !important; box-sizing: border-box !important;">
             <div class="lounge-msg-header">
               <div class="lounge-author-info">
                 <span class="lounge-msg-author">${this.escapeHTML(msg.senderName)}</span>
@@ -3248,8 +3265,8 @@ class CampusNotificationManagementSystem {
       return `
         <div class="admin-user-card" id="admin_row_${u.id}">
           <div class="admin-user-left">
-            <div class="admin-user-avatar">
-              ${u.avatarUrl ? `<img src="${this.escapeHTML(u.avatarUrl)}" class="admin-user-avatar-img" alt="${this.escapeHTML(u.name)}">` : this.getInitials(u.name)}
+            <div class="admin-user-avatar" style="width: 36px !important; height: 36px !important; min-width: 36px !important; max-width: 36px !important; min-height: 36px !important; max-height: 36px !important; border-radius: 50% !important; overflow: hidden !important; flex-shrink: 0 !important; display: flex !important; align-items: center !important; justify-content: center !important;">
+              ${(u.avatarUrl || (u.avatar && (u.avatar.startsWith('http') || u.avatar.startsWith('data:image/')))) ? `<img src="${this.escapeHTML(u.avatarUrl || u.avatar)}" class="admin-user-avatar-img" alt="${this.escapeHTML(u.name)}" style="width: 36px !important; height: 36px !important; min-width: 36px !important; max-width: 36px !important; min-height: 36px !important; max-height: 36px !important; border-radius: 50% !important; object-fit: cover !important; display: block !important; flex-shrink: 0 !important; margin: 0 !important;">` : this.getInitials(u.name)}
             </div>
             <div class="admin-user-details">
               <span class="admin-user-name">${this.escapeHTML(u.name)} (@${this.escapeHTML(u.username)})</span>
@@ -4479,19 +4496,34 @@ class CampusNotificationManagementSystem {
       const canDelete = this.isAdmin() || Boolean(this.currentUser && q.userId === this.currentUser.id);
 
       // Decrypt if E2EE
+      const commentCipher = (q.ciphertext && q.ciphertext.startsWith('E2EE:AES256GCM:'))
+        ? q.ciphertext
+        : (q.text && q.text.startsWith('E2EE:AES256GCM:') ? q.text : null);
+
       let displayText = q.text || '';
-      if (q.ciphertext && this.e2ee) {
-        const dec = this.e2ee.decryptSync(q.ciphertext, q.iv);
-        if (dec) displayText = dec;
+      if (commentCipher && this.e2ee) {
+        const dec = this.e2ee.decryptSync(commentCipher, q.iv);
+        if (dec && dec !== commentCipher) {
+          displayText = dec;
+        } else {
+          displayText = '🔒 Decrypting...';
+          this.e2ee.decrypt(commentCipher).then(plain => {
+            if (plain && plain !== commentCipher) {
+              const el = document.querySelector(`#comment_${q.id} .comment-text`);
+              if (el) el.textContent = plain;
+            }
+          }).catch(err => console.warn('Comment decrypt error:', err));
+        }
       }
 
       // Avatar (Strictly bounded 26px circular avatar or initials)
-      const avatarContent = q.avatarUrl
-        ? `<img src="${this.escapeHTML(q.avatarUrl)}" class="avatar-comment-img" alt="${this.escapeHTML(q.authorName || 'User')}">`
+      const commentPhoto = q.avatarUrl || (q.avatar && (q.avatar.startsWith('http') || q.avatar.startsWith('data:image/')) ? q.avatar : '');
+      const avatarContent = commentPhoto
+        ? `<img src="${this.escapeHTML(commentPhoto)}" class="avatar-comment-img" alt="${this.escapeHTML(q.authorName || 'User')}" style="width: 26px !important; height: 26px !important; min-width: 26px !important; max-width: 26px !important; min-height: 26px !important; max-height: 26px !important; border-radius: 50% !important; object-fit: cover !important; display: block !important; flex-shrink: 0 !important; margin: 0 !important;">`
         : `<span class="comment-avatar-initials">${this.getInitials(q.authorName || q.author || 'User')}</span>`;
 
       const avatarHtml = `
-        <span class="comment-author-avatar" title="${this.escapeHTML(q.authorName || q.author || 'User')}">
+        <span class="comment-author-avatar" title="${this.escapeHTML(q.authorName || q.author || 'User')}" style="width: 26px !important; height: 26px !important; min-width: 26px !important; max-width: 26px !important; min-height: 26px !important; max-height: 26px !important; border-radius: 50% !important; overflow: hidden !important; flex-shrink: 0 !important; display: inline-flex !important; align-items: center !important; justify-content: center !important;">
           ${avatarContent}
         </span>
       `;

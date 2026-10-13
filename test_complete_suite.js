@@ -415,6 +415,8 @@ async function runTests() {
   const isGifFormatted = cnms.dom.loungeGifGrid.innerHTML.includes('gif-card-thumb') && cnms.dom.loungeGifGrid.innerHTML.includes('gif-card-label');
   assert('Curated GIF grid is properly formatted with .gif-card-thumb cards', isGifFormatted);
   assert('Lounge avatar with photo is strictly enclosed in lounge-msg-avatar container', loungeHtmlForViewer.includes('lounge-msg-avatar') && loungeHtmlForViewer.includes('avatar-msg-img'));
+  assert('Lounge avatar image has strict 40px inline style constraint', loungeHtmlForViewer.includes('width: 40px !important') && loungeHtmlForViewer.includes('height: 40px !important'));
+  assert('Lounge message item has robust flex layout inline constraint', loungeHtmlForViewer.includes('display: flex !important') && loungeHtmlForViewer.includes('min-width: 0 !important'));
 
   console.log('\n================================================================');
   console.log(`  VERIFICATION COMPLETED: ${passed} / ${total} TESTS PASSED (${((passed/total)*100).toFixed(1)}%)`);
