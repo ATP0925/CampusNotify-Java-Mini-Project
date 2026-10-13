@@ -4555,33 +4555,39 @@ button, input, textarea, select {
   border-color: var(--brand-accent);
 }
 
-/* GIF Picker Grid */
+/* GIF Picker Grid - Neat Responsive Arrangement */
 .gif-picker-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-  gap: 8px;
-  max-height: 220px;
+  grid-template-columns: repeat(auto-fill, minmax(125px, 1fr));
+  gap: 10px;
+  max-height: 250px;
   overflow-y: auto;
-  padding-right: 4px;
+  padding: 4px;
 }
 
+.gif-preview-card,
 .gif-card-thumb {
   position: relative;
-  border-radius: var(--radius-sm);
+  border-radius: 10px;
   overflow: hidden;
   border: 1px solid var(--border-color);
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 16 / 10;
   cursor: pointer;
   background: var(--bg-subtle);
-  transition: transform var(--transition-fast), border-color var(--transition-fast);
+  transition: transform var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
+.gif-preview-card:hover,
 .gif-card-thumb:hover {
-  transform: scale(1.04);
+  transform: translateY(-2px) scale(1.03);
   border-color: var(--brand-accent);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.22);
 }
 
+.gif-preview-card img,
 .gif-card-thumb img {
   width: 100%;
   height: 100%;
@@ -4594,27 +4600,97 @@ button, input, textarea, select {
   bottom: 0;
   left: 0;
   right: 0;
-  background: rgba(0, 0, 0, 0.65);
+  background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.82) 100%);
   color: #ffffff;
-  font-size: 0.65rem;
+  font-size: 0.68rem;
   font-weight: 600;
-  padding: 2px 4px;
+  padding: 10px 4px 4px;
   text-align: center;
-  backdrop-filter: blur(2px);
+  letter-spacing: 0.2px;
+  pointer-events: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* Chat Message GIF Render */
 .lounge-gif-attachment {
   margin-top: 8px;
-  border-radius: var(--radius-md);
+  border-radius: 12px;
   overflow: hidden;
-  max-width: 320px;
+  max-width: 280px;
   border: 1px solid var(--border-color);
+  background: var(--bg-subtle);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
 }
 
 .lounge-msg-gif {
   width: 100%;
-  max-height: 240px;
+  max-height: 200px;
+  object-fit: cover;
+  display: block;
+}
+
+/* Cryptographic End-to-End Encryption (E2EE) Badges */
+.e2ee-tag-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  background: rgba(16, 185, 129, 0.12);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.32);
+  padding: 1px 6px;
+  border-radius: 10px;
+  margin-left: 5px;
+  user-select: none;
+}
+
+.e2ee-security-pill {
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  color: #10b981;
+  cursor: pointer;
+  transition: transform var(--transition-fast), background var(--transition-fast);
+}
+
+.e2ee-security-pill:hover {
+  transform: translateY(-2px);
+  background: rgba(16, 185, 129, 0.22);
+}
+
+/* Super Admin Exclusive Real Identity Audit Badge */
+.admin-audit-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  background: rgba(245, 158, 11, 0.14);
+  color: #d97706;
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  padding: 1px 7px;
+  border-radius: 12px;
+  margin-left: 6px;
+  user-select: none;
+}
+
+[data-theme="dark"] .admin-audit-tag {
+  color: #fbbf24;
+  background: rgba(245, 158, 11, 0.22);
+  border-color: rgba(245, 158, 11, 0.5);
+}
+
+/* User Profile Circular Photos */
+.avatar-nav-img,
+.avatar-hero-img,
+.avatar-msg-img,
+.avatar-comment-img,
+.admin-user-avatar-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
   object-fit: cover;
   display: block;
 }

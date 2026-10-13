@@ -228,7 +228,7 @@ async function runTests() {
 
   cnms.activeDiscussionNoticeId = testNoticeId;
   cnms.dom.commentInputText.value = 'Is this verification test running live?';
-  cnms.handleSubmitInquiry();
+  await cnms.handleSubmitInquiry();
   assert('Viewer can submit inquiry/comment', createdNotice.comments.length > 0);
   const comment = createdNotice.comments[0];
   assert('Comment text matches', comment.text === 'Is this verification test running live?');
@@ -272,7 +272,7 @@ async function runTests() {
   cnms.activeView = 'lounge';
   const initialLoungeCount = cnms.loungeMessages.length;
   cnms.dom.loungeTextInput.value = 'Welcome everyone to the official Campus Lounge!';
-  cnms.handleSendLoungeMessage();
+  await cnms.handleSendLoungeMessage();
   assert('Lounge message sent successfully', cnms.loungeMessages.length === initialLoungeCount + 1);
 
   // --- TEST PILLAR 9: Multi-Account Device Restriction & Approval ---
@@ -340,6 +340,80 @@ async function runTests() {
   // Test Reset Default
   cnms.resetDefaultTheme();
   assert('Reset removes custom palette from localStorage', localStorage.getItem('cnms_custom_palette') === null);
+
+  // --- TEST PILLAR 10: Cryptographic E2EE, User Privacy Shield & Profile Customization ---
+  console.log('\n--- PILLAR 10: E2EE 256-Bit Cryptography, Privacy Shield & Profile Customizer ---');
+
+  // 1. E2EE Cryptographic Verification
+  const confidentialText = 'Official Confidential Academic Doubts 2026';
+  const encResult = await cnms.e2ee.encrypt(confidentialText);
+  assert('CampusE2EE encrypts payload with E2EE prefix', encResult.ciphertext.startsWith('E2EE:AES256GCM:'));
+  assert('CampusE2EE encrypt flag is true', encResult.isE2ee === true);
+  const decryptedText = cnms.e2ee.decryptSync(encResult.ciphertext);
+  assert('CampusE2EE decryptSync restores original plain text', decryptedText === confidentialText);
+
+  // 2. Privacy Shield: Shield raw personal email handle from Google login
+  const rawFirebaseUser = {
+    uid: 'google_user_998844',
+    email: 'maneomkar844@gmail.com',
+    displayName: 'Omkar Mane',
+    photoURL: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100'
+  };
+  await cnms.syncFirebaseUserToLocal(rawFirebaseUser);
+  assert('Privacy Shield: Public username does NOT expose raw email prefix maneomkar844', cnms.currentUser.username !== 'maneomkar844');
+  assert('Privacy Shield: Public username is shielded alias (e.g. scholar_844)', cnms.currentUser.username.startsWith('scholar_'));
+  assert('Privacy Shield: Verified real email is preserved for Super Admin audit', cnms.currentUser.realEmail === 'maneomkar844@gmail.com');
+  assert('Privacy Shield: Verified real name is preserved for Super Admin audit', cnms.currentUser.realName === 'Omkar Mane');
+  assert('Profile Photo: Custom photoURL is preserved', cnms.currentUser.avatarUrl === rawFirebaseUser.photoURL);
+
+  // 3. Profile Customization: User edits username and profile photo
+  cnms.dom.editProfileFullName = { value: 'Omkar M.', focus: () => {} };
+  cnms.dom.editProfileUsername = { value: 'omkar_lead', focus: () => {} };
+  cnms.dom.editProfilePhotoUrl = { value: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=120' };
+  cnms.dom.editProfileRollNo = { value: 'TE-CS-844' };
+  cnms.dom.editProfileDept = { value: 'Information Technology' };
+  cnms.dom.editProfileYear = { value: 'Final Year (BE)' };
+  cnms.dom.editProfileBio = { value: 'Campus Full Stack Research Scholar' };
+  cnms.dom.editProfilePrivacyShield = { checked: true };
+
+  await cnms.handleSaveProfileCustomization();
+  assert('User can customize public username to @omkar_lead', cnms.currentUser.username === 'omkar_lead');
+  assert('User can customize profile photo URL', cnms.currentUser.avatarUrl === 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=120');
+  assert('Real verified email maneomkar844@gmail.com remains protected in profile', cnms.currentUser.realEmail === 'maneomkar844@gmail.com');
+
+  // 4. Lounge Messaging with E2EE
+  cnms.dom.loungeTextInput.value = 'Encrypted campus inquiry with high privacy standards';
+  await cnms.handleSendLoungeMessage();
+  const lastMsg = cnms.loungeMessages[cnms.loungeMessages.length - 1];
+  assert('Lounge message has isE2ee flag set', lastMsg.isE2ee === true);
+  assert('Lounge message has E2EE ciphertext generated', typeof lastMsg.ciphertext === 'string' && lastMsg.ciphertext.startsWith('E2EE:AES256GCM:'));
+  assert('Lounge message stores sender realEmail for Super Admin audit', lastMsg.senderRealEmail === 'maneomkar844@gmail.com');
+
+  // 5. Viewer vs Super Admin Identity Audit in Community Lounge
+  // Case A: Regular Viewer View
+  cnms.currentUser = {
+    id: 'user_viewer_09',
+    name: 'Regular Student',
+    username: 'student_99',
+    role: 'VIEWER',
+    canPost: false,
+    status: 'APPROVED'
+  };
+  cnms.renderCommunityLounge();
+  const loungeHtmlForViewer = cnms.dom.loungeMessagesFeed.innerHTML;
+  assert('Viewer cannot see other students raw email maneomkar844@gmail.com in lounge', !loungeHtmlForViewer.includes('maneomkar844@gmail.com'));
+  assert('Viewer sees E2EE cryptographic badge in lounge', loungeHtmlForViewer.includes('🔒 E2EE'));
+
+  // Case B: Super Admin Exclusive View
+  cnms.currentUser = Object.assign({}, DEFAULT_SUPER_ADMIN);
+  cnms.renderCommunityLounge();
+  const loungeHtmlForAdmin = cnms.dom.loungeMessagesFeed.innerHTML;
+  assert('Super Admin can audit verified student identity in lounge', loungeHtmlForAdmin.includes('🛡️ Verified ID:') && loungeHtmlForAdmin.includes('maneomkar844@gmail.com'));
+
+  // 6. GIF Arrangement & Picker Grid Verification
+  cnms.renderLoungeGifsGrid('all');
+  const isGifFormatted = cnms.dom.loungeGifGrid.innerHTML.includes('gif-card-thumb') && cnms.dom.loungeGifGrid.innerHTML.includes('gif-card-label');
+  assert('Curated GIF grid is properly formatted with .gif-card-thumb cards', isGifFormatted);
 
   console.log('\n================================================================');
   console.log(`  VERIFICATION COMPLETED: ${passed} / ${total} TESTS PASSED (${((passed/total)*100).toFixed(1)}%)`);

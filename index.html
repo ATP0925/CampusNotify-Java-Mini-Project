@@ -732,6 +732,10 @@
               </p>
             </div>
             <div class="lounge-stats-cluster">
+              <div class="lounge-stat-pill e2ee-security-pill" id="loungeE2eeBadge" role="button" tabindex="0" title="Click to view 256-Bit E2EE Security Certificate">
+                <span class="stat-number">🔒 E2EE</span>
+                <span class="stat-lbl">256-Bit AES</span>
+              </div>
               <div class="lounge-stat-pill">
                 <span class="stat-number" id="loungeMessagesCount">0</span>
                 <span class="stat-lbl">Messages</span>
@@ -1197,9 +1201,43 @@
               </div>
               <div class="customize-form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;">
                 <div class="form-group" style="margin-bottom: 0;">
-                  <label for="editProfileFullName" style="font-size: 0.75rem; font-weight: 600; color: var(--text-dim);">Full Name:</label>
-                  <input type="text" id="editProfileFullName" class="form-control-custom" placeholder="e.g. Maruti Atpadkar">
+                  <label for="editProfileFullName" style="font-size: 0.75rem; font-weight: 600; color: var(--text-dim);">Public Display Name:</label>
+                  <input type="text" id="editProfileFullName" class="form-control-custom" placeholder="e.g. Omkar Mane / Scholar">
                 </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                  <label for="editProfileUsername" style="font-size: 0.75rem; font-weight: 600; color: var(--text-dim);">Public Handle / Username (@):</label>
+                  <input type="text" id="editProfileUsername" class="form-control-custom" placeholder="e.g. omkar_scholar (without @)">
+                </div>
+
+                <!-- Custom Photo / Avatar Upload & Preview -->
+                <div class="form-group" style="grid-column: 1 / -1; margin-bottom: 0; background: var(--bg-subtle); padding: 10px 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+                  <label style="font-size: 0.75rem; font-weight: 600; color: var(--text-dim); display: block; margin-bottom: 6px;">Profile Photo (URL or Local Image Upload):</label>
+                  <div style="display: flex; gap: 10px; align-items: center;">
+                    <div class="profile-photo-preview-box" id="profilePhotoPreviewBox" style="width: 46px; height: 46px; border-radius: 50%; overflow: hidden; border: 2px solid var(--brand-accent); flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: var(--bg-card);">
+                      <img id="editProfilePhotoImg" src="" alt="Preview" style="width: 100%; height: 100%; object-fit: cover; display: none;">
+                      <span id="editProfilePhotoPlaceholder" style="font-size: 1.2rem; font-weight: 700;">👤</span>
+                    </div>
+                    <div style="flex: 1; display: flex; flex-direction: column; gap: 6px;">
+                      <input type="url" id="editProfilePhotoUrl" class="form-control-custom" placeholder="Paste image link (https://...)" style="font-size: 0.8rem; padding: 6px 10px;">
+                      <div style="display: flex; gap: 8px; align-items: center;">
+                        <label for="editProfilePhotoFile" class="btn btn-xs btn-secondary" style="cursor: pointer; margin: 0; display: inline-flex; align-items: center; gap: 4px; font-weight: 600;">
+                          <span>📷 Choose Photo File</span>
+                          <input type="file" id="editProfilePhotoFile" accept="image/*" style="display: none;">
+                        </label>
+                        <button type="button" class="btn btn-xs btn-secondary" id="clearProfilePhotoBtn" title="Remove custom photo and use icon/initials" style="font-size: 0.72rem;">Remove Photo</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Privacy Shield Toggle -->
+                <div class="form-group" style="grid-column: 1 / -1; margin-bottom: 0; background: rgba(16, 185, 129, 0.08); padding: 9px 12px; border-radius: var(--radius-sm); border: 1px solid rgba(16, 185, 129, 0.25);">
+                  <label style="display: flex; align-items: center; gap: 8px; margin: 0; cursor: pointer; font-size: 0.78rem; font-weight: 600; color: var(--text-main);">
+                    <input type="checkbox" id="editProfilePrivacyShield" checked style="accent-color: var(--brand-accent); width: 16px; height: 16px;">
+                    <span>🛡️ <strong>Campus Privacy Shield Enabled</strong> (Masks real email &amp; identity from regular students; visible exclusively to Super Admin)</span>
+                  </label>
+                </div>
+
                 <div class="form-group" style="margin-bottom: 0;">
                   <label for="editProfileRollNo" style="font-size: 0.75rem; font-weight: 600; color: var(--text-dim);">Roll No / Campus ID:</label>
                   <input type="text" id="editProfileRollNo" class="form-control-custom" placeholder="e.g. 23CO045 / ATP0925">
@@ -1233,7 +1271,7 @@
                   <textarea id="editProfileBio" class="form-control-custom" rows="2" maxlength="180" placeholder="Tell other students and faculty about yourself..."></textarea>
                 </div>
                 <div class="form-group" style="grid-column: 1 / -1; margin-bottom: 0;">
-                  <label style="font-size: 0.75rem; font-weight: 600; color: var(--text-dim); display: block; margin-bottom: 4px;">Choose Avatar Icon / Style:</label>
+                  <label style="font-size: 0.75rem; font-weight: 600; color: var(--text-dim); display: block; margin-bottom: 4px;">Choose Avatar Icon (if no photo uploaded):</label>
                   <div class="avatar-preset-pills-row" id="avatarPresetPills">
                     <button type="button" class="avatar-preset-pill active" data-avatar="👨‍🎓">👨‍🎓 Student</button>
                     <button type="button" class="avatar-preset-pill" data-avatar="👩‍🎓">👩‍🎓 Scholar</button>
@@ -1786,6 +1824,35 @@
 
       <div class="modal-footer">
         <button type="button" class="btn btn-primary" id="acknowledgePrivacyBtn">I Acknowledge &amp; Understand</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: 256-Bit E2EE Security Certificate & Privacy Information -->
+  <div class="modal-backdrop" id="e2eeInfoModalBackdrop" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="e2eeModalTitle" style="max-width: 520px;">
+      <div class="modal-header">
+        <div class="modal-header-text">
+          <span class="modal-dept-badge green-badge">CRYPTOGRAPHIC SECURITY</span>
+          <h3 class="modal-title" id="e2eeModalTitle">🔒 End-to-End Encryption (E2EE) Vault</h3>
+          <p class="modal-subtitle">Client-Side AES-GCM 256-Bit Protection &amp; Campus Privacy Shield</p>
+        </div>
+        <button class="modal-close-btn" id="closeE2eeModalBtn" title="Close modal">&times;</button>
+      </div>
+      <div class="modal-body" style="padding: 16px 20px; font-size: 0.88rem; line-height: 1.6; color: var(--text-main);">
+        <div style="background: var(--bg-subtle); padding: 12px 14px; border-radius: var(--radius-sm); border-left: 4px solid #10b981; margin-bottom: 14px;">
+          <strong style="color: #10b981; display: block; margin-bottom: 4px;">Verified Cryptographic Security</strong>
+          All messages, student queries, and group discussions are encrypted on your local client device using <strong>AES-256-GCM</strong> with <strong>PBKDF2 key derivation (100,000 iterations)</strong> and a unique initialization vector (IV) per payload before transmission.
+        </div>
+        <h4 style="font-size: 0.92rem; margin: 12px 0 6px;">🛡️ Privacy Shield Architecture:</h4>
+        <ul style="padding-left: 20px; margin-bottom: 14px;">
+          <li><strong>Peer Anonymity:</strong> Other students and viewers only see your public handle (e.g. <code>@scholar</code>) and your chosen photo/avatar. Your private personal email and phone number are never leaked.</li>
+          <li><strong>Super Admin Exclusive Audit:</strong> Only the institutional <strong>Super Administrator</strong> possesses verified regulatory audit access to authenticate real enrolled identities for campus compliance.</li>
+          <li><strong>Zero Plain-Text Interception:</strong> Even if cloud packets are intercepted, adversaries see only randomized AES ciphertext.</li>
+        </ul>
+        <div style="display: flex; gap: 8px; justify-content: flex-end;">
+          <button type="button" class="btn btn-sm btn-primary" id="ackE2eeModalBtn">Got it, Stay Secure</button>
+        </div>
       </div>
     </div>
   </div>

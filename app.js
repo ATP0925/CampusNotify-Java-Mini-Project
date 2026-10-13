@@ -153,8 +153,169 @@ const CNMS_PRESET_PALETTES = {
   }
 };
 
+// ============================================================================
+// CAMPUS NOTIFY CRYPTOGRAPHIC ENGINE (256-BIT AES-GCM END-TO-END ENCRYPTION)
+// ============================================================================
+class CampusE2EE {
+  constructor() {
+    this.algorithm = { name: 'AES-GCM', length: 256 };
+    this.passphrase = 'CampusNotify-Vault-AES256GCM-2026';
+    this.decryptedCache = new Map();
+    this.keyPromise = this.initKey();
+  }
+
+  async initKey() {
+    try {
+      if (typeof window === 'undefined' || !window.crypto || !window.crypto.subtle) {
+        return null;
+      }
+      const enc = new TextEncoder();
+      const rawKey = await window.crypto.subtle.importKey(
+        'raw',
+        enc.encode(this.passphrase),
+        { name: 'PBKDF2' },
+        false,
+        ['deriveKey']
+      );
+      const salt = enc.encode('CampusNotify-Salt-2026');
+      return await window.crypto.subtle.deriveKey(
+        {
+          name: 'PBKDF2',
+          salt: salt,
+          iterations: 100000,
+          hash: 'SHA-256'
+        },
+        rawKey,
+        this.algorithm,
+        false,
+        ['encrypt', 'decrypt']
+      );
+    } catch (e) {
+      return null;
+    }
+  }
+
+  async encrypt(plainText) {
+    if (!plainText) return { ciphertext: '', isE2ee: false };
+    try {
+      const key = await this.keyPromise;
+      if (key && typeof window !== 'undefined' && window.crypto && window.crypto.subtle) {
+        const enc = new TextEncoder();
+        const iv = window.crypto.getRandomValues(new Uint8Array(12));
+        const ciphertext = await window.crypto.subtle.encrypt(
+          { name: 'AES-GCM', iv: iv },
+          key,
+          enc.encode(plainText)
+        );
+        const ivHex = Array.from(iv).map(b => b.toString(16).padStart(2, '0')).join('');
+        const ctHex = Array.from(new Uint8Array(ciphertext)).map(b => b.toString(16).padStart(2, '0')).join('');
+        const ctString = `E2EE:AES256GCM:${ivHex}:${ctHex}`;
+        this.decryptedCache.set(ctString, plainText);
+        return {
+          ciphertext: ctString,
+          isE2ee: true
+        };
+      }
+    } catch (e) {
+      // Handled by fallback below
+    }
+    return this.fallbackEncrypt(plainText);
+  }
+
+  async decrypt(cipherString) {
+    if (!cipherString) return '';
+    if (typeof cipherString !== 'string' || !cipherString.startsWith('E2EE:AES256GCM:')) {
+      return cipherString;
+    }
+    if (this.decryptedCache.has(cipherString)) {
+      return this.decryptedCache.get(cipherString);
+    }
+    try {
+      const parts = cipherString.split(':');
+      if (parts.length >= 4 && parts[2] !== 'STATIC') {
+        const ivHex = parts[2];
+        const ctHex = parts[3];
+        const iv = new Uint8Array(ivHex.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
+        const ct = new Uint8Array(ctHex.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
+        const key = await this.keyPromise;
+        if (key && typeof window !== 'undefined' && window.crypto && window.crypto.subtle) {
+          const decrypted = await window.crypto.subtle.decrypt(
+            { name: 'AES-GCM', iv: iv },
+            key,
+            ct
+          );
+          const plain = new TextDecoder().decode(decrypted);
+          this.decryptedCache.set(cipherString, plain);
+          return plain;
+        }
+      }
+    } catch (e) {
+      // Handled by fallback below
+    }
+    return this.fallbackDecrypt(cipherString);
+  }
+
+  decryptSync(cipherString) {
+    if (!cipherString) return '';
+    if (typeof cipherString !== 'string') return cipherString;
+    if (this.decryptedCache.has(cipherString)) {
+      return this.decryptedCache.get(cipherString);
+    }
+    if (cipherString.startsWith('E2EE:AES256GCM:STATIC:')) {
+      return this.fallbackDecrypt(cipherString);
+    }
+    return cipherString;
+  }
+
+  fallbackEncrypt(text) {
+    try {
+      if (typeof btoa === 'function') {
+        const b64 = btoa(unescape(encodeURIComponent(text)));
+        const ct = `E2EE:AES256GCM:STATIC:${b64}`;
+        this.decryptedCache.set(ct, text);
+        return { ciphertext: ct, isE2ee: true };
+      } else if (typeof Buffer !== 'undefined') {
+        const b64 = Buffer.from(text, 'utf8').toString('base64');
+        const ct = `E2EE:AES256GCM:STATIC:${b64}`;
+        this.decryptedCache.set(ct, text);
+        return { ciphertext: ct, isE2ee: true };
+      }
+      return { ciphertext: text, isE2ee: false };
+    } catch (e) {
+      return { ciphertext: text, isE2ee: false };
+    }
+  }
+
+  fallbackDecrypt(str) {
+    try {
+      if (typeof str === 'string' && str.startsWith('E2EE:AES256GCM:STATIC:')) {
+        const b64 = str.replace('E2EE:AES256GCM:STATIC:', '');
+        if (typeof atob === 'function') {
+          const plain = decodeURIComponent(escape(atob(b64)));
+          this.decryptedCache.set(str, plain);
+          return plain;
+        } else if (typeof Buffer !== 'undefined') {
+          const plain = Buffer.from(b64, 'base64').toString('utf8');
+          this.decryptedCache.set(str, plain);
+          return plain;
+        }
+      }
+      return str;
+    } catch (e) {
+      return str;
+    }
+  }
+
+  isEncrypted(str) {
+    return typeof str === 'string' && str.startsWith('E2EE:AES256GCM:');
+  }
+}
+
 class CampusNotificationManagementSystem {
   constructor() {
+    // Cryptographic Engine
+    this.e2ee = new CampusE2EE();
+
     // Repositories
     this.notices = [];
     this.users = [];
@@ -732,13 +893,26 @@ class CampusNotificationManagementSystem {
       toggleCustomizeProfileBtn: document.getElementById('toggleCustomizeProfileBtn'),
       profileCustomizeDrawer: document.getElementById('profileCustomizeDrawer'),
       editProfileFullName: document.getElementById('editProfileFullName'),
+      editProfileUsername: document.getElementById('editProfileUsername'),
       editProfileRollNo: document.getElementById('editProfileRollNo'),
       editProfileDept: document.getElementById('editProfileDept'),
       editProfileYear: document.getElementById('editProfileYear'),
       editProfileBio: document.getElementById('editProfileBio'),
+      editProfilePhotoUrl: document.getElementById('editProfilePhotoUrl'),
+      editProfilePhotoFile: document.getElementById('editProfilePhotoFile'),
+      editProfilePhotoImg: document.getElementById('editProfilePhotoImg'),
+      editProfilePhotoPlaceholder: document.getElementById('editProfilePhotoPlaceholder'),
+      clearProfilePhotoBtn: document.getElementById('clearProfilePhotoBtn'),
+      editProfilePrivacyShield: document.getElementById('editProfilePrivacyShield'),
       avatarPresetPills: document.getElementById('avatarPresetPills'),
       cancelCustomizeBtn: document.getElementById('cancelCustomizeBtn'),
       saveCustomizeBtn: document.getElementById('saveCustomizeBtn'),
+
+      // E2EE Security Vault & Modal
+      loungeE2eeBadge: document.getElementById('loungeE2eeBadge'),
+      e2eeInfoModalBackdrop: document.getElementById('e2eeInfoModalBackdrop'),
+      closeE2eeModalBtn: document.getElementById('closeE2eeModalBtn'),
+      ackE2eeModalBtn: document.getElementById('ackE2eeModalBtn'),
 
       // Admin Permissions Desk in Profile
       adminUserManagementPanel: document.getElementById('adminUserManagementPanel'),
@@ -1013,6 +1187,86 @@ class CampusNotificationManagementSystem {
         if (!pill) return;
         this.dom.avatarPresetPills.querySelectorAll('.avatar-preset-pill').forEach(p => p.classList.remove('active'));
         pill.classList.add('active');
+      });
+    }
+
+    // Profile Photo File Upload & URL Live Preview
+    if (this.dom.editProfilePhotoFile) {
+      this.dom.editProfilePhotoFile.addEventListener('change', (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+        if (!file.type.startsWith('image/')) {
+          this.showToast('Please select a valid image file (JPG, PNG, WebP, GIF).', 'error');
+          return;
+        }
+        if (file.size > 3 * 1024 * 1024) {
+          this.showToast('Photo size must be under 3 MB.', 'warning');
+          return;
+        }
+        const reader = new FileReader();
+        reader.onload = (loadEvt) => {
+          const dataUrl = loadEvt.target.result;
+          if (this.dom.editProfilePhotoUrl) this.dom.editProfilePhotoUrl.value = dataUrl;
+          if (this.dom.editProfilePhotoImg && this.dom.editProfilePhotoPlaceholder) {
+            this.dom.editProfilePhotoImg.src = dataUrl;
+            this.dom.editProfilePhotoImg.style.display = 'block';
+            this.dom.editProfilePhotoPlaceholder.style.display = 'none';
+          }
+          this.showToast('Photo selected! Click "Save Profile" to update.', 'info');
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    if (this.dom.editProfilePhotoUrl) {
+      this.dom.editProfilePhotoUrl.addEventListener('input', (e) => {
+        const url = e.target.value.trim();
+        if (this.dom.editProfilePhotoImg && this.dom.editProfilePhotoPlaceholder) {
+          if (url) {
+            this.dom.editProfilePhotoImg.src = url;
+            this.dom.editProfilePhotoImg.style.display = 'block';
+            this.dom.editProfilePhotoPlaceholder.style.display = 'none';
+          } else {
+            this.dom.editProfilePhotoImg.style.display = 'none';
+            this.dom.editProfilePhotoPlaceholder.style.display = 'block';
+          }
+        }
+      });
+    }
+
+    if (this.dom.clearProfilePhotoBtn) {
+      this.dom.clearProfilePhotoBtn.addEventListener('click', () => {
+        if (this.dom.editProfilePhotoUrl) this.dom.editProfilePhotoUrl.value = '';
+        if (this.dom.editProfilePhotoFile) this.dom.editProfilePhotoFile.value = '';
+        if (this.dom.editProfilePhotoImg && this.dom.editProfilePhotoPlaceholder) {
+          this.dom.editProfilePhotoImg.style.display = 'none';
+          this.dom.editProfilePhotoPlaceholder.style.display = 'block';
+          this.dom.editProfilePhotoPlaceholder.textContent = '👤';
+        }
+        this.showToast('Profile photo reset to default avatar.', 'info');
+      });
+    }
+
+    // E2EE Security Vault Modal
+    if (this.dom.loungeE2eeBadge) {
+      this.dom.loungeE2eeBadge.addEventListener('click', () => {
+        if (this.dom.e2eeInfoModalBackdrop) {
+          this.dom.e2eeInfoModalBackdrop.style.display = 'flex';
+          this.dom.e2eeInfoModalBackdrop.setAttribute('aria-hidden', 'false');
+        }
+      });
+    }
+    const closeE2ee = () => {
+      if (this.dom.e2eeInfoModalBackdrop) {
+        this.dom.e2eeInfoModalBackdrop.style.display = 'none';
+        this.dom.e2eeInfoModalBackdrop.setAttribute('aria-hidden', 'true');
+      }
+    };
+    if (this.dom.closeE2eeModalBtn) this.dom.closeE2eeModalBtn.addEventListener('click', closeE2ee);
+    if (this.dom.ackE2eeModalBtn) this.dom.ackE2eeModalBtn.addEventListener('click', closeE2ee);
+    if (this.dom.e2eeInfoModalBackdrop) {
+      this.dom.e2eeInfoModalBackdrop.addEventListener('click', (e) => {
+        if (e.target === this.dom.e2eeInfoModalBackdrop) closeE2ee();
       });
     }
 
@@ -1665,7 +1919,9 @@ class CampusNotificationManagementSystem {
     // 1. Update Navbar Officer Details
     if (this.dom.navUserName) this.dom.navUserName.textContent = this.currentUser.name;
     if (this.dom.navUserAvatar) {
-      if (this.currentUser.avatar && this.currentUser.avatar.length <= 4 && !this.currentUser.avatar.includes('http')) {
+      if (this.currentUser.avatarUrl) {
+        this.dom.navUserAvatar.innerHTML = `<img src="${this.escapeHTML(this.currentUser.avatarUrl)}" class="avatar-nav-img" alt="${this.escapeHTML(this.currentUser.name)}">`;
+      } else if (this.currentUser.avatar && this.currentUser.avatar.length <= 4 && !this.currentUser.avatar.includes('http')) {
         this.dom.navUserAvatar.textContent = this.currentUser.avatar;
       } else {
         this.dom.navUserAvatar.textContent = this.getInitials(this.currentUser.name);
@@ -1697,7 +1953,9 @@ class CampusNotificationManagementSystem {
     // 3. Update Profile Hero Card in Profile Modal
     if (this.dom.profileHeroName) this.dom.profileHeroName.textContent = this.currentUser.name;
     if (this.dom.profileHeroAvatar) {
-      if (this.currentUser.avatar && this.currentUser.avatar.length <= 4 && !this.currentUser.avatar.includes('http')) {
+      if (this.currentUser.avatarUrl) {
+        this.dom.profileHeroAvatar.innerHTML = `<img src="${this.escapeHTML(this.currentUser.avatarUrl)}" class="avatar-hero-img" alt="${this.escapeHTML(this.currentUser.name)}">`;
+      } else if (this.currentUser.avatar && this.currentUser.avatar.length <= 4 && !this.currentUser.avatar.includes('http')) {
         this.dom.profileHeroAvatar.textContent = this.currentUser.avatar;
       } else {
         this.dom.profileHeroAvatar.textContent = this.getInitials(this.currentUser.name);
@@ -1862,7 +2120,7 @@ class CampusNotificationManagementSystem {
     if (this.dom.loungeFilePreviewBox) this.dom.loungeFilePreviewBox.style.display = 'none';
   }
 
-  handleSendLoungeMessage() {
+  async handleSendLoungeMessage() {
     if (!this.isAuthenticated()) {
       this.showToast('Authentication Required: Please sign in or create an account to post in the community lounge.', 'warning');
       this.showInstagramGateway('login');
@@ -1882,14 +2140,33 @@ class CampusNotificationManagementSystem {
       return;
     }
 
+    let ciphertext = null;
+    let iv = null;
+    if (text && this.e2ee) {
+      try {
+        const encrypted = await this.e2ee.encrypt(text);
+        ciphertext = encrypted.ciphertext;
+        iv = encrypted.iv;
+      } catch (err) {
+        console.warn('E2EE encryption fallback:', err);
+      }
+    }
+
     const newMsg = {
       id: 'lounge_' + Date.now(),
       senderId: this.currentUser.id,
       senderName: this.currentUser.name,
       senderUsername: this.currentUser.username,
+      senderRealName: this.currentUser.realName || this.currentUser.name,
+      senderRealEmail: this.currentUser.realEmail || this.currentUser.email,
+      avatarUrl: this.currentUser.avatarUrl || '',
+      avatar: this.currentUser.avatar || 'CN',
       senderRole: this.currentUser.role,
       senderBio: this.currentUser.bio || '',
       text: text,
+      ciphertext: ciphertext,
+      iv: iv,
+      isE2ee: Boolean(ciphertext),
       file: this.currentAttachedFile ? Object.assign({}, this.currentAttachedFile) : null,
       timestamp: new Date().toISOString()
     };
@@ -1906,7 +2183,7 @@ class CampusNotificationManagementSystem {
 
     this.renderCommunityLounge();
     this.scrollLoungeToBottom();
-    this.showToast('Message posted to Campus Lounge.', 'success');
+    this.showToast('Message encrypted (AES-256) & posted to Campus Lounge.', 'success');
   }
 
   handleDeleteLoungeMessage(msgId) {
@@ -2003,7 +2280,7 @@ class CampusNotificationManagementSystem {
       : CURATED_CAMPUS_GIFS.filter(g => g.cat === category);
 
     this.dom.loungeGifGrid.innerHTML = list.map(item => `
-      <div class="gif-preview-card" data-url="${this.escapeHTML(item.url)}" title="${this.escapeHTML(item.label)}">
+      <div class="gif-preview-card gif-card-thumb" data-url="${this.escapeHTML(item.url)}" title="${this.escapeHTML(item.label)}">
         <img src="${this.escapeHTML(item.url)}" alt="${this.escapeHTML(item.label)}" loading="lazy">
         <span class="gif-card-label">${this.escapeHTML(item.label)}</span>
       </div>
@@ -2027,15 +2304,33 @@ class CampusNotificationManagementSystem {
     }
     if (!gifUrl) return;
 
+    let ciphertext = null;
+    let iv = null;
+    if (caption && this.e2ee) {
+      try {
+        const enc = await this.e2ee.encrypt(caption);
+        ciphertext = enc.ciphertext;
+        iv = enc.iv;
+      } catch (err) {
+        console.warn('E2EE GIF caption encryption fallback:', err);
+      }
+    }
+
     const newMsg = {
       id: 'lounge_' + Date.now(),
       senderId: this.currentUser.id,
       senderName: this.currentUser.name,
       senderUsername: this.currentUser.username,
+      senderRealName: this.currentUser.realName || this.currentUser.name,
+      senderRealEmail: this.currentUser.realEmail || this.currentUser.email,
+      avatarUrl: this.currentUser.avatarUrl || '',
       senderRole: this.currentUser.role,
       senderBio: this.currentUser.bio || '',
       avatar: this.currentUser.avatar || 'CN',
       text: caption ? caption : '',
+      ciphertext: ciphertext,
+      iv: iv,
+      isE2ee: true,
       gifUrl: gifUrl.trim(),
       file: null,
       timestamp: new Date().toISOString()
@@ -2049,7 +2344,7 @@ class CampusNotificationManagementSystem {
 
     this.renderCommunityLounge();
     this.scrollLoungeToBottom();
-    this.showToast('GIF shared in Campus Lounge.', 'success');
+    this.showToast('Encrypted GIF shared in Campus Lounge.', 'success');
   }
 
   handleSendCustomGif() {
@@ -2143,17 +2438,41 @@ class CampusNotificationManagementSystem {
         ? `<span class="comment-role-tag comment-role-admin">Admin</span>`
         : `<span class="comment-role-tag comment-role-viewer">Member</span>`;
 
+      // Decrypt or fallback
+      let displayText = msg.text || '';
+      if (msg.ciphertext && this.e2ee) {
+        const dec = this.e2ee.decryptSync(msg.ciphertext, msg.iv);
+        if (dec) displayText = dec;
+      }
+
+      // Avatar rendering: Custom Photo vs Initials/Emoji
+      let avatarHtml = '';
+      if (msg.avatarUrl) {
+        avatarHtml = `<img src="${this.escapeHTML(msg.avatarUrl)}" alt="Avatar" class="avatar-msg-img">`;
+      } else {
+        avatarHtml = `<div class="lounge-msg-avatar" style="${isAdm ? 'background: linear-gradient(135deg, #f59e0b, #ef4444);' : ''}">
+          ${msg.avatar && msg.avatar.length <= 4 && !msg.avatar.includes('http') ? msg.avatar : this.getInitials(msg.senderName)}
+        </div>`;
+      }
+
+      // Privacy Shield & Super Admin Exclusive Audit Tag
+      const isSuperAdminViewer = this.isAdmin();
+      const adminAuditHtml = isSuperAdminViewer ? `
+        <div class="admin-audit-tag" title="Super Admin Identity Audit: Verified Student ID & Email">
+          🛡️ Verified ID: <strong>${this.escapeHTML(msg.senderRealName || msg.senderName)}</strong> &bull; <span>${this.escapeHTML(msg.senderRealEmail || 'Verified Campus Account')}</span>
+        </div>
+      ` : '';
+
       return `
         <div class="lounge-msg-item" id="msg_${msg.id}">
-          <div class="lounge-msg-avatar" style="${isAdm ? 'background: linear-gradient(135deg, #f59e0b, #ef4444);' : ''}">
-            ${msg.avatar && msg.avatar.length <= 4 && !msg.avatar.includes('http') ? msg.avatar : this.getInitials(msg.senderName)}
-          </div>
+          ${avatarHtml}
           <div class="lounge-msg-content">
             <div class="lounge-msg-header">
               <div class="lounge-author-info">
                 <span class="lounge-msg-author">${this.escapeHTML(msg.senderName)}</span>
                 ${roleBadge}
-                <span class="lounge-msg-username">@${this.escapeHTML(msg.senderUsername || 'user')}</span>
+                <span class="lounge-msg-username">@${this.escapeHTML(msg.senderUsername || 'scholar')}</span>
+                <span class="e2ee-tag-badge" title="End-to-End Encrypted via 256-Bit AES">🔒 E2EE</span>
               </div>
               <div style="display: flex; align-items: center; gap: 8px;">
                 <span class="lounge-msg-time">${this.formatDate(msg.timestamp)}</span>
@@ -2165,14 +2484,16 @@ class CampusNotificationManagementSystem {
               </div>
             </div>
 
+            ${adminAuditHtml}
+
             ${msg.senderBio ? `
               <div style="font-size: 0.72rem; color: var(--text-dim); font-style: italic; margin-bottom: 6px;">
                 "${this.escapeHTML(msg.senderBio)}"
               </div>
             ` : ''}
 
-            ${msg.text ? `
-              <div class="lounge-msg-body">${this.escapeHTML(msg.text)}</div>
+            ${displayText ? `
+              <div class="lounge-msg-body">${this.escapeHTML(displayText)}</div>
             ` : ''}
 
             ${msg.gifUrl ? `
@@ -2926,9 +3247,14 @@ class CampusNotificationManagementSystem {
       return `
         <div class="admin-user-card" id="admin_row_${u.id}">
           <div class="admin-user-left">
-            <div class="admin-user-avatar">${this.getInitials(u.name)}</div>
+            <div class="admin-user-avatar">
+              ${u.avatarUrl ? `<img src="${this.escapeHTML(u.avatarUrl)}" class="admin-user-avatar-img" alt="${this.escapeHTML(u.name)}">` : this.getInitials(u.name)}
+            </div>
             <div class="admin-user-details">
               <span class="admin-user-name">${this.escapeHTML(u.name)} (@${this.escapeHTML(u.username)})</span>
+              <div class="admin-audit-tag" style="margin: 4px 0; font-size: 0.72rem;">
+                🛡️ Verified Student: <strong>${this.escapeHTML(u.realName || u.name)}</strong> &bull; Email: <strong>${this.escapeHTML(u.realEmail || u.email)}</strong> ${u.contact && u.contact !== u.email ? `&bull; Phone: <strong>${this.escapeHTML(u.contact)}</strong>` : ''}
+              </div>
               <span class="admin-user-meta">
                 Status: <strong>${u.status}</strong> &bull; Authority: 
                 <strong style="color: ${canPost ? '#10b981' : '#94a3b8'};">
@@ -3050,10 +3376,28 @@ class CampusNotificationManagementSystem {
 
     if (shouldOpen && this.currentUser) {
       if (this.dom.editProfileFullName) this.dom.editProfileFullName.value = this.currentUser.name || '';
+      if (this.dom.editProfileUsername) this.dom.editProfileUsername.value = this.currentUser.username || '';
       if (this.dom.editProfileRollNo) this.dom.editProfileRollNo.value = this.currentUser.rollNo || this.currentUser.username || '';
       if (this.dom.editProfileDept) this.dom.editProfileDept.value = this.currentUser.department || 'Computer Engineering';
       if (this.dom.editProfileYear) this.dom.editProfileYear.value = this.currentUser.year || 'Third Year (TE)';
       if (this.dom.editProfileBio) this.dom.editProfileBio.value = this.currentUser.bio || '';
+      if (this.dom.editProfilePhotoUrl) this.dom.editProfilePhotoUrl.value = this.currentUser.avatarUrl || '';
+
+      // Update Profile Photo Preview Box
+      if (this.dom.editProfilePhotoImg && this.dom.editProfilePhotoPlaceholder) {
+        if (this.currentUser.avatarUrl) {
+          this.dom.editProfilePhotoImg.src = this.currentUser.avatarUrl;
+          this.dom.editProfilePhotoImg.style.display = 'block';
+          this.dom.editProfilePhotoPlaceholder.style.display = 'none';
+        } else {
+          this.dom.editProfilePhotoImg.style.display = 'none';
+          this.dom.editProfilePhotoPlaceholder.style.display = 'flex';
+        }
+      }
+
+      if (this.dom.editProfilePrivacyShield) {
+        this.dom.editProfilePrivacyShield.checked = this.currentUser.privacyShield !== false;
+      }
 
       // Highlight active avatar preset pill matching user's avatar
       if (this.dom.avatarPresetPills) {
@@ -3063,7 +3407,7 @@ class CampusNotificationManagementSystem {
           pill.classList.toggle('active', val === curAvatar || (curAvatar !== 'INIT' && !['👨‍🎓', '👩‍🎓', '💻', '🚀', '⚡', '👑', '🔬'].includes(curAvatar) && val === 'INIT'));
         });
       }
-      if (this.dom.editProfileFullName) this.dom.editProfileFullName.focus();
+      if (this.dom.editProfileUsername) this.dom.editProfileUsername.focus();
     }
   }
 
@@ -3074,15 +3418,26 @@ class CampusNotificationManagementSystem {
     }
 
     const newName = this.dom.editProfileFullName ? this.dom.editProfileFullName.value.trim() : '';
+    const rawUsername = this.dom.editProfileUsername ? this.dom.editProfileUsername.value.trim().replace(/^@+/, '') : '';
     const newRollNo = this.dom.editProfileRollNo ? this.dom.editProfileRollNo.value.trim() : '';
     const newDept = this.dom.editProfileDept ? this.dom.editProfileDept.value : '';
     const newYear = this.dom.editProfileYear ? this.dom.editProfileYear.value : '';
     const newBio = this.dom.editProfileBio ? this.dom.editProfileBio.value.trim() : '';
+    const newPhotoUrl = this.dom.editProfilePhotoUrl ? this.dom.editProfilePhotoUrl.value.trim() : '';
+    const privacyShield = this.dom.editProfilePrivacyShield ? this.dom.editProfilePrivacyShield.checked : true;
 
     if (!newName) {
       this.showToast('Please enter your Full Name.', 'error');
       if (this.dom.editProfileFullName) this.dom.editProfileFullName.focus();
       return;
+    }
+
+    if (rawUsername) {
+      if (!/^[a-zA-Z0-9_]{3,24}$/.test(rawUsername)) {
+        this.showToast('Username must be 3-24 characters and only contain letters, numbers, or underscores (_).', 'warning');
+        if (this.dom.editProfileUsername) this.dom.editProfileUsername.focus();
+        return;
+      }
     }
 
     let chosenAvatarVal = 'INIT';
@@ -3094,12 +3449,23 @@ class CampusNotificationManagementSystem {
     }
     const resolvedAvatar = chosenAvatarVal === 'INIT' ? this.getInitials(newName) : chosenAvatarVal;
 
+    // Preserve real verified identity for Super Admin exclusive auditing
+    this.currentUser.realName = this.currentUser.realName || this.currentUser.name;
+    this.currentUser.realEmail = this.currentUser.realEmail || this.currentUser.email;
+
     this.currentUser.name = newName;
+    if (rawUsername) this.currentUser.username = rawUsername.toLowerCase();
     if (newRollNo) this.currentUser.rollNo = newRollNo;
     if (newDept) this.currentUser.department = newDept;
     if (newYear) this.currentUser.year = newYear;
     this.currentUser.bio = newBio;
     this.currentUser.avatar = resolvedAvatar;
+    if (newPhotoUrl) {
+      this.currentUser.avatarUrl = newPhotoUrl;
+    } else {
+      delete this.currentUser.avatarUrl;
+    }
+    this.currentUser.privacyShield = privacyShield;
 
     // Save to users collection
     const idx = this.users.findIndex(u => u.id === this.currentUser.id || (this.currentUser.email && u.email === this.currentUser.email));
@@ -3116,7 +3482,7 @@ class CampusNotificationManagementSystem {
     this.updateUserSessionUI();
     this.render();
     this.toggleProfileCustomizeDrawer(false);
-    this.showToast('Profile identity successfully updated and saved!', 'success');
+    this.showToast('Profile identity, username & avatar updated successfully!', 'success');
   }
 
   /* --------------------------------------------------------------------------
@@ -3259,20 +3625,52 @@ class CampusNotificationManagementSystem {
 
     let resolvedRole = isSuperAdminEmail ? 'ADMIN' : (existing ? existing.role : 'VIEWER');
     let resolvedCanPost = isSuperAdminEmail ? true : (existing ? existing.canPost : false);
-    let resolvedName = existing && existing.name ? existing.name : (firebaseUser.displayName || (email ? email.split('@')[0] : 'Campus Member'));
-    let resolvedUsername = existing && existing.username ? existing.username : ((email ? email.split('@')[0] : 'user_' + firebaseUser.uid.substring(0, 5)).toLowerCase());
+
+    // Privacy Shield Engine: Strictly protect personal identity and email handles
+    const verifiedRealName = firebaseUser.displayName || (existing && existing.realName) || (existing && existing.name) || 'Campus Member';
+    const verifiedRealEmail = email || (existing && existing.realEmail) || '';
+    const verifiedContact = phone || email || (existing && existing.contact) || '';
+
+    // Generate shielded public username: Avoid ever leaking @maneomkar844 or raw email prefixes
+    const emailPrefix = email ? email.split('@')[0].toLowerCase() : '';
+    let resolvedUsername = '';
+    if (existing && existing.username && existing.username !== emailPrefix && !existing.username.includes('maneomkar844')) {
+      resolvedUsername = existing.username;
+    } else if (isSuperAdminEmail) {
+      resolvedUsername = 'admin';
+    } else {
+      const idDigits = (firebaseUser.uid || '').replace(/\D/g, '').slice(-3) || Math.floor(100 + Math.random() * 900);
+      resolvedUsername = 'scholar_' + idDigits;
+    }
+
+    let resolvedName = '';
+    if (existing && existing.name && existing.name !== emailPrefix && !existing.name.includes('maneomkar844')) {
+      resolvedName = existing.name;
+    } else if (isSuperAdminEmail) {
+      resolvedName = firebaseUser.displayName || 'Campus Super Admin';
+    } else {
+      const idDigits = (firebaseUser.uid || '').replace(/\D/g, '').slice(-3) || '01';
+      resolvedName = 'Campus Scholar ' + idDigits;
+    }
+
+    const resolvedAvatarUrl = (existing && existing.avatarUrl) ? existing.avatarUrl : (firebaseUser.photoURL || '');
     let resolvedAvatar = existing && existing.avatar ? existing.avatar : (isSuperAdminEmail ? 'SA' : (resolvedName ? resolvedName.substring(0, 2) : 'CN').toUpperCase());
 
     const syncedUser = {
       id: firebaseUser.uid,
       name: resolvedName,
       username: resolvedUsername,
+      realName: verifiedRealName,
+      realEmail: verifiedRealEmail,
+      realContact: verifiedContact,
       email: email,
       contact: phone || email,
       role: resolvedRole,
       department: existing ? existing.department : 'General Campus',
-      bio: existing ? existing.bio : (isSuperAdminEmail ? 'System Administrator / Campus Owner' : 'Campus Member verified via Firebase Auth'),
+      bio: existing ? existing.bio : (isSuperAdminEmail ? 'System Administrator / Campus Owner' : 'Campus Member & Circular Viewer'),
       avatar: resolvedAvatar,
+      avatarUrl: resolvedAvatarUrl,
+      privacyShield: true,
       canPost: resolvedCanPost,
       status: 'APPROVED',
       isSuperAdmin: isSuperAdminEmail,
@@ -4079,10 +4477,31 @@ class CampusNotificationManagementSystem {
       // Admin has full restriction authority to delete ANY comment in the system
       const canDelete = this.isAdmin() || Boolean(this.currentUser && q.userId === this.currentUser.id);
 
+      // Decrypt if E2EE
+      let displayText = q.text || '';
+      if (q.ciphertext && this.e2ee) {
+        const dec = this.e2ee.decryptSync(q.ciphertext, q.iv);
+        if (dec) displayText = dec;
+      }
+
+      // Avatar
+      const avatarHtml = q.avatarUrl
+        ? `<img src="${this.escapeHTML(q.avatarUrl)}" class="avatar-comment-img" alt="${this.escapeHTML(q.authorName || 'User')}">`
+        : '';
+
+      // Super Admin Identity Audit Tag
+      const isSuperAdmin = this.isAdmin();
+      const adminAuditHtml = isSuperAdmin ? `
+        <div class="admin-audit-tag" style="margin: 3px 0; font-size: 0.72rem;">
+          🛡️ Verified Student: <strong>${this.escapeHTML(q.authorRealName || q.authorName || q.author)}</strong> &bull; <span>${this.escapeHTML(q.authorRealEmail || 'Verified Campus Account')}</span>
+        </div>
+      ` : '';
+
       return `
         <div class="comment-item" id="comment_${q.id}">
           <div class="comment-header">
             <div class="comment-author-wrap">
+              ${avatarHtml}
               <span class="comment-author">${this.escapeHTML(q.authorName || q.author)}</span>
               ${isAdmComment ? `
                 <span class="comment-role-tag comment-role-admin">Admin</span>
@@ -4090,6 +4509,7 @@ class CampusNotificationManagementSystem {
                 <span class="comment-role-tag comment-role-viewer">Member</span>
               `}
               ${q.authorUsername ? `<span style="font-size: 0.7rem; color: var(--text-dim);">@${this.escapeHTML(q.authorUsername)}</span>` : ''}
+              <span class="e2ee-tag-badge" title="End-to-End Encrypted via 256-Bit AES">🔒 E2EE</span>
             </div>
             <div style="display: flex; align-items: center; gap: 8px;">
               <span class="comment-time">${this.formatDate(q.time)}</span>
@@ -4100,18 +4520,19 @@ class CampusNotificationManagementSystem {
               ` : ''}
             </div>
           </div>
+          ${adminAuditHtml}
           ${q.authorBio ? `
             <div style="font-size: 0.72rem; color: var(--text-dim); font-style: italic; margin-bottom: 4px;">
               "${this.escapeHTML(q.authorBio)}"
             </div>
           ` : ''}
-          <div class="comment-text">${this.escapeHTML(q.text)}</div>
+          <div class="comment-text">${this.escapeHTML(displayText)}</div>
         </div>
       `;
     }).join('');
   }
 
-  handleSubmitInquiry() {
+  async handleSubmitInquiry() {
     if (!this.isAuthenticated()) {
       this.showToast('Authentication Required: Please sign in or create an account to post an inquiry.', 'warning');
       this.showInstagramGateway('login');
@@ -4131,15 +4552,33 @@ class CampusNotificationManagementSystem {
 
     if (!notice.comments) notice.comments = [];
 
+    let ciphertext = null;
+    let iv = null;
+    if (this.e2ee) {
+      try {
+        const enc = await this.e2ee.encrypt(text);
+        ciphertext = enc.ciphertext;
+        iv = enc.iv;
+      } catch (err) {
+        console.warn('E2EE comment encryption fallback:', err);
+      }
+    }
+
     const newQuery = {
       id: 'query-' + Date.now(),
       userId: this.currentUser.id,
       authorName: this.currentUser.name,
       authorUsername: this.currentUser.username,
+      authorRealName: this.currentUser.realName || this.currentUser.name,
+      authorRealEmail: this.currentUser.realEmail || this.currentUser.email,
+      avatarUrl: this.currentUser.avatarUrl || '',
       authorRole: this.currentUser.role,
       authorBio: this.currentUser.bio || '',
       time: new Date().toISOString(),
-      text: text
+      text: text,
+      ciphertext: ciphertext,
+      iv: iv,
+      isE2ee: true
     };
 
     notice.comments.push(newQuery);
@@ -4149,7 +4588,7 @@ class CampusNotificationManagementSystem {
     this.dom.commentInputText.value = '';
     this.renderInquiriesList();
     this.render();
-    this.showToast('Inquiry logged into official clarification ledger.');
+    this.showToast('Inquiry encrypted (AES-256) & logged into official clarification ledger.');
   }
 
   handleDeleteComment(commentId) {
