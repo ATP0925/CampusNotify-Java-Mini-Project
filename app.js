@@ -204,8 +204,12 @@ class CampusNotificationManagementSystem {
       const storedBookmarks = localStorage.getItem('cnms_user_bookmarks');
       if (storedBookmarks) this.bookmarkSet = new Set(JSON.parse(storedBookmarks));
 
-      // 6. Theme
-      const savedTheme = localStorage.getItem('cnms_theme') || 'dark';
+      // 6. Theme (Default to Light Pink, Orange & White theme)
+      let savedTheme = localStorage.getItem('cnms_theme');
+      if (!savedTheme || savedTheme === 'dark') {
+        savedTheme = 'light';
+        try { localStorage.setItem('cnms_theme', 'light'); } catch (_) {}
+      }
       if (typeof document !== 'undefined' && document.documentElement && document.documentElement.setAttribute) {
         document.documentElement.setAttribute('data-theme', savedTheme);
       }
@@ -3185,7 +3189,7 @@ class CampusNotificationManagementSystem {
      THEME TOGGLE
      -------------------------------------------------------------------------- */
   toggleTheme() {
-    const current = document.documentElement.getAttribute('data-theme') || 'dark';
+    const current = document.documentElement.getAttribute('data-theme') || 'light';
     const nextTheme = current === 'dark' ? 'light' : 'dark';
     document.documentElement.setAttribute('data-theme', nextTheme);
     localStorage.setItem('cnms_theme', nextTheme);
