@@ -1304,7 +1304,8 @@ button, input, textarea, select {
 }
 
 .modal-dialog {
-  background-color: #ffffff;
+  background-color: var(--bg-card);
+  color: var(--text-main);
   border: 1.5px solid var(--border-color);
   border-radius: var(--radius-lg);
   width: 100%;
@@ -4682,6 +4683,390 @@ button, input, textarea, select {
   color: var(--brand-accent);
   font-weight: 700;
 }
+
+/* ==========================================================================
+   THEME STUDIO & LIVE COLOR CUSTOMIZER (FULL AESTHETICS & RESPONSIVENESS)
+   ========================================================================== */
+.modal-dialog.modal-theme-studio {
+  max-width: min(100%, 780px);
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background-color: var(--bg-card);
+  color: var(--text-main);
+  border: 1.5px solid var(--border-color);
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.25);
+}
+
+.theme-studio-badge {
+  background: var(--brand-gradient);
+  color: #ffffff !important;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+}
+
+.theme-studio-body {
+  padding: clamp(14px, 3vw, 24px);
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* Live Preview Swatch Strip */
+.theme-preview-banner {
+  background-color: var(--bg-subtle);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 14px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.theme-preview-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.theme-preview-tag {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--brand-primary);
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+}
+
+.theme-preview-status {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.theme-preview-swatches {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.preview-swatch {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 2px solid #ffffff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  transition: transform 0.2s ease;
+}
+.preview-swatch:hover {
+  transform: scale(1.15);
+}
+
+.theme-preview-note {
+  font-size: 0.76rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+  margin: 0;
+}
+
+/* Sections */
+.theme-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.theme-section-title-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.theme-section-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin: 0;
+}
+
+.theme-section-hint {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* Preset Palettes Grid */
+.preset-palettes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 10px;
+}
+
+.preset-card {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--bg-card);
+  border: 1.5px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 8px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: var(--shadow-sm);
+  color: var(--text-main);
+}
+
+.preset-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--brand-primary);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+}
+
+.preset-card.active {
+  border-color: var(--brand-primary);
+  background-color: var(--bg-subtle);
+  outline: 2px solid var(--brand-primary);
+}
+
+.preset-preview {
+  height: 48px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 8px;
+  margin-bottom: 8px;
+}
+
+.preset-mini-card {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 800;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+}
+
+.preset-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.preset-name {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.preset-desc {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+/* Color Controls Grid */
+.color-controls-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.color-control-card {
+  background-color: var(--bg-subtle);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.color-control-card:hover, .color-control-card:focus-within {
+  border-color: var(--brand-primary);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+}
+
+.color-control-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.color-control-label {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-main);
+  cursor: pointer;
+}
+
+.color-var-tag {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  padding: 1px 6px;
+  border-radius: 4px;
+  color: var(--text-muted);
+}
+
+.color-control-sub {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  line-height: 1.3;
+  margin: 0;
+  min-height: 26px;
+}
+
+.color-control-inputs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.color-swatch-wrapper {
+  position: relative;
+  width: 42px;
+  height: 36px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 2px solid var(--border-color);
+  box-shadow: inset 0 0 4px rgba(0,0,0,0.1);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.color-picker-input {
+  position: absolute;
+  top: -8px;
+  left: -8px;
+  width: 60px;
+  height: 60px;
+  cursor: pointer;
+  border: none;
+  background: none;
+  padding: 0;
+}
+
+.color-hex-input {
+  flex: 1;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-card);
+  color: var(--text-main);
+  transition: border-color 0.2s ease;
+  min-width: 0;
+}
+
+.color-hex-input:focus {
+  outline: none;
+  border-color: var(--brand-primary);
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+}
+
+/* Modal Footer Actions */
+.theme-studio-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 20px;
+  border-top: 1px solid var(--border-color);
+  background-color: var(--bg-card);
+  flex-wrap: wrap;
+}
+
+.footer-left-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.footer-right-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Floating FAB Button */
+.floating-theme-fab {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 990;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--brand-gradient);
+  color: #ffffff;
+  border: 1.5px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25), 0 2px 6px rgba(0, 0, 0, 0.15);
+  padding: 10px 18px;
+  border-radius: var(--radius-full);
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  backdrop-filter: blur(8px);
+}
+
+.floating-theme-fab:hover {
+  transform: translateY(-3px) scale(1.03);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+  border-color: #ffffff;
+}
+
+.floating-theme-fab:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.floating-theme-fab .fab-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (max-width: 640px) {
+  .floating-theme-fab {
+    bottom: 16px;
+    right: 16px;
+    padding: 10px;
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    justify-content: center;
+  }
+  .floating-theme-fab .fab-label {
+    display: none;
+  }
+}
+
 
 
 

@@ -88,6 +88,13 @@
           <span class="theme-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line></svg></span>
         </button>
 
+        <!-- Theme Studio & Live Color Customizer -->
+        <button class="btn btn-secondary btn-sm" id="openThemeStudioBtn" title="Customize Colors & Theme Studio" aria-label="Open Color Customizer">
+          <span class="auth-btn-icon"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"></circle><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"></circle><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"></circle><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"></circle><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.563-2.512 5.563-5.563C22 6.5 17.5 2 12 2z"></path></svg></span>
+          <span class="btn-text-full">Customize Colors</span>
+          <span class="btn-text-short">Colors</span>
+        </button>
+
         <!-- Officer Credentials (Opens Profile & Governance Modal) -->
         <div class="officer-card" id="openProfileModalBtn" role="button" tabindex="0" title="Click to view Profile, Bio & System Governance">
           <div class="officer-avatar" id="navUserAvatar">SA</div>
@@ -111,6 +118,9 @@
         <span class="insta-sub-tag">INSTITUTIONAL ACCESS PORTAL</span>
       </div>
       <div class="insta-topbar-right">
+        <button type="button" class="btn btn-sm btn-secondary" id="instaThemeStudioBtn" title="Customize Colors & Theme Studio">
+          <span>🎨 Customize Colors</span>
+        </button>
         <button type="button" class="btn btn-sm btn-secondary" id="instaReturnToPortalBtn" style="display: none;" title="Return to Campus Notification Board">
           <span>Enter Portal as <strong id="instaActiveUserSnippet">User</strong></span>
         </button>
@@ -848,6 +858,287 @@
 
   </div>
 
+  <!-- Modal: Theme Studio & Live Color Customizer -->
+  <div class="modal-backdrop" id="themeStudioModalBackdrop" aria-hidden="true">
+    <div class="modal-dialog modal-theme-studio" role="dialog" aria-modal="true" aria-labelledby="themeStudioHeading">
+      
+      <div class="modal-header">
+        <div class="modal-header-text">
+          <span class="modal-dept-badge theme-studio-badge">LIVE PALETTE &amp; THEME STUDIO</span>
+          <h3 class="modal-title" id="themeStudioHeading">🎨 Color Customizer &amp; Palette Studio</h3>
+          <p class="modal-subtitle">Customize every color in the interface live in real-time, or choose curated academic presets.</p>
+        </div>
+        <button class="modal-close-btn" id="closeThemeStudioBtn" title="Close Theme Studio">&times;</button>
+      </div>
+
+      <div class="modal-body theme-studio-body">
+        
+        <!-- Live Palette Mini Preview Banner -->
+        <div class="theme-preview-banner">
+          <div class="theme-preview-header">
+            <span class="theme-preview-tag">LIVE PREVIEW</span>
+            <span class="theme-preview-status" id="themeStatusText">Custom Active Palette</span>
+          </div>
+          <div class="theme-preview-swatches" id="themePreviewSwatches">
+            <span class="preview-swatch swatch-primary" title="Primary Brand" id="swatchPrimaryPreview"></span>
+            <span class="preview-swatch swatch-secondary" title="Secondary Accent" id="swatchSecondaryPreview"></span>
+            <span class="preview-swatch swatch-bg" title="Page Background" id="swatchBgPreview"></span>
+            <span class="preview-swatch swatch-card" title="Card Surface" id="swatchCardPreview"></span>
+            <span class="preview-swatch swatch-subtle" title="Subtle Tint" id="swatchSubtlePreview"></span>
+            <span class="preview-swatch swatch-border" title="Border" id="swatchBorderPreview"></span>
+            <span class="preview-swatch swatch-text" title="Main Text" id="swatchTextPreview"></span>
+          </div>
+          <p class="theme-preview-note">Changes apply instantaneously across all boards, circulars, buttons, and navigation in real time.</p>
+        </div>
+
+        <!-- Section 1: Curated 1-Click Presets -->
+        <div class="theme-section">
+          <div class="theme-section-title-row">
+            <h4 class="theme-section-title">🌟 Curated 1-Click Academic &amp; Modern Presets</h4>
+            <span class="theme-section-hint">Instant high-contrast palettes</span>
+          </div>
+
+          <div class="preset-palettes-grid">
+            
+            <button type="button" class="preset-card" data-preset="sapphire">
+              <div class="preset-preview" style="background: linear-gradient(135deg, #2563eb, #0284c7);">
+                <div class="preset-mini-card" style="background: #ffffff; color: #0f172a;">Aa</div>
+              </div>
+              <div class="preset-meta">
+                <strong class="preset-name">🎓 Royal Sapphire</strong>
+                <span class="preset-desc">Academic Blue &amp; Slate</span>
+              </div>
+            </button>
+
+            <button type="button" class="preset-card" data-preset="emerald">
+              <div class="preset-preview" style="background: linear-gradient(135deg, #059669, #10b981);">
+                <div class="preset-mini-card" style="background: #ffffff; color: #064e3b;">Aa</div>
+              </div>
+              <div class="preset-meta">
+                <strong class="preset-name">🌲 Campus Emerald</strong>
+                <span class="preset-desc">Forest Green &amp; Mint</span>
+              </div>
+            </button>
+
+            <button type="button" class="preset-card" data-preset="midnight">
+              <div class="preset-preview" style="background: linear-gradient(135deg, #6366f1, #8b5cf6);">
+                <div class="preset-mini-card" style="background: #131b2e; color: #f8fafc; border: 1px solid #2e384d;">Aa</div>
+              </div>
+              <div class="preset-meta">
+                <strong class="preset-name">🌌 Cyber Midnight</strong>
+                <span class="preset-desc">Dark Obsidian &amp; Indigo</span>
+              </div>
+            </button>
+
+            <button type="button" class="preset-card" data-preset="amethyst">
+              <div class="preset-preview" style="background: linear-gradient(135deg, #7c3aed, #a855f7);">
+                <div class="preset-mini-card" style="background: #ffffff; color: #3b0764;">Aa</div>
+              </div>
+              <div class="preset-meta">
+                <strong class="preset-name">👑 Imperial Violet</strong>
+                <span class="preset-desc">Royal Purple &amp; Lilac</span>
+              </div>
+            </button>
+
+            <button type="button" class="preset-card" data-preset="oceanic">
+              <div class="preset-preview" style="background: linear-gradient(135deg, #0d9488, #06b6d4);">
+                <div class="preset-mini-card" style="background: #ffffff; color: #134e4a;">Aa</div>
+              </div>
+              <div class="preset-meta">
+                <strong class="preset-name">🌊 Oceanic Teal</strong>
+                <span class="preset-desc">Pacific Aqua &amp; Cyan</span>
+              </div>
+            </button>
+
+            <button type="button" class="preset-card" data-preset="crimson">
+              <div class="preset-preview" style="background: linear-gradient(135deg, #dc2626, #f59e0b);">
+                <div class="preset-mini-card" style="background: #ffffff; color: #4c0519;">Aa</div>
+              </div>
+              <div class="preset-meta">
+                <strong class="preset-name">🍷 Oxford Crimson</strong>
+                <span class="preset-desc">Varsity Red &amp; Amber</span>
+              </div>
+            </button>
+
+            <button type="button" class="preset-card" data-preset="slate">
+              <div class="preset-preview" style="background: linear-gradient(135deg, #334155, #64748b);">
+                <div class="preset-mini-card" style="background: #ffffff; color: #0f172a;">Aa</div>
+              </div>
+              <div class="preset-meta">
+                <strong class="preset-name">🏛️ Executive Slate</strong>
+                <span class="preset-desc">Minimalist Charcoal</span>
+              </div>
+            </button>
+
+            <button type="button" class="preset-card" data-preset="sunset">
+              <div class="preset-preview" style="background: linear-gradient(135deg, #f43f5e, #f97316);">
+                <div class="preset-mini-card" style="background: #ffffff; color: #000000;">Aa</div>
+              </div>
+              <div class="preset-meta">
+                <strong class="preset-name">🌅 Sunset Peach</strong>
+                <span class="preset-desc">Original Rose &amp; Orange</span>
+              </div>
+            </button>
+
+          </div>
+        </div>
+
+        <!-- Section 2: Complete Color Controls (Any Color) -->
+        <div class="theme-section">
+          <div class="theme-section-title-row">
+            <h4 class="theme-section-title">🎨 Custom Color Controls (Pick Literally Any Color)</h4>
+            <span class="theme-section-hint">Drag color picker or type #hex</span>
+          </div>
+
+          <div class="color-controls-grid">
+            
+            <!-- 1. Primary Brand -->
+            <div class="color-control-card">
+              <div class="color-control-top">
+                <label for="pickerBrandPrimary" class="color-control-label">Primary Brand</label>
+                <span class="color-var-tag">--brand-primary</span>
+              </div>
+              <p class="color-control-sub">Headers, buttons, active tabs, highlights</p>
+              <div class="color-control-inputs">
+                <div class="color-swatch-wrapper">
+                  <input type="color" id="pickerBrandPrimary" class="color-picker-input" value="#2563eb" title="Click to choose Primary Brand Color">
+                </div>
+                <input type="text" id="hexBrandPrimary" class="color-hex-input" value="#2563eb" maxlength="7" placeholder="#2563eb">
+              </div>
+            </div>
+
+            <!-- 2. Secondary Brand -->
+            <div class="color-control-card">
+              <div class="color-control-top">
+                <label for="pickerBrandSecondary" class="color-control-label">Secondary Accent</label>
+                <span class="color-var-tag">--brand-secondary</span>
+              </div>
+              <p class="color-control-sub">Gradient secondary stop, badges, tags</p>
+              <div class="color-control-inputs">
+                <div class="color-swatch-wrapper">
+                  <input type="color" id="pickerBrandSecondary" class="color-picker-input" value="#0284c7" title="Click to choose Secondary Accent Color">
+                </div>
+                <input type="text" id="hexBrandSecondary" class="color-hex-input" value="#0284c7" maxlength="7" placeholder="#0284c7">
+              </div>
+            </div>
+
+            <!-- 3. Page Background -->
+            <div class="color-control-card">
+              <div class="color-control-top">
+                <label for="pickerBgPage" class="color-control-label">Page Background</label>
+                <span class="color-var-tag">--bg-page</span>
+              </div>
+              <p class="color-control-sub">Overall main window canvas &amp; backdrop</p>
+              <div class="color-control-inputs">
+                <div class="color-swatch-wrapper">
+                  <input type="color" id="pickerBgPage" class="color-picker-input" value="#f8fafc" title="Click to choose Page Background">
+                </div>
+                <input type="text" id="hexBgPage" class="color-hex-input" value="#f8fafc" maxlength="7" placeholder="#f8fafc">
+              </div>
+            </div>
+
+            <!-- 4. Card / Surface -->
+            <div class="color-control-card">
+              <div class="color-control-top">
+                <label for="pickerBgCard" class="color-control-label">Card &amp; Surfaces</label>
+                <span class="color-var-tag">--bg-card</span>
+              </div>
+              <p class="color-control-sub">Circular cards, modals, sidebar cards</p>
+              <div class="color-control-inputs">
+                <div class="color-swatch-wrapper">
+                  <input type="color" id="pickerBgCard" class="color-picker-input" value="#ffffff" title="Click to choose Card Background">
+                </div>
+                <input type="text" id="hexBgCard" class="color-hex-input" value="#ffffff" maxlength="7" placeholder="#ffffff">
+              </div>
+            </div>
+
+            <!-- 5. Subtle Tint Area -->
+            <div class="color-control-card">
+              <div class="color-control-top">
+                <label for="pickerBgSubtle" class="color-control-label">Subtle Tint Area</label>
+                <span class="color-var-tag">--bg-subtle</span>
+              </div>
+              <p class="color-control-sub">Notice item headers, active pills, alert backings</p>
+              <div class="color-control-inputs">
+                <div class="color-swatch-wrapper">
+                  <input type="color" id="pickerBgSubtle" class="color-picker-input" value="#eff6ff" title="Click to choose Subtle Tint">
+                </div>
+                <input type="text" id="hexBgSubtle" class="color-hex-input" value="#eff6ff" maxlength="7" placeholder="#eff6ff">
+              </div>
+            </div>
+
+            <!-- 6. Borders & Dividers -->
+            <div class="color-control-card">
+              <div class="color-control-top">
+                <label for="pickerBorderColor" class="color-control-label">Borders &amp; Dividers</label>
+                <span class="color-var-tag">--border-color</span>
+              </div>
+              <p class="color-control-sub">Card borders, input outlines, table borders</p>
+              <div class="color-control-inputs">
+                <div class="color-swatch-wrapper">
+                  <input type="color" id="pickerBorderColor" class="color-picker-input" value="#cbd5e1" title="Click to choose Border Color">
+                </div>
+                <input type="text" id="hexBorderColor" class="color-hex-input" value="#cbd5e1" maxlength="7" placeholder="#cbd5e1">
+              </div>
+            </div>
+
+            <!-- 7. Main Heading & Text -->
+            <div class="color-control-card">
+              <div class="color-control-top">
+                <label for="pickerTextMain" class="color-control-label">Headings &amp; Main Text</label>
+                <span class="color-var-tag">--text-main</span>
+              </div>
+              <p class="color-control-sub">Circular titles, bold headers, officer names</p>
+              <div class="color-control-inputs">
+                <div class="color-swatch-wrapper">
+                  <input type="color" id="pickerTextMain" class="color-picker-input" value="#0f172a" title="Click to choose Main Text Color">
+                </div>
+                <input type="text" id="hexTextMain" class="color-hex-input" value="#0f172a" maxlength="7" placeholder="#0f172a">
+              </div>
+            </div>
+
+            <!-- 8. Muted Subtext -->
+            <div class="color-control-card">
+              <div class="color-control-top">
+                <label for="pickerTextMuted" class="color-control-label">Muted Details &amp; Meta</label>
+                <span class="color-var-tag">--text-muted</span>
+              </div>
+              <p class="color-control-sub">Dates, timestamps, descriptions, subtitles</p>
+              <div class="color-control-inputs">
+                <div class="color-swatch-wrapper">
+                  <input type="color" id="pickerTextMuted" class="color-picker-input" value="#475569" title="Click to choose Muted Text Color">
+                </div>
+                <input type="text" id="hexTextMuted" class="color-hex-input" value="#475569" maxlength="7" placeholder="#475569">
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+      <div class="modal-footer theme-studio-footer">
+        <div class="footer-left-actions">
+          <button type="button" class="btn btn-secondary btn-sm" id="randomizePaletteBtn" title="Generate a surprise harmonious palette">
+            <span>🎲 Randomize</span>
+          </button>
+          <button type="button" class="btn btn-secondary btn-sm" id="resetDefaultPaletteBtn" title="Reset to default original palette">
+            <span>🔄 Reset Default</span>
+          </button>
+          <button type="button" class="btn btn-secondary btn-sm" id="copyThemeCssBtn" title="Copy CSS Variables to Clipboard">
+            <span>📋 Copy CSS</span>
+          </button>
+        </div>
+        <div class="footer-right-actions">
+          <button type="button" class="btn btn-primary" id="saveThemePaletteBtn">
+            <span>💾 Save &amp; Keep Palette</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
   <!-- Modal: Officer Profile & System Governance -->
   <div class="modal-backdrop" id="officerProfileModalBackdrop" aria-hidden="true">
     <div class="modal-dialog modal-profile" role="dialog" aria-modal="true" aria-labelledby="profileHeading">
@@ -1498,6 +1789,12 @@
       </div>
     </div>
   </div>
+
+  <!-- Floating Quick-Access Theme Customizer FAB -->
+  <button class="floating-theme-fab" id="floatingThemeFab" title="Customize Colors &amp; Theme Studio" aria-label="Customize Colors">
+    <span class="fab-icon"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.563-2.512 5.563-5.563C22 6.5 17.5 2 12 2z"></path><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"></circle><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"></circle><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"></circle><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"></circle></svg></span>
+    <span class="fab-label">Customize Colors</span>
+  </button>
 
   <!-- Toast Notification Container -->
   <div class="toast-container" id="toastContainer" aria-live="polite"></div>

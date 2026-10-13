@@ -53,6 +53,106 @@ const CURATED_CAMPUS_GIFS = [
   { cat: 'team', label: 'Applause & Cheers 👏', url: 'https://media.giphy.com/media/l4q8cJzGdR9J8w3hS/giphy.gif' }
 ];
 
+// Curated Academic & Modern Presets for Theme Studio
+const CNMS_PRESET_PALETTES = {
+  sapphire: {
+    id: 'sapphire',
+    name: 'Royal Sapphire',
+    brandPrimary: '#2563eb',
+    brandSecondary: '#0284c7',
+    bgPage: '#f8fafc',
+    bgCard: '#ffffff',
+    bgSubtle: '#eff6ff',
+    borderColor: '#cbd5e1',
+    textMain: '#0f172a',
+    textMuted: '#475569'
+  },
+  emerald: {
+    id: 'emerald',
+    name: 'Campus Emerald',
+    brandPrimary: '#059669',
+    brandSecondary: '#10b981',
+    bgPage: '#f0fdf4',
+    bgCard: '#ffffff',
+    bgSubtle: '#dcfce7',
+    borderColor: '#bbf7d0',
+    textMain: '#064e3b',
+    textMuted: '#374151'
+  },
+  midnight: {
+    id: 'midnight',
+    name: 'Cyber Midnight',
+    brandPrimary: '#6366f1',
+    brandSecondary: '#8b5cf6',
+    bgPage: '#090d16',
+    bgCard: '#131b2e',
+    bgSubtle: '#1e293b',
+    borderColor: '#2e384d',
+    textMain: '#f8fafc',
+    textMuted: '#94a3b8'
+  },
+  amethyst: {
+    id: 'amethyst',
+    name: 'Imperial Violet',
+    brandPrimary: '#7c3aed',
+    brandSecondary: '#a855f7',
+    bgPage: '#faf5ff',
+    bgCard: '#ffffff',
+    bgSubtle: '#f3e8ff',
+    borderColor: '#e9d5ff',
+    textMain: '#3b0764',
+    textMuted: '#4b5563'
+  },
+  oceanic: {
+    id: 'oceanic',
+    name: 'Oceanic Teal',
+    brandPrimary: '#0d9488',
+    brandSecondary: '#06b6d4',
+    bgPage: '#f0fdfa',
+    bgCard: '#ffffff',
+    bgSubtle: '#ccfbf1',
+    borderColor: '#99f6e4',
+    textMain: '#134e4a',
+    textMuted: '#334155'
+  },
+  crimson: {
+    id: 'crimson',
+    name: 'Oxford Crimson',
+    brandPrimary: '#dc2626',
+    brandSecondary: '#f59e0b',
+    bgPage: '#fff1f2',
+    bgCard: '#ffffff',
+    bgSubtle: '#ffe4e6',
+    borderColor: '#fecdd3',
+    textMain: '#4c0519',
+    textMuted: '#475569'
+  },
+  slate: {
+    id: 'slate',
+    name: 'Executive Slate',
+    brandPrimary: '#334155',
+    brandSecondary: '#64748b',
+    bgPage: '#f8fafc',
+    bgCard: '#ffffff',
+    bgSubtle: '#f1f5f9',
+    borderColor: '#e2e8f0',
+    textMain: '#0f172a',
+    textMuted: '#64748b'
+  },
+  sunset: {
+    id: 'sunset',
+    name: 'Sunset Peach (Original)',
+    brandPrimary: '#f43f5e',
+    brandSecondary: '#f97316',
+    bgPage: '#fff8f6',
+    bgCard: '#ffffff',
+    bgSubtle: '#fff1f2',
+    borderColor: '#fed7aa',
+    textMain: '#000000',
+    textMuted: '#1e293b'
+  }
+};
+
 class CampusNotificationManagementSystem {
   constructor() {
     // Repositories
@@ -86,7 +186,8 @@ class CampusNotificationManagementSystem {
     this.firebaseApp = null;
     this.firestoreDb = null;
     this.firebaseConnected = false;
-    this.unsubscribers = [];
+    // Theme Studio Active Palette
+    this.activeCustomPalette = null;
 
     this.init();
   }
@@ -95,9 +196,17 @@ class CampusNotificationManagementSystem {
      INITIALIZATION & REPOSITORY LOAD
      -------------------------------------------------------------------------- */
   init() {
+    // Restore Dark/Light mode theme state
+    const storedTheme = localStorage.getItem('cnms_theme');
+    if (storedTheme) {
+      document.documentElement.setAttribute('data-theme', storedTheme);
+      this.updateThemeIcon(storedTheme);
+    }
+
     this.loadState();
     this.bindDOM();
     this.bindEvents();
+    this.initThemeStudio();
     this.initFirebase();
     this.initPhoneMockupSlider();
     this.updateDeviceAdminVisibility();
@@ -535,8 +644,11 @@ class CampusNotificationManagementSystem {
       globalSearchInput: document.getElementById('globalSearchInput'),
       openNewNoticeBtn: document.getElementById('openNewNoticeBtn'),
       newNoticeBtnLabel: document.getElementById('newNoticeBtnLabel'),
-      openAuthModalBtn: document.getElementById('openAuthModalBtn'),
       themeToggleBtn: document.getElementById('themeToggleBtn'),
+      openThemeStudioBtn: document.getElementById('openThemeStudioBtn'),
+      instaThemeStudioBtn: document.getElementById('instaThemeStudioBtn'),
+      floatingThemeFab: document.getElementById('floatingThemeFab'),
+      themeStudioModalBackdrop: document.getElementById('themeStudioModalBackdrop'),
       openProfileModalBtn: document.getElementById('openProfileModalBtn'),
       navUserAvatar: document.getElementById('navUserAvatar'),
       navUserName: document.getElementById('navUserName'),
@@ -1836,13 +1948,15 @@ class CampusNotificationManagementSystem {
         <button type="button" class="emoji-cell-btn" data-emoji="${emoji}" title="${emoji}">${emoji}</button>
       `).join('');
 
-      this.dom.loungeEmojiGrid.querySelectorAll('.emoji-cell-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          e.preventDefault();
-          const emoji = btn.getAttribute('data-emoji');
-          this.insertEmojiToLoungeInput(emoji);
+      if (typeof this.dom.loungeEmojiGrid.querySelectorAll === 'function') {
+        this.dom.loungeEmojiGrid.querySelectorAll('.emoji-cell-btn').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const emoji = btn.getAttribute('data-emoji');
+            this.insertEmojiToLoungeInput(emoji);
+          });
         });
-      });
+      }
     }
 
     // Populate Initial GIF Grid
@@ -3204,6 +3318,359 @@ class CampusNotificationManagementSystem {
         iconSpan.innerHTML = theme === 'dark' ? CNMS_ICONS.moon : CNMS_ICONS.sun;
       }
     }
+  }
+
+  /* --------------------------------------------------------------------------
+     THEME STUDIO & REAL-TIME DYNAMIC COLOR CUSTOMIZER
+     -------------------------------------------------------------------------- */
+  initThemeStudio() {
+    // 1. Hook up Preset Cards (1-Click Switchers)
+    document.querySelectorAll('.preset-card').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const presetKey = btn.getAttribute('data-preset');
+        const preset = CNMS_PRESET_PALETTES[presetKey];
+        if (preset) {
+          this.applyCustomTheme(preset, true);
+          this.syncColorPickers(preset);
+          this.showToast(`Applied preset: ${preset.name}`, 'success');
+        }
+      });
+    });
+
+    // 2. Hook up Individual Color Pickers and Hex Inputs (Live Instant Sync)
+    const colorKeys = [
+      { picker: 'pickerBrandPrimary', hex: 'hexBrandPrimary', key: 'brandPrimary' },
+      { picker: 'pickerBrandSecondary', hex: 'hexBrandSecondary', key: 'brandSecondary' },
+      { picker: 'pickerBgPage', hex: 'hexBgPage', key: 'bgPage' },
+      { picker: 'pickerBgCard', hex: 'hexBgCard', key: 'bgCard' },
+      { picker: 'pickerBgSubtle', hex: 'hexBgSubtle', key: 'bgSubtle' },
+      { picker: 'pickerBorderColor', hex: 'hexBorderColor', key: 'borderColor' },
+      { picker: 'pickerTextMain', hex: 'hexTextMain', key: 'textMain' },
+      { picker: 'pickerTextMuted', hex: 'hexTextMuted', key: 'textMuted' }
+    ];
+
+    colorKeys.forEach(({ picker, hex, key }) => {
+      const pEl = document.getElementById(picker);
+      const hEl = document.getElementById(hex);
+
+      if (pEl) {
+        pEl.addEventListener('input', (e) => {
+          const val = e.target.value;
+          if (hEl) hEl.value = val;
+          const current = this.getCurrentPaletteFromInputs();
+          current.name = 'Custom Personalized';
+          current.id = null;
+          this.applyCustomTheme(current, true);
+        });
+      }
+
+      if (hEl) {
+        hEl.addEventListener('input', (e) => {
+          let val = e.target.value.trim();
+          if (!val.startsWith('#') && val.length === 6) val = '#' + val;
+          if (/^#[0-9A-Fa-f]{6}$/.test(val)) {
+            if (pEl) pEl.value = val;
+            const current = this.getCurrentPaletteFromInputs();
+            current.name = 'Custom Personalized';
+            current.id = null;
+            this.applyCustomTheme(current, true);
+          }
+        });
+      }
+    });
+
+    // 3. Open Modal Triggers
+    const openBtns = [
+      document.getElementById('openThemeStudioBtn'),
+      document.getElementById('instaThemeStudioBtn'),
+      document.getElementById('floatingThemeFab')
+    ];
+    openBtns.forEach(btn => {
+      if (btn) {
+        btn.addEventListener('click', () => this.openThemeStudio());
+      }
+    });
+
+    // 4. Close Modal Triggers
+    const closeBtn = document.getElementById('closeThemeStudioBtn');
+    if (closeBtn) {
+      closeBtn.addEventListener('click', () => this.closeThemeStudio());
+    }
+    const backdrop = document.getElementById('themeStudioModalBackdrop');
+    if (backdrop) {
+      backdrop.addEventListener('click', (e) => {
+        if (e.target === backdrop) this.closeThemeStudio();
+      });
+    }
+
+    // 5. Randomize Palette Action
+    const randomizeBtn = document.getElementById('randomizePaletteBtn');
+    if (randomizeBtn) {
+      randomizeBtn.addEventListener('click', () => this.randomizeTheme());
+    }
+
+    // 6. Reset to Default Action
+    const resetBtn = document.getElementById('resetDefaultPaletteBtn');
+    if (resetBtn) {
+      resetBtn.addEventListener('click', () => this.resetDefaultTheme());
+    }
+
+    // 7. Copy CSS Action
+    const copyBtn = document.getElementById('copyThemeCssBtn');
+    if (copyBtn) {
+      copyBtn.addEventListener('click', () => this.copyThemeCss());
+    }
+
+    // 8. Save Palette Action
+    const saveBtn = document.getElementById('saveThemePaletteBtn');
+    if (saveBtn) {
+      saveBtn.addEventListener('click', () => {
+        const palette = this.getCurrentPaletteFromInputs();
+        this.applyCustomTheme(palette, true);
+        this.showToast('Custom palette saved successfully!', 'success');
+        this.closeThemeStudio();
+      });
+    }
+
+    // 9. Auto-restore stored custom palette if user previously customized colors
+    const saved = localStorage.getItem('cnms_custom_palette');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (parsed && parsed.brandPrimary) {
+          this.applyCustomTheme(parsed, false);
+          this.syncColorPickers(parsed);
+        }
+      } catch (err) {
+        console.warn('Could not restore saved custom palette:', err);
+      }
+    } else {
+      // If no custom palette stored, initialize pickers with Sunset (Original)
+      this.syncColorPickers(CNMS_PRESET_PALETTES.sunset);
+      this.updateThemePreviewSwatches(CNMS_PRESET_PALETTES.sunset);
+    }
+
+    // 10. Query param direct link support (e.g. ?openThemeStudio=1 or ?preset=sapphire)
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const prParam = urlParams.get('preset');
+      if (prParam && CNMS_PRESET_PALETTES[prParam]) {
+        const pr = CNMS_PRESET_PALETTES[prParam];
+        this.applyCustomTheme(pr, true);
+        this.syncColorPickers(pr);
+      }
+      if (urlParams.has('openThemeStudio') || urlParams.has('themeStudio')) {
+        setTimeout(() => this.openThemeStudio(), 50);
+      }
+    } catch (e) {
+      // Ignored
+    }
+  }
+
+  openThemeStudio() {
+    const backdrop = document.getElementById('themeStudioModalBackdrop');
+    if (backdrop) {
+      backdrop.classList.add('open');
+      backdrop.setAttribute('aria-hidden', 'false');
+    }
+  }
+
+  closeThemeStudio() {
+    const backdrop = document.getElementById('themeStudioModalBackdrop');
+    if (backdrop) {
+      backdrop.classList.remove('open');
+      backdrop.setAttribute('aria-hidden', 'true');
+    }
+  }
+
+  applyCustomTheme(palette, persist = true) {
+    if (!palette) return;
+
+    let styleEl = document.getElementById('cnmsDynamicThemeStyle');
+    if (!styleEl) {
+      styleEl = document.createElement('style');
+      styleEl.id = 'cnmsDynamicThemeStyle';
+      document.head.appendChild(styleEl);
+    }
+
+    const brandGradient = `linear-gradient(135deg, ${palette.brandPrimary} 0%, ${palette.brandSecondary} 100%)`;
+
+    styleEl.innerHTML = `
+      :root, [data-theme="light"], [data-theme="dark"] {
+        --brand-primary: ${palette.brandPrimary} !important;
+        --brand-primary-hover: ${palette.brandPrimary} !important;
+        --brand-secondary: ${palette.brandSecondary} !important;
+        --brand-accent: ${palette.brandSecondary} !important;
+        --brand-gradient: ${brandGradient} !important;
+        --bg-page: ${palette.bgPage} !important;
+        --bg-body: ${palette.bgPage} !important;
+        --bg-card: ${palette.bgCard} !important;
+        --bg-card-hover: ${palette.bgCard} !important;
+        --bg-subtle: ${palette.bgSubtle} !important;
+        --bg-input: ${palette.bgCard} !important;
+        --border-color: ${palette.borderColor} !important;
+        --border-light: ${palette.borderColor} !important;
+        --text-main: ${palette.textMain} !important;
+        --text-muted: ${palette.textMuted} !important;
+        --text-dim: ${palette.textMuted} !important;
+      }
+      .modal-dialog {
+        background-color: var(--bg-card) !important;
+        color: var(--text-main) !important;
+        border-color: var(--border-color) !important;
+      }
+      .modal-header, .modal-footer {
+        border-color: var(--border-color) !important;
+      }
+    `;
+
+    this.activeCustomPalette = { ...palette };
+    this.updateThemePreviewSwatches(palette);
+
+    if (persist) {
+      try {
+        localStorage.setItem('cnms_custom_palette', JSON.stringify(palette));
+      } catch (e) {
+        console.warn('Could not save theme palette to localStorage:', e);
+      }
+    }
+  }
+
+  updateThemePreviewSwatches(palette) {
+    const sPrimary = document.getElementById('swatchPrimaryPreview');
+    const sSecondary = document.getElementById('swatchSecondaryPreview');
+    const sBg = document.getElementById('swatchBgPreview');
+    const sCard = document.getElementById('swatchCardPreview');
+    const sSubtle = document.getElementById('swatchSubtlePreview');
+    const sBorder = document.getElementById('swatchBorderPreview');
+    const sText = document.getElementById('swatchTextPreview');
+
+    if (sPrimary) sPrimary.style.backgroundColor = palette.brandPrimary;
+    if (sSecondary) sSecondary.style.backgroundColor = palette.brandSecondary;
+    if (sBg) sBg.style.backgroundColor = palette.bgPage;
+    if (sCard) sCard.style.backgroundColor = palette.bgCard;
+    if (sSubtle) sSubtle.style.backgroundColor = palette.bgSubtle;
+    if (sBorder) sBorder.style.backgroundColor = palette.borderColor;
+    if (sText) sText.style.backgroundColor = palette.textMain;
+
+    const statusText = document.getElementById('themeStatusText');
+    if (statusText) {
+      statusText.textContent = palette.name ? `${palette.name} Active` : 'Custom Palette Active';
+    }
+  }
+
+  syncColorPickers(palette) {
+    const map = [
+      { picker: 'pickerBrandPrimary', hex: 'hexBrandPrimary', key: 'brandPrimary' },
+      { picker: 'pickerBrandSecondary', hex: 'hexBrandSecondary', key: 'brandSecondary' },
+      { picker: 'pickerBgPage', hex: 'hexBgPage', key: 'bgPage' },
+      { picker: 'pickerBgCard', hex: 'hexBgCard', key: 'bgCard' },
+      { picker: 'pickerBgSubtle', hex: 'hexBgSubtle', key: 'bgSubtle' },
+      { picker: 'pickerBorderColor', hex: 'hexBorderColor', key: 'borderColor' },
+      { picker: 'pickerTextMain', hex: 'hexTextMain', key: 'textMain' },
+      { picker: 'pickerTextMuted', hex: 'hexTextMuted', key: 'textMuted' }
+    ];
+
+    map.forEach(item => {
+      const pEl = document.getElementById(item.picker);
+      const hEl = document.getElementById(item.hex);
+      const val = palette[item.key];
+      if (pEl && val) pEl.value = val;
+      if (hEl && val) hEl.value = val;
+    });
+
+    document.querySelectorAll('.preset-card').forEach(card => {
+      const presetKey = card.getAttribute('data-preset');
+      if (palette.id && palette.id === presetKey) {
+        card.classList.add('active');
+      } else {
+        card.classList.remove('active');
+      }
+    });
+  }
+
+  getCurrentPaletteFromInputs() {
+    return {
+      brandPrimary: document.getElementById('pickerBrandPrimary')?.value || '#2563eb',
+      brandSecondary: document.getElementById('pickerBrandSecondary')?.value || '#0284c7',
+      bgPage: document.getElementById('pickerBgPage')?.value || '#f8fafc',
+      bgCard: document.getElementById('pickerBgCard')?.value || '#ffffff',
+      bgSubtle: document.getElementById('pickerBgSubtle')?.value || '#eff6ff',
+      borderColor: document.getElementById('pickerBorderColor')?.value || '#cbd5e1',
+      textMain: document.getElementById('pickerTextMain')?.value || '#0f172a',
+      textMuted: document.getElementById('pickerTextMuted')?.value || '#475569'
+    };
+  }
+
+  randomizeTheme() {
+    const hues = [215, 160, 260, 340, 190, 30, 280, 140];
+    const baseHue = hues[Math.floor(Math.random() * hues.length)];
+    const secHue = (baseHue + 40 + Math.floor(Math.random() * 60)) % 360;
+
+    const hslToHex = (h, s, l) => {
+      l /= 100;
+      const a = s * Math.min(l, 1 - l) / 100;
+      const f = n => {
+        const k = (n + h / 30) % 12;
+        const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+        return Math.round(255 * color).toString(16).padStart(2, '0');
+      };
+      return `#${f(0)}${f(8)}${f(4)}`;
+    };
+
+    const isDark = Math.random() > 0.6;
+    const randomPalette = {
+      id: null,
+      name: 'Surprise Harmonious',
+      brandPrimary: hslToHex(baseHue, 80, isDark ? 65 : 45),
+      brandSecondary: hslToHex(secHue, 85, isDark ? 60 : 50),
+      bgPage: isDark ? hslToHex(baseHue, 30, 8) : hslToHex(baseHue, 25, 97),
+      bgCard: isDark ? hslToHex(baseHue, 25, 14) : '#ffffff',
+      bgSubtle: isDark ? hslToHex(baseHue, 35, 20) : hslToHex(baseHue, 40, 93),
+      borderColor: isDark ? hslToHex(baseHue, 20, 25) : hslToHex(baseHue, 30, 85),
+      textMain: isDark ? '#ffffff' : hslToHex(baseHue, 40, 12),
+      textMuted: isDark ? hslToHex(baseHue, 15, 70) : hslToHex(baseHue, 20, 35)
+    };
+
+    this.applyCustomTheme(randomPalette, true);
+    this.syncColorPickers(randomPalette);
+    this.showToast('🎲 Generated surprise palette! Adjust any color further.', 'info');
+  }
+
+  resetDefaultTheme() {
+    localStorage.removeItem('cnms_custom_palette');
+    const dynamicStyle = document.getElementById('cnmsDynamicThemeStyle');
+    if (dynamicStyle) {
+      if (typeof dynamicStyle.remove === 'function') {
+        dynamicStyle.remove();
+      } else if (dynamicStyle.parentNode) {
+        dynamicStyle.parentNode.removeChild(dynamicStyle);
+      }
+    }
+    this.syncColorPickers(CNMS_PRESET_PALETTES.sunset);
+    this.updateThemePreviewSwatches(CNMS_PRESET_PALETTES.sunset);
+    this.showToast('Reset to default system palette', 'info');
+  }
+
+  copyThemeCss() {
+    const palette = this.getCurrentPaletteFromInputs();
+    const css = `:root {
+  --brand-primary: ${palette.brandPrimary};
+  --brand-secondary: ${palette.brandSecondary};
+  --bg-page: ${palette.bgPage};
+  --bg-card: ${palette.bgCard};
+  --bg-subtle: ${palette.bgSubtle};
+  --border-color: ${palette.borderColor};
+  --text-main: ${palette.textMain};
+  --text-muted: ${palette.textMuted};
+  --brand-gradient: linear-gradient(135deg, ${palette.brandPrimary} 0%, ${palette.brandSecondary} 100%);
+}`;
+    navigator.clipboard.writeText(css).then(() => {
+      this.showToast('Copied CSS theme variables to clipboard!', 'success');
+    }).catch(() => {
+      this.showToast('Theme CSS variables logged to console', 'info');
+      console.log('CNMS Custom CSS Palette:\n' + css);
+    });
   }
 
   /* --------------------------------------------------------------------------
