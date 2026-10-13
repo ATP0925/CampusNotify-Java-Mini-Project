@@ -2073,64 +2073,305 @@ button, input, textarea, select {
 }
 
 /* ==========================================================================
-   VIEW MODE TABS (Official Circulars vs Campus Community Lounge)
+   VIEW MODE WORKSPACE SWITCHER (Official Circulars vs Campus Community Lounge)
+   Elevated Control Deck with Live Radar Beacons & Segmented Cards
    ========================================================================== */
 .view-mode-tabs-wrap {
   display: flex;
+  flex-direction: column;
   gap: 12px;
-  margin-bottom: 22px;
-  background-color: var(--bg-card);
-  padding: 8px;
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border-color);
-  box-shadow: var(--shadow-sm);
+  margin-bottom: 24px;
+  background: linear-gradient(180deg, #ffffff 0%, #fffbf9 100%);
+  padding: 14px 18px;
+  border-radius: 20px;
+  border: 2px solid #fed7aa;
+  box-shadow: 0 10px 30px -4px rgba(251, 146, 60, 0.16), 0 4px 12px -2px rgba(244, 63, 94, 0.08);
+  position: relative;
+  overflow: hidden;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.view-mode-tabs-wrap::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #f43f5e 0%, #fb923c 50%, #f97316 100%);
+}
+
+.view-mode-header-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   flex-wrap: wrap;
+  gap: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #ffedd5;
+}
+
+.view-mode-badge-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #ea580c;
+  background: #fff7ed;
+  padding: 5px 12px;
+  border-radius: 9999px;
+  border: 1px solid #fed7aa;
+  box-shadow: 0 1px 3px rgba(251, 146, 60, 0.1);
+}
+
+.pulse-beacon {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #f43f5e;
+  box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.7);
+  animation: beaconPulse 2s infinite ease-in-out;
+}
+
+@keyframes beaconPulse {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.7);
+  }
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 6px rgba(244, 63, 94, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(244, 63, 94, 0);
+  }
+}
+
+.view-mode-quick-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  color: #4b5563;
+  font-weight: 600;
+}
+
+.view-mode-quick-hint svg {
+  color: #ea580c;
+  flex-shrink: 0;
+}
+
+.view-mode-buttons-row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+@media (max-width: 860px) {
+  .view-mode-buttons-row {
+    grid-template-columns: 1fr;
+  }
 }
 
 .view-mode-tab {
-  flex: 1 1 200px;
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 10px;
-  padding: 12px 18px;
-  border: 1px solid transparent;
-  border-radius: var(--radius-md);
-  background: transparent;
-  color: var(--text-muted);
-  font-size: var(--font-sm);
-  font-weight: 700;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 14px;
   cursor: pointer;
-  transition: all var(--transition-fast);
+  position: relative;
+  transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+  text-align: left;
+  width: 100%;
+  overflow: hidden;
 }
 
-.view-mode-tab:hover {
-  background-color: var(--bg-card-hover);
-  color: var(--text-main);
+.tab-left-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  flex: 1 1 auto;
+  overflow: hidden;
 }
 
+.tab-text-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1 1 auto;
+  overflow: hidden;
+}
+
+/* Inactive Tab: Crisp white elevated card with peach border */
+.view-mode-tab:not(.active) {
+  background: #ffffff;
+  border: 1.5px solid #fed7aa;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+}
+
+.view-mode-tab:not(.active):hover {
+  background: #fff7ed;
+  border-color: #fb923c;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px -4px rgba(251, 146, 60, 0.2);
+}
+
+.view-mode-tab:not(.active) .tab-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: #fff1f2;
+  color: #f43f5e;
+  border: 1.5px solid #fecdd3;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(244, 63, 94, 0.12);
+  transition: transform 0.2s ease;
+}
+
+.view-mode-tab:not(.active):hover .tab-icon {
+  transform: scale(1.08);
+}
+
+.view-mode-tab:not(.active) .tab-title {
+  color: #000000;
+  font-size: 0.95rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.view-mode-tab:not(.active) .tab-subtext {
+  color: #4b5563;
+  font-size: 0.74rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.view-mode-tab:not(.active) .tab-badge {
+  background: #fff7ed;
+  color: #c2410c;
+  border: 1.5px solid #fed7aa;
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 5px 12px;
+  border-radius: 9999px;
+  margin-left: auto;
+  white-space: nowrap;
+  flex-shrink: 0;
+  box-shadow: 0 1px 3px rgba(251, 146, 60, 0.08);
+}
+
+.view-mode-tab:not(.active) .tab-badge.green-badge {
+  background: #ecfdf5;
+  color: #047857;
+  border: 1.5px solid #a7f3d0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 1px 3px rgba(16, 185, 129, 0.1);
+}
+
+/* Green Live Radar Dot on Lounge Badge */
+.view-mode-tab .tab-badge.green-badge::before {
+  content: '';
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: #10b981;
+  box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+  animation: radarGreenPulse 1.8s infinite;
+  flex-shrink: 0;
+}
+
+@keyframes radarGreenPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+  }
+}
+
+/* Active Tab: Vibrant Sunset Pink-Orange Gradient 3D Card */
 .view-mode-tab.active {
-  background: var(--brand-gradient);
-  color: #ffffff;
-  border-color: rgba(255, 255, 255, 0.15);
-  box-shadow: var(--shadow-md);
+  background: linear-gradient(135deg, #f43f5e 0%, #fb923c 55%, #ea580c 100%);
+  border: 1.5px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 12px 28px -4px rgba(244, 63, 94, 0.42), 0 4px 12px -2px rgba(234, 88, 12, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.6);
+  transform: translateY(-2px);
 }
 
-.view-mode-tab .tab-icon {
-  font-size: 1.15rem;
+.view-mode-tab.active .tab-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+  border: 1.5px solid rgba(255, 255, 255, 0.45);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  backdrop-filter: blur(6px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
 }
 
-.view-mode-tab .tab-badge {
-  font-size: var(--font-2xs);
-  padding: 2px 8px;
-  border-radius: var(--radius-full);
-  background-color: rgba(0, 0, 0, 0.25);
+.view-mode-tab.active .tab-title {
   color: #ffffff;
-  font-weight: 700;
+  font-size: 0.95rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.18);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.view-mode-tab.active .tab-subtext {
+  color: rgba(255, 255, 255, 0.96);
+  font-size: 0.74rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.view-mode-tab.active .tab-badge {
+  background: #ffffff;
+  color: #c2410c;
+  border: 1.5px solid rgba(255, 255, 255, 0.9);
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 5px 12px;
+  border-radius: 9999px;
+  margin-left: auto;
+  white-space: nowrap;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.16);
+  flex-shrink: 0;
 }
 
 .view-mode-tab.active .tab-badge.green-badge {
-  background-color: #10b981;
+  background: #ffffff;
+  color: #047857;
+  border-color: #ffffff;
 }
 
 /* ==========================================================================

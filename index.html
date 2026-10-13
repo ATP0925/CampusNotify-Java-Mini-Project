@@ -20,7 +20,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-analytics-compat.js"></script>
 
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
-  <link rel="stylesheet" href="style.css?v=20261013d">
+  <link rel="stylesheet" href="style.css?v=20261013e">
 </head>
 <body>
 
@@ -580,16 +580,44 @@
 
     <!-- Portal Primary View Switcher: Official Circulars vs Community Lounge -->
     <div class="view-mode-tabs-wrap">
-      <button class="view-mode-tab active" id="tabCircularsViewBtn">
-        <span class="tab-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg></span>
-        <span class="tab-title">Official Circulars Board</span>
-        <span class="tab-badge" id="circularsTabBadge">0 Records</span>
-      </button>
-      <button class="view-mode-tab" id="tabCommunityLoungeBtn">
-        <span class="tab-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></span>
-        <span class="tab-title">Campus Lounge &amp; Files Group</span>
-        <span class="tab-badge green-badge" id="loungeTabBadge">Live Open Channel</span>
-      </button>
+      <div class="view-mode-header-bar">
+        <div class="view-mode-badge-pill">
+          <span class="pulse-beacon"></span>
+          <span>CAMPUS PORTAL WORKSPACES</span>
+        </div>
+        <div class="view-mode-quick-hint">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+          <span>Select workspace mode to filter administrative circulars or access real-time peer lounge</span>
+        </div>
+      </div>
+
+      <div class="view-mode-buttons-row">
+        <button class="view-mode-tab active" id="tabCircularsViewBtn" type="button" aria-label="Official Circulars Board">
+          <div class="tab-left-group">
+            <span class="tab-icon">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+            </span>
+            <div class="tab-text-info">
+              <span class="tab-title">Official Circulars Board</span>
+              <span class="tab-subtext">Verified orders &amp; academic circulars</span>
+            </div>
+          </div>
+          <span class="tab-badge" id="circularsTabBadge">0 Records</span>
+        </button>
+
+        <button class="view-mode-tab" id="tabCommunityLoungeBtn" type="button" aria-label="Campus Lounge and Files Group">
+          <div class="tab-left-group">
+            <span class="tab-icon">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path><line x1="8" y1="9" x2="16" y2="9"></line><line x1="8" y1="13" x2="14" y2="13"></line></svg>
+            </span>
+            <div class="tab-text-info">
+              <span class="tab-title">Campus Lounge &amp; Files</span>
+              <span class="tab-subtext">Student discussions, notes &amp; queries</span>
+            </div>
+          </div>
+          <span class="tab-badge green-badge" id="loungeTabBadge">Live Channel</span>
+        </button>
+      </div>
     </div>
 
     <!-- Main Content Area: Centered Primary Feed & Control Desk -->
@@ -1475,6 +1503,6 @@
   <div class="toast-container" id="toastContainer" aria-live="polite"></div>
 
   <script src="icons.js"></script>
-  <script src="app.js?v=20261013d"></script>
+  <script src="app.js?v=20261013e"></script>
 </body>
 </html>
