@@ -9,7 +9,7 @@
 
 ---
 
-## Project Overview
+## Project Overview :
 **CampusNotify (CNMS)** is an official **Campus Notification Management System** engineered for colleges, universities, and educational institutions. It provides a centralized, audited dispatch platform for administrative circulars, examination notifications, placement drives, and student affairs notices.
 
 Designed to eliminate scattered communication across multiple informal channels, CampusNotify introduces a verified reference numbering system, read receipt acknowledgements, printable official circular letterheads, vector reaction engagement, inquiry threads, a community lounge with file sharing, and a **strict Zero-Access Security Gate** compliant with the **Digital Personal Data Protection (DPDP) Act 2023**.
