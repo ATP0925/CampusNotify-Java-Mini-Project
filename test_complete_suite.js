@@ -408,7 +408,9 @@ async function runTests() {
   cnms.currentUser = Object.assign({}, DEFAULT_SUPER_ADMIN);
   cnms.renderCommunityLounge();
   const loungeHtmlForAdmin = cnms.dom.loungeMessagesFeed.innerHTML;
-  assert('Super Admin can audit verified student identity in lounge', loungeHtmlForAdmin.includes('🛡️ Verified ID:') && loungeHtmlForAdmin.includes('maneomkar844@gmail.com'));
+  assert('Lounge messages do not show clutter audit badge or bio in chat', !loungeHtmlForAdmin.includes('admin-audit-tag') && !loungeHtmlForAdmin.includes('🛡️ Verified ID:'));
+  cnms.renderAdminUsersList();
+  assert('Super Admin can audit verified student identity in Admin Governance Desk', cnms.dom.adminUsersListContainer.innerHTML.includes('🛡️ Verified Student:') && cnms.dom.adminUsersListContainer.innerHTML.includes('maneomkar844@gmail.com'));
 
   // 6. GIF Arrangement & Picker Grid Verification
   cnms.renderLoungeGifsGrid('all');

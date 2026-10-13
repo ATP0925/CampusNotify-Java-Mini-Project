@@ -2473,14 +2473,6 @@ class CampusNotificationManagementSystem {
         </div>
       `;
 
-      // Privacy Shield & Super Admin Exclusive Audit Tag
-      const isSuperAdminViewer = this.isAdmin();
-      const adminAuditHtml = isSuperAdminViewer ? `
-        <div class="admin-audit-tag" title="Super Admin Identity Audit: Verified Student ID & Email">
-          🛡️ Verified ID: <strong>${this.escapeHTML(msg.senderRealName || msg.senderName)}</strong> &bull; <span>${this.escapeHTML(msg.senderRealEmail || 'Verified Campus Account')}</span>
-        </div>
-      ` : '';
-
       return `
         <div class="lounge-msg-item" id="msg_${msg.id}" style="display: flex !important; gap: 14px !important; align-items: flex-start !important; width: 100% !important; min-width: 0 !important;">
           ${avatarHtml}
@@ -2501,14 +2493,6 @@ class CampusNotificationManagementSystem {
                 ` : ''}
               </div>
             </div>
-
-            ${adminAuditHtml}
-
-            ${msg.senderBio ? `
-              <div style="font-size: 0.72rem; color: var(--text-dim); font-style: italic; margin-bottom: 6px;">
-                "${this.escapeHTML(msg.senderBio)}"
-              </div>
-            ` : ''}
 
             ${displayText ? `
               <div class="lounge-msg-body">${this.escapeHTML(displayText)}</div>
@@ -4528,14 +4512,6 @@ class CampusNotificationManagementSystem {
         </span>
       `;
 
-      // Super Admin Identity Audit Tag
-      const isSuperAdmin = this.isAdmin();
-      const adminAuditHtml = isSuperAdmin ? `
-        <div class="admin-audit-tag">
-          🛡️ Verified Student: <strong>${this.escapeHTML(q.authorRealName || q.authorName || q.author)}</strong> &bull; <span>${this.escapeHTML(q.authorRealEmail || 'Verified Campus Account')}</span>
-        </div>
-      ` : '';
-
       return `
         <div class="comment-item" id="comment_${q.id}">
           <div class="comment-header">
@@ -4559,12 +4535,6 @@ class CampusNotificationManagementSystem {
               ` : ''}
             </div>
           </div>
-          ${adminAuditHtml}
-          ${q.authorBio ? `
-            <div style="font-size: 0.72rem; color: var(--text-dim); font-style: italic; margin-bottom: 4px;">
-              "${this.escapeHTML(q.authorBio)}"
-            </div>
-          ` : ''}
           <div class="comment-text">${this.escapeHTML(displayText)}</div>
         </div>
       `;
