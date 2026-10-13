@@ -414,6 +414,7 @@ async function runTests() {
   cnms.renderLoungeGifsGrid('all');
   const isGifFormatted = cnms.dom.loungeGifGrid.innerHTML.includes('gif-card-thumb') && cnms.dom.loungeGifGrid.innerHTML.includes('gif-card-label');
   assert('Curated GIF grid is properly formatted with .gif-card-thumb cards', isGifFormatted);
+  assert('Lounge avatar with photo is strictly enclosed in lounge-msg-avatar container', loungeHtmlForViewer.includes('lounge-msg-avatar') && loungeHtmlForViewer.includes('avatar-msg-img'));
 
   console.log('\n================================================================');
   console.log(`  VERIFICATION COMPLETED: ${passed} / ${total} TESTS PASSED (${((passed/total)*100).toFixed(1)}%)`);

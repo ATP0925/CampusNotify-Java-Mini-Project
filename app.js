@@ -2445,15 +2445,16 @@ class CampusNotificationManagementSystem {
         if (dec) displayText = dec;
       }
 
-      // Avatar rendering: Custom Photo vs Initials/Emoji
-      let avatarHtml = '';
-      if (msg.avatarUrl) {
-        avatarHtml = `<img src="${this.escapeHTML(msg.avatarUrl)}" alt="Avatar" class="avatar-msg-img">`;
-      } else {
-        avatarHtml = `<div class="lounge-msg-avatar" style="${isAdm ? 'background: linear-gradient(135deg, #f59e0b, #ef4444);' : ''}">
-          ${msg.avatar && msg.avatar.length <= 4 && !msg.avatar.includes('http') ? msg.avatar : this.getInitials(msg.senderName)}
-        </div>`;
-      }
+      // Avatar rendering: Custom Photo vs Initials/Emoji (Strictly wrapped in fixed-dimension container)
+      const avatarContent = msg.avatarUrl
+        ? `<img src="${this.escapeHTML(msg.avatarUrl)}" alt="Avatar" class="avatar-msg-img">`
+        : (msg.avatar && msg.avatar.length <= 4 && !msg.avatar.includes('http') ? msg.avatar : this.getInitials(msg.senderName));
+
+      const avatarHtml = `
+        <div class="lounge-msg-avatar" style="${isAdm && !msg.avatarUrl ? 'background: linear-gradient(135deg, #f59e0b, #ef4444);' : ''}">
+          ${avatarContent}
+        </div>
+      `;
 
       // Privacy Shield & Super Admin Exclusive Audit Tag
       const isSuperAdminViewer = this.isAdmin();
@@ -4484,15 +4485,21 @@ class CampusNotificationManagementSystem {
         if (dec) displayText = dec;
       }
 
-      // Avatar
-      const avatarHtml = q.avatarUrl
+      // Avatar (Strictly bounded 26px circular avatar or initials)
+      const avatarContent = q.avatarUrl
         ? `<img src="${this.escapeHTML(q.avatarUrl)}" class="avatar-comment-img" alt="${this.escapeHTML(q.authorName || 'User')}">`
-        : '';
+        : `<span class="comment-avatar-initials">${this.getInitials(q.authorName || q.author || 'User')}</span>`;
+
+      const avatarHtml = `
+        <span class="comment-author-avatar" title="${this.escapeHTML(q.authorName || q.author || 'User')}">
+          ${avatarContent}
+        </span>
+      `;
 
       // Super Admin Identity Audit Tag
       const isSuperAdmin = this.isAdmin();
       const adminAuditHtml = isSuperAdmin ? `
-        <div class="admin-audit-tag" style="margin: 3px 0; font-size: 0.72rem;">
+        <div class="admin-audit-tag">
           🛡️ Verified Student: <strong>${this.escapeHTML(q.authorRealName || q.authorName || q.author)}</strong> &bull; <span>${this.escapeHTML(q.authorRealEmail || 'Verified Campus Account')}</span>
         </div>
       ` : '';
