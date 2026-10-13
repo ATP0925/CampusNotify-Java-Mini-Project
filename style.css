@@ -4051,4 +4051,285 @@ button, input, textarea, select {
   gap: 6px;
 }
 
+/* ==========================================================================
+   CAMPUS COMMUNITY LOUNGE: EMOJIS & ANIMATED GIFS ENGINE
+   ========================================================================== */
+.lounge-tool-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-weight: 600;
+  font-size: 0.8rem;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+}
+
+.quick-reactions-strip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.lounge-popover-panel {
+  position: relative;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 12px;
+  margin-top: 10px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.2);
+  animation: fadeInDown 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 20;
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.popover-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 8px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.popover-panel-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.popover-close-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-dim);
+  font-size: 1.2rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 4px;
+  border-radius: var(--radius-sm);
+}
+
+.popover-close-btn:hover {
+  color: var(--text-main);
+  background: var(--bg-subtle);
+}
+
+/* Emoji Grid */
+.emoji-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(36px, 1fr));
+  gap: 6px;
+  max-height: 180px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.emoji-cell-btn {
+  background: var(--bg-subtle);
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  font-size: 1.3rem;
+  padding: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform var(--transition-fast), background-color var(--transition-fast);
+}
+
+.emoji-cell-btn:hover {
+  transform: scale(1.22);
+  background: var(--bg-card-hover);
+  border-color: var(--brand-accent);
+}
+
+/* Custom GIF Toolbar & Categories */
+.custom-gif-url-bar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.custom-gif-input {
+  flex: 1;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 6px 10px;
+  font-size: 0.8rem;
+  color: var(--text-main);
+  outline: none;
+}
+
+.custom-gif-input:focus {
+  border-color: var(--brand-accent);
+}
+
+.gif-cat-pills-row {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 10px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.gif-pill {
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-full);
+  color: var(--text-dim);
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 3px 10px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all var(--transition-fast);
+}
+
+.gif-pill:hover, .gif-pill.active {
+  background: var(--brand-accent);
+  color: #ffffff;
+  border-color: var(--brand-accent);
+}
+
+/* GIF Picker Grid */
+.gif-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 8px;
+  max-height: 220px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.gif-card-thumb {
+  position: relative;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+  aspect-ratio: 4 / 3;
+  cursor: pointer;
+  background: var(--bg-subtle);
+  transition: transform var(--transition-fast), border-color var(--transition-fast);
+}
+
+.gif-card-thumb:hover {
+  transform: scale(1.04);
+  border-color: var(--brand-accent);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.gif-card-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.gif-card-label {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.65);
+  color: #ffffff;
+  font-size: 0.65rem;
+  font-weight: 600;
+  padding: 2px 4px;
+  text-align: center;
+  backdrop-filter: blur(2px);
+}
+
+/* Chat Message GIF Render */
+.lounge-gif-attachment {
+  margin-top: 8px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  max-width: 320px;
+  border: 1px solid var(--border-color);
+}
+
+.lounge-msg-gif {
+  width: 100%;
+  max-height: 240px;
+  object-fit: cover;
+  display: block;
+}
+
+/* ==========================================================================
+   PROFILE CUSTOMIZATION DRAWER & PRESET AVATARS
+   ========================================================================== */
+.profile-customize-drawer {
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  animation: fadeInDown 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.customize-drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.form-control-custom {
+  width: 100%;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 6px 10px;
+  font-size: 0.82rem;
+  color: var(--text-main);
+  outline: none;
+  transition: border-color var(--transition-fast);
+}
+
+.form-control-custom:focus {
+  border-color: var(--brand-accent);
+}
+
+.avatar-preset-pills-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.avatar-preset-pill {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-full);
+  color: var(--text-main);
+  font-size: 0.78rem;
+  padding: 4px 10px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.avatar-preset-pill:hover {
+  border-color: var(--brand-accent);
+  transform: translateY(-1px);
+}
+
+.avatar-preset-pill.active {
+  background: rgba(99, 102, 241, 0.15);
+  border-color: var(--brand-accent);
+  color: var(--brand-accent);
+  font-weight: 700;
+}
+
+
 

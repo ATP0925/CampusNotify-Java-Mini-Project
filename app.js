@@ -23,6 +23,36 @@ const DEFAULT_SUPER_ADMIN = {
   createdAt: 1740000000000
 };
 
+// Authorized Institutional Super Admin Accounts (Owner Protected)
+const SUPER_ADMIN_EMAILS = [
+  'admin@campusnotify.edu',
+  'atpadkarmaruti@gmail.com',
+  'atpadkarpratik00925@gmail.com'
+];
+
+// Curated Emojis for Community Lounge Chat
+const LOUNGE_EMOJIS = [
+  '👍', '❤️', '😂', '🔥', '🎉', '📚', '🚀', '👏', '💯', '✨',
+  '💡', '🙌', '🎓', '🤝', '📢', '✍️', '☕', '😎', '🎯', '⚡',
+  '🔔', '🏆', '👀', '💪', '🙏', '🥳', '🤔', '🌟', '💻', '🧪',
+  '📝', '📌', '✅', '⭐', '🎈', '🤩', '💖', '👌', '🤗', '🔥'
+];
+
+// Curated High-Speed Animated GIFs for Campus Life
+const CURATED_CAMPUS_GIFS = [
+  { cat: 'celebrate', label: 'Party Confetti 🎉', url: 'https://media.giphy.com/media/artj92V8o75VPL7AeQ/giphy.gif' },
+  { cat: 'celebrate', label: 'Victory Dance 💃', url: 'https://media.giphy.com/media/26tPplGWjN0xLybiU/giphy.gif' },
+  { cat: 'thumbsup', label: 'Thumbs Up 👍', url: 'https://media.giphy.com/media/111ebonMs90YLu/giphy.gif' },
+  { cat: 'thumbsup', label: 'Approved & Nice 👌', url: 'https://media.giphy.com/media/3o7abKhOpu0NwenH3O/giphy.gif' },
+  { cat: 'study', label: 'Study Grind 📚', url: 'https://media.giphy.com/media/9wLKh6ms5t9qE/giphy.gif' },
+  { cat: 'study', label: 'Exam Mood 📖', url: 'https://media.giphy.com/media/unQ3IJU2RG7DO/giphy.gif' },
+  { cat: 'study', label: 'Brain Sparks 💡', url: 'https://media.giphy.com/media/d3mlE7uhX8KFgEmY/giphy.gif' },
+  { cat: 'laugh', label: 'Campus Laugh 😂', url: 'https://media.giphy.com/media/l3fQf1OEAq0iri9RC/giphy.gif' },
+  { cat: 'laugh', label: 'Cool Shades 😎', url: 'https://media.giphy.com/media/62PP2yEIAZF6g/giphy.gif' },
+  { cat: 'team', label: 'High Five 🤝', url: 'https://media.giphy.com/media/3oEjHV0z8S7WM4MwnK/giphy.gif' },
+  { cat: 'team', label: 'Applause & Cheers 👏', url: 'https://media.giphy.com/media/l4q8cJzGdR9J8w3hS/giphy.gif' }
+];
+
 class CampusNotificationManagementSystem {
   constructor() {
     // Repositories
@@ -70,6 +100,8 @@ class CampusNotificationManagementSystem {
     this.bindEvents();
     this.initFirebase();
     this.initPhoneMockupSlider();
+    this.updateDeviceAdminVisibility();
+    this.initEmojiAndGifPickers();
     this.updateUserSessionUI();
     this.render();
 
@@ -101,8 +133,8 @@ class CampusNotificationManagementSystem {
       // Ensure Super Admin is always present in users registry & has updated identity
       const adminUser = this.users.find(u => u.email === DEFAULT_SUPER_ADMIN.email || u.id === DEFAULT_SUPER_ADMIN.id || u.role === 'ADMIN');
       if (adminUser) {
-        adminUser.name = 'System Administrator';
-        adminUser.avatar = 'SA';
+        adminUser.name = adminUser.name || 'System Administrator';
+        adminUser.avatar = adminUser.avatar || 'SA';
         if (!adminUser.username) {
           adminUser.username = 'admin';
         }
@@ -110,15 +142,32 @@ class CampusNotificationManagementSystem {
         this.users.unshift(DEFAULT_SUPER_ADMIN);
       }
 
+      // Automatically assign Super Admin permissions to authorized admin accounts
+      this.users.forEach(u => {
+        if (u.email && SUPER_ADMIN_EMAILS.some(e => e.toLowerCase() === u.email.trim().toLowerCase())) {
+          u.role = 'ADMIN';
+          u.canPost = true;
+          u.status = 'APPROVED';
+          u.isSuperAdmin = true;
+        }
+      });
+
       // 2. Load Active User Session
       const isSignedOut = localStorage.getItem('cnms_session_signed_out') === 'true';
       const storedActiveUser = localStorage.getItem('cnms_active_user');
       if (storedActiveUser && !isSignedOut) {
         const parsedActive = JSON.parse(storedActiveUser);
         // Find fresh copy from users list
-        const matched = this.users.find(u => u.id === parsedActive.id || u.email === parsedActive.email);
+        const matched = this.users.find(u => u.id === parsedActive.id || (u.email && parsedActive.email && u.email.toLowerCase() === parsedActive.email.toLowerCase()));
         if (matched && (matched.status === 'APPROVED' || matched.role === 'ADMIN')) {
           this.currentUser = matched;
+          if (matched.email && SUPER_ADMIN_EMAILS.some(e => e.toLowerCase() === matched.email.trim().toLowerCase())) {
+            this.currentUser.role = 'ADMIN';
+            this.currentUser.canPost = true;
+            this.currentUser.status = 'APPROVED';
+            this.currentUser.isSuperAdmin = true;
+            localStorage.setItem('cnms_device_owner_verified', 'true');
+          }
         } else {
           this.currentUser = null;
           localStorage.removeItem('cnms_active_user');
@@ -533,6 +582,19 @@ class CampusNotificationManagementSystem {
       loungeFileInput: document.getElementById('loungeFileInput'),
       loungeSendBtn: document.getElementById('loungeSendBtn'),
 
+      // Lounge Emoji & GIF Elements
+      toggleLoungeEmojiPickerBtn: document.getElementById('toggleLoungeEmojiPickerBtn'),
+      toggleLoungeGifPickerBtn: document.getElementById('toggleLoungeGifPickerBtn'),
+      loungeEmojiPopover: document.getElementById('loungeEmojiPopover'),
+      closeEmojiPopoverBtn: document.getElementById('closeEmojiPopoverBtn'),
+      loungeEmojiGrid: document.getElementById('loungeEmojiGrid'),
+      loungeGifPopover: document.getElementById('loungeGifPopover'),
+      closeGifPopoverBtn: document.getElementById('closeGifPopoverBtn'),
+      customGifUrlInput: document.getElementById('customGifUrlInput'),
+      sendCustomGifBtn: document.getElementById('sendCustomGifBtn'),
+      gifCategoryPills: document.getElementById('gifCategoryPills'),
+      loungeGifGrid: document.getElementById('loungeGifGrid'),
+
       // Profile Modal & Bio & Governance
       officerProfileModalBackdrop: document.getElementById('officerProfileModalBackdrop'),
       closeProfileModalBtn: document.getElementById('closeProfileModalBtn'),
@@ -549,6 +611,18 @@ class CampusNotificationManagementSystem {
       bioEditTextarea: document.getElementById('bioEditTextarea'),
       cancelBioEditBtn: document.getElementById('cancelBioEditBtn'),
       saveBioEditBtn: document.getElementById('saveBioEditBtn'),
+
+      // Profile Customizer Elements
+      toggleCustomizeProfileBtn: document.getElementById('toggleCustomizeProfileBtn'),
+      profileCustomizeDrawer: document.getElementById('profileCustomizeDrawer'),
+      editProfileFullName: document.getElementById('editProfileFullName'),
+      editProfileRollNo: document.getElementById('editProfileRollNo'),
+      editProfileDept: document.getElementById('editProfileDept'),
+      editProfileYear: document.getElementById('editProfileYear'),
+      editProfileBio: document.getElementById('editProfileBio'),
+      avatarPresetPills: document.getElementById('avatarPresetPills'),
+      cancelCustomizeBtn: document.getElementById('cancelCustomizeBtn'),
+      saveCustomizeBtn: document.getElementById('saveCustomizeBtn'),
 
       // Admin Permissions Desk in Profile
       adminUserManagementPanel: document.getElementById('adminUserManagementPanel'),
@@ -807,6 +881,25 @@ class CampusNotificationManagementSystem {
       this.dom.saveBioEditBtn.addEventListener('click', () => this.handleSaveBio());
     }
 
+    // Profile Identity Customizer Drawer
+    if (this.dom.toggleCustomizeProfileBtn) {
+      this.dom.toggleCustomizeProfileBtn.addEventListener('click', () => this.toggleProfileCustomizeDrawer());
+    }
+    if (this.dom.cancelCustomizeBtn) {
+      this.dom.cancelCustomizeBtn.addEventListener('click', () => this.toggleProfileCustomizeDrawer(false));
+    }
+    if (this.dom.saveCustomizeBtn) {
+      this.dom.saveCustomizeBtn.addEventListener('click', () => this.handleSaveProfileCustomization());
+    }
+    if (this.dom.avatarPresetPills) {
+      this.dom.avatarPresetPills.addEventListener('click', (e) => {
+        const pill = e.target.closest('.avatar-preset-pill');
+        if (!pill) return;
+        this.dom.avatarPresetPills.querySelectorAll('.avatar-preset-pill').forEach(p => p.classList.remove('active'));
+        pill.classList.add('active');
+      });
+    }
+
     // 9. Firebase Settings Actions
     if (this.dom.saveFirebaseConfigBtn) {
       this.dom.saveFirebaseConfigBtn.addEventListener('click', () => this.handleSaveFirebaseConfig());
@@ -965,6 +1058,80 @@ class CampusNotificationManagementSystem {
           this.dom.loungeTextInput.focus();
         }
       });
+    });
+
+    // Lounge Emoji Popover Controls
+    if (this.dom.toggleLoungeEmojiPickerBtn) {
+      this.dom.toggleLoungeEmojiPickerBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        this.toggleLoungeEmojiPopover();
+      });
+    }
+    if (this.dom.closeEmojiPopoverBtn) {
+      this.dom.closeEmojiPopoverBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        this.toggleLoungeEmojiPopover(false);
+      });
+    }
+
+    // Lounge GIF Popover & Custom GIF Controls
+    if (this.dom.toggleLoungeGifPickerBtn) {
+      this.dom.toggleLoungeGifPickerBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        this.toggleLoungeGifPopover();
+      });
+    }
+    if (this.dom.closeGifPopoverBtn) {
+      this.dom.closeGifPopoverBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        this.toggleLoungeGifPopover(false);
+      });
+    }
+    if (this.dom.sendCustomGifBtn) {
+      this.dom.sendCustomGifBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        this.handleSendCustomGif();
+      });
+    }
+    if (this.dom.customGifUrlInput) {
+      this.dom.customGifUrlInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          this.handleSendCustomGif();
+        }
+      });
+    }
+    if (this.dom.gifCategoryPills) {
+      this.dom.gifCategoryPills.addEventListener('click', (e) => {
+        const pill = e.target.closest('.gif-pill');
+        if (!pill) return;
+        this.dom.gifCategoryPills.querySelectorAll('.gif-pill').forEach(p => p.classList.remove('active'));
+        pill.classList.add('active');
+        const cat = pill.getAttribute('data-cat') || 'all';
+        this.renderLoungeGifsGrid(cat);
+      });
+    }
+
+    // Click outside to dismiss Emoji and GIF popovers
+    document.addEventListener('click', (e) => {
+      if (this.dom.loungeEmojiPopover && this.dom.loungeEmojiPopover.style.display !== 'none') {
+        const isClickInside = this.dom.loungeEmojiPopover.contains(e.target) ||
+                              (this.dom.toggleLoungeEmojiPickerBtn && this.dom.toggleLoungeEmojiPickerBtn.contains(e.target));
+        if (!isClickInside) {
+          this.toggleLoungeEmojiPopover(false);
+        }
+      }
+      if (this.dom.loungeGifPopover && this.dom.loungeGifPopover.style.display !== 'none') {
+        const isClickInside = this.dom.loungeGifPopover.contains(e.target) ||
+                              (this.dom.toggleLoungeGifPickerBtn && this.dom.toggleLoungeGifPickerBtn.contains(e.target));
+        if (!isClickInside) {
+          this.toggleLoungeGifPopover(false);
+        }
+      }
     });
 
     // 15. Delegated Actions on Circular Cards (Likes, Reactions, Acks, Inquiries, Letterhead, Delete)
@@ -1150,6 +1317,36 @@ class CampusNotificationManagementSystem {
       });
     }
 
+    // Secret 5-Tap Device Owner Verification Trigger on Campus Crest / Logo
+    const crestLogo = document.getElementById('authModalCrestLogo');
+    if (crestLogo) {
+      let tapCount = 0;
+      let lastTapTime = 0;
+      crestLogo.addEventListener('click', () => {
+        const now = Date.now();
+        if (now - lastTapTime < 800) {
+          tapCount++;
+        } else {
+          tapCount = 1;
+        }
+        lastTapTime = now;
+
+        if (tapCount >= 5) {
+          tapCount = 0;
+          const isCurrentlyVerified = localStorage.getItem('cnms_device_owner_verified') === 'true';
+          const next = !isCurrentlyVerified;
+          if (next) {
+            localStorage.setItem('cnms_device_owner_verified', 'true');
+            this.showToast('Authorized Admin Device Enabled (1-Click Admin Access Unlocked).', 'success');
+          } else {
+            localStorage.removeItem('cnms_device_owner_verified');
+            this.showToast('Authorized Admin Device Disabled.', 'info');
+          }
+          this.updateDeviceAdminVisibility();
+        }
+      });
+    }
+
     // Firebase Auth: Google Sign-In & Sign-Up
     if (this.dom.firebaseGoogleLoginBtn) {
       this.dom.firebaseGoogleLoginBtn.addEventListener('click', () => {
@@ -1296,6 +1493,27 @@ class CampusNotificationManagementSystem {
     return Boolean(this.currentUser && this.currentUser.role === 'ADMIN');
   }
 
+  isAuthorizedAdminDevice() {
+    const isLocal = typeof window !== 'undefined' && (
+      window.location.hostname === 'localhost' ||
+      window.location.hostname === '127.0.0.1' ||
+      window.location.protocol === 'file:'
+    );
+    const isVerifiedDevice = localStorage.getItem('cnms_device_owner_verified') === 'true';
+    return Boolean(isLocal || isVerifiedDevice);
+  }
+
+  updateDeviceAdminVisibility() {
+    const isAuthorized = this.isAuthorizedAdminDevice();
+    const instaAdminBox = document.getElementById('instaAdminBypassContainer');
+    const instaSignupAdminBox = document.getElementById('instaSignupAdminContainer');
+    const authModalAdminBox = document.getElementById('authModalQuickAdminContainer');
+
+    if (instaAdminBox) instaAdminBox.style.display = isAuthorized ? 'block' : 'none';
+    if (instaSignupAdminBox) instaSignupAdminBox.style.display = isAuthorized ? 'block' : 'none';
+    if (authModalAdminBox) authModalAdminBox.style.display = isAuthorized ? 'block' : 'none';
+  }
+
   updateUserSessionUI() {
     if (!this.isAuthenticated()) {
       if (this.dom.navUserName) this.dom.navUserName.textContent = 'Guest / Unverified';
@@ -1319,7 +1537,6 @@ class CampusNotificationManagementSystem {
       return;
     }
 
-    if (this.dom.openNewNoticeBtn) this.dom.openNewNoticeBtn.style.display = '';
     if (this.dom.navSignOutBtn) this.dom.navSignOutBtn.style.display = '';
     if (this.dom.globalSearchInput) {
       this.dom.globalSearchInput.disabled = false;
@@ -1331,7 +1548,13 @@ class CampusNotificationManagementSystem {
 
     // 1. Update Navbar Officer Details
     if (this.dom.navUserName) this.dom.navUserName.textContent = this.currentUser.name;
-    if (this.dom.navUserAvatar) this.dom.navUserAvatar.textContent = this.getInitials(this.currentUser.name);
+    if (this.dom.navUserAvatar) {
+      if (this.currentUser.avatar && this.currentUser.avatar.length <= 4 && !this.currentUser.avatar.includes('http')) {
+        this.dom.navUserAvatar.textContent = this.currentUser.avatar;
+      } else {
+        this.dom.navUserAvatar.textContent = this.getInitials(this.currentUser.name);
+      }
+    }
     if (this.dom.navUserRole) {
       if (isAdm) {
         this.dom.navUserRole.innerHTML = `Admin &bull; ${this.currentUser.username || 'ATP0925'} <span class="profile-gear-icon"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg></span>`;
@@ -1342,23 +1565,28 @@ class CampusNotificationManagementSystem {
       }
     }
 
-    // 2. Update Notice Publishing Button based on Authority
+    // 2. Update Notice Publishing Button based on Authority (Strictly hidden for non-authorized viewers)
     if (this.dom.openNewNoticeBtn) {
       if (canPost) {
+        this.dom.openNewNoticeBtn.style.display = 'inline-flex';
         this.dom.openNewNoticeBtn.style.opacity = '1';
         this.dom.openNewNoticeBtn.style.cursor = 'pointer';
         this.dom.openNewNoticeBtn.title = 'Dispatch & Publish Official Circular';
         if (this.dom.newNoticeBtnLabel) this.dom.newNoticeBtnLabel.textContent = 'Issue Circular';
       } else {
-        this.dom.openNewNoticeBtn.style.opacity = '0.7';
-        this.dom.openNewNoticeBtn.title = 'Authority Restricted: Only Admin or authorized officers can issue notices';
-        if (this.dom.newNoticeBtnLabel) this.dom.newNoticeBtnLabel.textContent = 'View Only';
+        this.dom.openNewNoticeBtn.style.display = 'none';
       }
     }
 
     // 3. Update Profile Hero Card in Profile Modal
     if (this.dom.profileHeroName) this.dom.profileHeroName.textContent = this.currentUser.name;
-    if (this.dom.profileHeroAvatar) this.dom.profileHeroAvatar.textContent = this.getInitials(this.currentUser.name);
+    if (this.dom.profileHeroAvatar) {
+      if (this.currentUser.avatar && this.currentUser.avatar.length <= 4 && !this.currentUser.avatar.includes('http')) {
+        this.dom.profileHeroAvatar.textContent = this.currentUser.avatar;
+      } else {
+        this.dom.profileHeroAvatar.textContent = this.getInitials(this.currentUser.name);
+      }
+    }
     if (this.dom.profileHeroBioText) {
       this.dom.profileHeroBioText.textContent = this.currentUser.bio || 'Campus member with official portal access.';
     }
@@ -1594,6 +1822,135 @@ class CampusNotificationManagementSystem {
     this.showToast('Message removed from Campus Lounge.', 'info');
   }
 
+  /* --------------------------------------------------------------------------
+     CAMPUS LOUNGE EMOJI & ANIMATED GIF SYSTEM
+     -------------------------------------------------------------------------- */
+  initEmojiAndGifPickers() {
+    // Populate Lounge Emoji Grid
+    if (this.dom.loungeEmojiGrid) {
+      this.dom.loungeEmojiGrid.innerHTML = LOUNGE_EMOJIS.map(emoji => `
+        <button type="button" class="emoji-cell-btn" data-emoji="${emoji}" title="${emoji}">${emoji}</button>
+      `).join('');
+
+      this.dom.loungeEmojiGrid.querySelectorAll('.emoji-cell-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          const emoji = btn.getAttribute('data-emoji');
+          this.insertEmojiToLoungeInput(emoji);
+        });
+      });
+    }
+
+    // Populate Initial GIF Grid
+    this.renderLoungeGifsGrid('all');
+  }
+
+  insertEmojiToLoungeInput(emoji) {
+    if (!this.dom.loungeTextInput || !emoji) return;
+    const input = this.dom.loungeTextInput;
+    const start = input.selectionStart || input.value.length;
+    const end = input.selectionEnd || input.value.length;
+    const text = input.value;
+    input.value = text.substring(0, start) + emoji + text.substring(end);
+    input.selectionStart = input.selectionEnd = start + emoji.length;
+    input.focus();
+  }
+
+  toggleLoungeEmojiPopover(forceState) {
+    if (!this.dom.loungeEmojiPopover) return;
+    const isCurrentlyOpen = this.dom.loungeEmojiPopover.style.display !== 'none';
+    const shouldOpen = typeof forceState === 'boolean' ? forceState : !isCurrentlyOpen;
+
+    this.dom.loungeEmojiPopover.style.display = shouldOpen ? 'block' : 'none';
+    if (shouldOpen && this.dom.loungeGifPopover) {
+      this.dom.loungeGifPopover.style.display = 'none';
+    }
+  }
+
+  toggleLoungeGifPopover(forceState) {
+    if (!this.dom.loungeGifPopover) return;
+    const isCurrentlyOpen = this.dom.loungeGifPopover.style.display !== 'none';
+    const shouldOpen = typeof forceState === 'boolean' ? forceState : !isCurrentlyOpen;
+
+    this.dom.loungeGifPopover.style.display = shouldOpen ? 'block' : 'none';
+    if (shouldOpen && this.dom.loungeEmojiPopover) {
+      this.dom.loungeEmojiPopover.style.display = 'none';
+    }
+  }
+
+  renderLoungeGifsGrid(category = 'all') {
+    if (!this.dom.loungeGifGrid) return;
+    const list = category === 'all'
+      ? CURATED_CAMPUS_GIFS
+      : CURATED_CAMPUS_GIFS.filter(g => g.cat === category);
+
+    this.dom.loungeGifGrid.innerHTML = list.map(item => `
+      <div class="gif-preview-card" data-url="${this.escapeHTML(item.url)}" title="${this.escapeHTML(item.label)}">
+        <img src="${this.escapeHTML(item.url)}" alt="${this.escapeHTML(item.label)}" loading="lazy">
+        <span class="gif-card-label">${this.escapeHTML(item.label)}</span>
+      </div>
+    `).join('');
+
+    this.dom.loungeGifGrid.querySelectorAll('.gif-preview-card').forEach(card => {
+      card.addEventListener('click', () => {
+        const url = card.getAttribute('data-url');
+        const label = card.getAttribute('title');
+        this.handleSendGifMessage(url, label);
+        this.toggleLoungeGifPopover(false);
+      });
+    });
+  }
+
+  async handleSendGifMessage(gifUrl, caption = '') {
+    if (!this.isAuthenticated()) {
+      this.showToast('Please sign in or create an account to send GIFs in the lounge.', 'warning');
+      this.showInstagramGateway('login');
+      return;
+    }
+    if (!gifUrl) return;
+
+    const newMsg = {
+      id: 'lounge_' + Date.now(),
+      senderId: this.currentUser.id,
+      senderName: this.currentUser.name,
+      senderUsername: this.currentUser.username,
+      senderRole: this.currentUser.role,
+      senderBio: this.currentUser.bio || '',
+      avatar: this.currentUser.avatar || 'CN',
+      text: caption ? caption : '',
+      gifUrl: gifUrl.trim(),
+      file: null,
+      timestamp: new Date().toISOString()
+    };
+
+    this.loungeMessages.push(newMsg);
+    this.saveLoungeMessages();
+
+    // Push to Google Firebase Firestore
+    this.pushToCloud('cnms_community_messages', newMsg.id, newMsg);
+
+    this.renderCommunityLounge();
+    this.scrollLoungeToBottom();
+    this.showToast('GIF shared in Campus Lounge.', 'success');
+  }
+
+  handleSendCustomGif() {
+    if (!this.dom.customGifUrlInput) return;
+    const url = this.dom.customGifUrlInput.value.trim();
+    if (!url) {
+      this.showToast('Please paste a GIF image link.', 'warning');
+      this.dom.customGifUrlInput.focus();
+      return;
+    }
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      this.showToast('Please provide a valid URL starting with http:// or https://', 'error');
+      return;
+    }
+    this.handleSendGifMessage(url, '');
+    this.dom.customGifUrlInput.value = '';
+    this.toggleLoungeGifPopover(false);
+  }
+
   renderCommunityLounge() {
     if (!this.dom.loungeMessagesFeed) return;
 
@@ -1671,7 +2028,7 @@ class CampusNotificationManagementSystem {
       return `
         <div class="lounge-msg-item" id="msg_${msg.id}">
           <div class="lounge-msg-avatar" style="${isAdm ? 'background: linear-gradient(135deg, #f59e0b, #ef4444);' : ''}">
-            ${this.getInitials(msg.senderName)}
+            ${msg.avatar && msg.avatar.length <= 4 && !msg.avatar.includes('http') ? msg.avatar : this.getInitials(msg.senderName)}
           </div>
           <div class="lounge-msg-content">
             <div class="lounge-msg-header">
@@ -1698,6 +2055,12 @@ class CampusNotificationManagementSystem {
 
             ${msg.text ? `
               <div class="lounge-msg-body">${this.escapeHTML(msg.text)}</div>
+            ` : ''}
+
+            ${msg.gifUrl ? `
+              <div class="lounge-gif-attachment">
+                <img src="${this.escapeHTML(msg.gifUrl)}" alt="Animated GIF" class="lounge-msg-gif" loading="lazy">
+              </div>
             ` : ''}
 
             ${msg.file ? `
@@ -1941,10 +2304,13 @@ class CampusNotificationManagementSystem {
 
     // 1. Super Admin 1-Click Verification
     const localAdminOverride = (localStorage.getItem('cnms_admin_email_override') || '').toLowerCase();
-    if (
-      (ident === 'admin@campusnotify.edu' || ident === 'admin' || ident === 'administrator' || (localAdminOverride && ident === localAdminOverride)) &&
-      pass === 'AdminPassword@123'
-    ) {
+    const isSuperAdminIdent = (ident === 'admin@campusnotify.edu' || ident === 'admin' || ident === 'administrator' ||
+      SUPER_ADMIN_EMAILS.some(e => e.toLowerCase() === ident) ||
+      (localAdminOverride && ident === localAdminOverride));
+
+    if (isSuperAdminIdent && pass === 'AdminPassword@123') {
+      localStorage.setItem('cnms_device_owner_verified', 'true');
+      this.updateDeviceAdminVisibility();
       this.currentUser = Object.assign({}, DEFAULT_SUPER_ADMIN);
       this.saveUsers();
       this.updateUserSessionUI();
@@ -1974,19 +2340,29 @@ class CampusNotificationManagementSystem {
       return;
     }
 
+    const isOwner = user.email && SUPER_ADMIN_EMAILS.some(e => e.toLowerCase() === user.email.trim().toLowerCase());
+
     // 3. Status Gatekeeper & Institutional Security Policy
-    if (user.status === 'PENDING') {
+    if (!isOwner && user.status === 'PENDING') {
       this.showToast(`Institutional Security Policy: Account @${user.username} is PENDING approval from Campus Administration. Multi-account policy requires verification.`, 'error');
       return;
     }
 
-    if (user.status === 'REJECTED') {
+    if (!isOwner && user.status === 'REJECTED') {
       this.showToast('Access declined by Campus Administration.', 'error');
       return;
     }
 
     // 4. Session Authenticated
     this.currentUser = Object.assign({}, user);
+    if (isOwner) {
+      this.currentUser.role = 'ADMIN';
+      this.currentUser.canPost = true;
+      this.currentUser.status = 'APPROVED';
+      this.currentUser.isSuperAdmin = true;
+      localStorage.setItem('cnms_device_owner_verified', 'true');
+      this.updateDeviceAdminVisibility();
+    }
     this.saveUsers();
     this.updateUserSessionUI();
     this.enterCampusPortal();
@@ -2035,6 +2411,7 @@ class CampusNotificationManagementSystem {
 
     // Cryptographic Password Hashing (Institutional Salt)
     const passHash = await this.hashPassword(pass);
+    const isOwner = contact.includes('@') && SUPER_ADMIN_EMAILS.some(e => e.toLowerCase() === contact.toLowerCase().trim());
 
     const newUser = {
       id: 'user_' + Date.now(),
@@ -2044,15 +2421,21 @@ class CampusNotificationManagementSystem {
       contact: contact,
       password: pass,
       passwordHash: passHash,
-      role: 'VIEWER',
-      canPost: false,
-      status: 'PENDING', // Multi-account device permission rule: Campus Administration must approve
-      bio: bio || 'Campus student / academic viewer',
+      role: isOwner ? 'ADMIN' : 'VIEWER',
+      canPost: isOwner ? true : false,
+      status: isOwner ? 'APPROVED' : 'PENDING', // Multi-account device permission rule: Campus Administration must approve
+      isSuperAdmin: isOwner ? true : false,
+      bio: bio || (isOwner ? 'System Administrator / Campus Owner' : 'Campus student / academic viewer'),
       avatar: this.getInitials(name),
       createdAt: Date.now(),
       privacyConsentGiven: true,
       privacyConsentDate: new Date().toISOString()
     };
+
+    if (isOwner) {
+      localStorage.setItem('cnms_device_owner_verified', 'true');
+      this.updateDeviceAdminVisibility();
+    }
 
     this.users.push(newUser);
     this.saveUsers();
@@ -2133,6 +2516,13 @@ class CampusNotificationManagementSystem {
   }
 
   handleQuickAdminLogin() {
+    if (!this.isAuthorizedAdminDevice()) {
+      this.showToast('Access restricted: Direct Admin login is only accessible on authorized institutional administrator hardware.', 'warning');
+      return;
+    }
+    localStorage.setItem('cnms_device_owner_verified', 'true');
+    this.updateDeviceAdminVisibility();
+
     this.currentUser = Object.assign({}, DEFAULT_SUPER_ADMIN);
     this.saveUsers();
     this.updateUserSessionUI();
@@ -2164,10 +2554,11 @@ class CampusNotificationManagementSystem {
 
     // Special Check for Super Admin
     const localAdminOverrideCheck = (localStorage.getItem('cnms_admin_email_override') || '').toLowerCase();
-    if (
-      (ident === 'admin@campusnotify.edu' || ident === 'admin' || ident === 'administrator' || (localAdminOverrideCheck && ident === localAdminOverrideCheck)) &&
-      pass === 'AdminPassword@123'
-    ) {
+    const isSuperAdminIdent = (ident === 'admin@campusnotify.edu' || ident === 'admin' || ident === 'administrator' ||
+      SUPER_ADMIN_EMAILS.some(e => e.toLowerCase() === ident) ||
+      (localAdminOverrideCheck && ident === localAdminOverrideCheck));
+
+    if (isSuperAdminIdent && pass === 'AdminPassword@123') {
       this.handleQuickAdminLogin();
       return;
     }
@@ -2203,18 +2594,28 @@ class CampusNotificationManagementSystem {
       return;
     }
 
+    const isOwner = user.email && SUPER_ADMIN_EMAILS.some(e => e.toLowerCase() === user.email.trim().toLowerCase());
+
     // Status Gatekeeper (Admin Approval Requirement)
-    if (user.status === 'PENDING') {
+    if (!isOwner && user.status === 'PENDING') {
       this.showToast('Account is PENDING approval from Campus Administration. Please wait.', 'error');
       return;
     }
-    if (user.status === 'REJECTED') {
+    if (!isOwner && user.status === 'REJECTED') {
       this.showToast('Your registration was declined by Admin.', 'error');
       return;
     }
 
     // Login successful
     this.currentUser = Object.assign({}, user);
+    if (isOwner) {
+      this.currentUser.role = 'ADMIN';
+      this.currentUser.canPost = true;
+      this.currentUser.status = 'APPROVED';
+      this.currentUser.isSuperAdmin = true;
+      localStorage.setItem('cnms_device_owner_verified', 'true');
+      this.updateDeviceAdminVisibility();
+    }
     this.saveUsers();
     this.updateUserSessionUI();
     this.closeAuthModal();
@@ -2268,19 +2669,26 @@ class CampusNotificationManagementSystem {
     }
 
     const email = `${cleanUsername}@campus.edu`;
+    const isOwner = SUPER_ADMIN_EMAILS.some(e => e.toLowerCase() === email.toLowerCase());
     const newUser = {
       id: 'user_' + Date.now(),
       name: name,
       username: cleanUsername,
       email: email,
       password: pass,
-      role: 'VIEWER',
-      canPost: false,
-      status: 'PENDING', // Requires Admin permission per requirements
-      bio: bio || 'Campus student / academic viewer',
+      role: isOwner ? 'ADMIN' : 'VIEWER',
+      canPost: isOwner ? true : false,
+      status: isOwner ? 'APPROVED' : 'PENDING', // Requires Admin permission per requirements
+      isSuperAdmin: isOwner ? true : false,
+      bio: bio || (isOwner ? 'System Administrator / Campus Owner' : 'Campus student / academic viewer'),
       avatar: this.getInitials(name),
       createdAt: Date.now()
     };
+
+    if (isOwner) {
+      localStorage.setItem('cnms_device_owner_verified', 'true');
+      this.updateDeviceAdminVisibility();
+    }
 
     // Attempt Firebase Auth account registration
     if (this.firebaseAuth) {
@@ -2375,8 +2783,8 @@ class CampusNotificationManagementSystem {
   renderAdminUsersList() {
     if (!this.dom.adminUsersListContainer || !this.isAdmin()) return;
 
-    // Filter out the Super Admin themself from the list
-    const candidateUsers = this.users.filter(u => u.id !== DEFAULT_SUPER_ADMIN.id && u.email !== DEFAULT_SUPER_ADMIN.email);
+    // Filter out the Super Admin themself from the list (protecting owner accounts privacy)
+    const candidateUsers = this.users.filter(u => u.id !== DEFAULT_SUPER_ADMIN.id && u.email !== DEFAULT_SUPER_ADMIN.email && !SUPER_ADMIN_EMAILS.some(e => e.toLowerCase() === (u.email || '').toLowerCase()));
 
     const pendingCount = candidateUsers.filter(u => u.status === 'PENDING').length;
     if (this.dom.pendingApprovalsBadge) {
@@ -2513,6 +2921,87 @@ class CampusNotificationManagementSystem {
   }
 
   /* --------------------------------------------------------------------------
+     PROFILE IDENTITY CUSTOMIZATION DRAWER ENGINE
+     -------------------------------------------------------------------------- */
+  toggleProfileCustomizeDrawer(forceState) {
+    if (!this.dom.profileCustomizeDrawer) return;
+    const isCurrentlyOpen = this.dom.profileCustomizeDrawer.style.display !== 'none';
+    const shouldOpen = typeof forceState === 'boolean' ? forceState : !isCurrentlyOpen;
+
+    this.dom.profileCustomizeDrawer.style.display = shouldOpen ? 'block' : 'none';
+
+    if (shouldOpen && this.currentUser) {
+      if (this.dom.editProfileFullName) this.dom.editProfileFullName.value = this.currentUser.name || '';
+      if (this.dom.editProfileRollNo) this.dom.editProfileRollNo.value = this.currentUser.rollNo || this.currentUser.username || '';
+      if (this.dom.editProfileDept) this.dom.editProfileDept.value = this.currentUser.department || 'Computer Engineering';
+      if (this.dom.editProfileYear) this.dom.editProfileYear.value = this.currentUser.year || 'Third Year (TE)';
+      if (this.dom.editProfileBio) this.dom.editProfileBio.value = this.currentUser.bio || '';
+
+      // Highlight active avatar preset pill matching user's avatar
+      if (this.dom.avatarPresetPills) {
+        const curAvatar = this.currentUser.avatar || 'INIT';
+        this.dom.avatarPresetPills.querySelectorAll('.avatar-preset-pill').forEach(pill => {
+          const val = pill.getAttribute('data-avatar');
+          pill.classList.toggle('active', val === curAvatar || (curAvatar !== 'INIT' && !['👨‍🎓', '👩‍🎓', '💻', '🚀', '⚡', '👑', '🔬'].includes(curAvatar) && val === 'INIT'));
+        });
+      }
+      if (this.dom.editProfileFullName) this.dom.editProfileFullName.focus();
+    }
+  }
+
+  async handleSaveProfileCustomization() {
+    if (!this.isAuthenticated() || !this.currentUser) {
+      this.showToast('Authentication Required: Please sign in first.', 'warning');
+      return;
+    }
+
+    const newName = this.dom.editProfileFullName ? this.dom.editProfileFullName.value.trim() : '';
+    const newRollNo = this.dom.editProfileRollNo ? this.dom.editProfileRollNo.value.trim() : '';
+    const newDept = this.dom.editProfileDept ? this.dom.editProfileDept.value : '';
+    const newYear = this.dom.editProfileYear ? this.dom.editProfileYear.value : '';
+    const newBio = this.dom.editProfileBio ? this.dom.editProfileBio.value.trim() : '';
+
+    if (!newName) {
+      this.showToast('Please enter your Full Name.', 'error');
+      if (this.dom.editProfileFullName) this.dom.editProfileFullName.focus();
+      return;
+    }
+
+    let chosenAvatarVal = 'INIT';
+    if (this.dom.avatarPresetPills) {
+      const activePill = this.dom.avatarPresetPills.querySelector('.avatar-preset-pill.active');
+      if (activePill) {
+        chosenAvatarVal = activePill.getAttribute('data-avatar') || 'INIT';
+      }
+    }
+    const resolvedAvatar = chosenAvatarVal === 'INIT' ? this.getInitials(newName) : chosenAvatarVal;
+
+    this.currentUser.name = newName;
+    if (newRollNo) this.currentUser.rollNo = newRollNo;
+    if (newDept) this.currentUser.department = newDept;
+    if (newYear) this.currentUser.year = newYear;
+    this.currentUser.bio = newBio;
+    this.currentUser.avatar = resolvedAvatar;
+
+    // Save to users collection
+    const idx = this.users.findIndex(u => u.id === this.currentUser.id || (this.currentUser.email && u.email === this.currentUser.email));
+    if (idx !== -1) {
+      this.users[idx] = Object.assign({}, this.users[idx], this.currentUser);
+    }
+    this.saveUsers();
+
+    // Push to Firestore cnms_users
+    if (this.firestoreDb && this.currentUser.id) {
+      await this.pushToCloud('cnms_users', this.currentUser.id, this.currentUser);
+    }
+
+    this.updateUserSessionUI();
+    this.render();
+    this.toggleProfileCustomizeDrawer(false);
+    this.showToast('Profile identity successfully updated and saved!', 'success');
+  }
+
+  /* --------------------------------------------------------------------------
      FIREBASE SETTINGS HANDLERS
      -------------------------------------------------------------------------- */
   handleSaveFirebaseConfig() {
@@ -2634,34 +3123,41 @@ class CampusNotificationManagementSystem {
   }
 
   async syncFirebaseUserToLocal(firebaseUser) {
-    const email = (firebaseUser.email || '').toLowerCase();
+    const email = (firebaseUser.email || '').toLowerCase().trim();
     const phone = firebaseUser.phoneNumber || '';
     const localAdminOverride = (localStorage.getItem('cnms_admin_email_override') || '').toLowerCase();
     const isSuperAdminEmail = email === 'admin@campusnotify.edu' ||
+      SUPER_ADMIN_EMAILS.some(e => e.toLowerCase() === email) ||
       (localAdminOverride && email === localAdminOverride) ||
       localStorage.getItem('cnms_admin_granted') === 'true';
     
+    if (isSuperAdminEmail) {
+      localStorage.setItem('cnms_device_owner_verified', 'true');
+      this.updateDeviceAdminVisibility();
+    }
+
     // Check if user already exists in Firestore or local
     let existing = this.users.find(u => (email && u.email === email) || (phone && u.contact === phone) || u.id === firebaseUser.uid);
 
     let resolvedRole = isSuperAdminEmail ? 'ADMIN' : (existing ? existing.role : 'VIEWER');
     let resolvedCanPost = isSuperAdminEmail ? true : (existing ? existing.canPost : false);
-    let resolvedName = firebaseUser.displayName || (existing ? existing.name : (email ? email.split('@')[0] : 'Campus Member'));
-    let resolvedUsername = existing ? existing.username : ((email ? email.split('@')[0] : 'user_' + firebaseUser.uid.substring(0, 5)).toLowerCase());
-    let resolvedAvatar = (resolvedName ? resolvedName.substring(0, 2) : 'CN').toUpperCase();
+    let resolvedName = existing && existing.name ? existing.name : (firebaseUser.displayName || (email ? email.split('@')[0] : 'Campus Member'));
+    let resolvedUsername = existing && existing.username ? existing.username : ((email ? email.split('@')[0] : 'user_' + firebaseUser.uid.substring(0, 5)).toLowerCase());
+    let resolvedAvatar = existing && existing.avatar ? existing.avatar : (isSuperAdminEmail ? 'SA' : (resolvedName ? resolvedName.substring(0, 2) : 'CN').toUpperCase());
 
     const syncedUser = {
       id: firebaseUser.uid,
-      name: isSuperAdminEmail ? 'System Administrator' : resolvedName,
-      username: isSuperAdminEmail ? 'admin' : resolvedUsername,
+      name: resolvedName,
+      username: resolvedUsername,
       email: email,
       contact: phone || email,
       role: resolvedRole,
       department: existing ? existing.department : 'General Campus',
-      bio: existing ? existing.bio : 'Campus Member verified via Firebase Auth',
-      avatar: isSuperAdminEmail ? 'SA' : resolvedAvatar,
+      bio: existing ? existing.bio : (isSuperAdminEmail ? 'System Administrator / Campus Owner' : 'Campus Member verified via Firebase Auth'),
+      avatar: resolvedAvatar,
       canPost: resolvedCanPost,
       status: 'APPROVED',
+      isSuperAdmin: isSuperAdminEmail,
       firebaseUid: firebaseUser.uid,
       authProvider: firebaseUser.providerData && firebaseUser.providerData[0] ? firebaseUser.providerData[0].providerId : 'firebase'
     };
@@ -3322,6 +3818,9 @@ class CampusNotificationManagementSystem {
       if (this.dom.noticesContainer) this.dom.noticesContainer.innerHTML = '';
       if (this.dom.emptyStateCard) {
         this.dom.emptyStateCard.style.display = 'block';
+        if (this.dom.emptyStateCreateBtn) {
+          this.dom.emptyStateCreateBtn.style.display = this.hasPostingAuthority() ? 'inline-flex' : 'none';
+        }
 
         const emptyTitle = this.dom.emptyStateCard && typeof this.dom.emptyStateCard.querySelector === 'function'
           ? this.dom.emptyStateCard.querySelector('.empty-title')

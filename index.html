@@ -20,7 +20,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-analytics-compat.js"></script>
 
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=20261013">
 </head>
 <body>
 
@@ -59,8 +59,8 @@
 
       <!-- Action Items & Officer Profile -->
       <div class="nav-actions">
-        <!-- New Announcement Button (Authority restricted) -->
-        <button class="btn btn-primary" id="openNewNoticeBtn" title="Dispatch & Publish Official Circular">
+        <!-- New Announcement Button (Authority restricted: only visible to users with publishing authority) -->
+        <button class="btn btn-primary" id="openNewNoticeBtn" title="Dispatch & Publish Official Circular" style="display: none;">
           <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2">
             <line x1="12" y1="5" x2="12" y2="19"></line>
             <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -214,7 +214,7 @@
         <div class="insta-card insta-main-card">
           <!-- Campus Iconic Branding -->
           <div class="insta-brand-header">
-            <h1 class="insta-logo-text">CampusNotify</h1>
+            <h1 class="insta-logo-text" id="authModalCrestLogo" title="CampusNotify Portal (Tap to verify device)" style="user-select: none;">CampusNotify</h1>
             <p class="insta-brand-subtitle">Official Campus Gateway &bull; Central Notification Portal</p>
           </div>
 
@@ -300,11 +300,13 @@
               <!-- Invisible Recaptcha Container -->
               <div id="recaptcha-container"></div>
 
-              <!-- Quick 1-Click Super Admin Login -->
-              <button type="button" class="insta-btn-admin-fb" id="instaQuickAdminLoginBtn">
-                <span class="insta-crown-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="m2 4 3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14"></path></svg></span>
-                <span>Institutional Administrator Sign In</span>
-              </button>
+              <!-- Quick 1-Click Super Admin Login (Restricted to Authorized Device) -->
+              <div id="instaAdminBypassContainer" style="display: none;">
+                <button type="button" class="insta-btn-admin-fb" id="instaQuickAdminLoginBtn">
+                  <span class="insta-crown-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="m2 4 3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14"></path></svg></span>
+                  <span>Institutional Administrator Sign In</span>
+                </button>
+              </div>
 
               <!-- Data Privacy Guarantee Snippet -->
               <div class="insta-privacy-secure-note">
@@ -339,10 +341,12 @@
               <span>Sign up with Google</span>
             </button>
 
-            <button type="button" class="insta-btn-admin-fb" id="instaSignupAdminShortcutBtn">
-              <span class="insta-crown-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="m2 4 3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14"></path></svg></span>
-              <span>Administrator Sign In</span>
-            </button>
+            <div id="instaSignupAdminContainer" style="display: none;">
+              <button type="button" class="insta-btn-admin-fb" id="instaSignupAdminShortcutBtn">
+                <span class="insta-crown-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="m2 4 3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14"></path></svg></span>
+                <span>Administrator Sign In</span>
+              </button>
+            </div>
 
             <div class="insta-divider">
               <span class="divider-line"></span>
@@ -731,14 +735,25 @@
               </div>
 
               <div class="lounge-composer-toolbar">
-                <!-- Emoji shelf shortcuts -->
+                <!-- Emoji & GIF Tools and Quick Reactions -->
                 <div class="emoji-shortcuts-bar">
-                  <span class="emoji-bar-label">Quick Tag:</span>
-                  <button type="button" class="quick-emoji-btn" data-emoji="[Urgent]">Urgent</button>
-                  <button type="button" class="quick-emoji-btn" data-emoji="[Notice]">Notice</button>
-                  <button type="button" class="quick-emoji-btn" data-emoji="[Academic]">Academic</button>
-                  <button type="button" class="quick-emoji-btn" data-emoji="[Exam]">Exam</button>
-                  <button type="button" class="quick-emoji-btn" data-emoji="[Clarification]">Clarification</button>
+                  <button type="button" class="btn btn-xs btn-secondary lounge-tool-btn" id="toggleLoungeEmojiPickerBtn" title="Express with Emojis">
+                    <span>😊</span>
+                    <span>Emojis</span>
+                  </button>
+                  <button type="button" class="btn btn-xs btn-secondary lounge-tool-btn" id="toggleLoungeGifPickerBtn" title="Send Animated GIF">
+                    <span>🎞️</span>
+                    <span>GIF</span>
+                  </button>
+                  <div class="quick-reactions-strip">
+                    <button type="button" class="quick-emoji-btn" data-emoji="👍" title="Thumbs Up">👍</button>
+                    <button type="button" class="quick-emoji-btn" data-emoji="❤️" title="Heart">❤️</button>
+                    <button type="button" class="quick-emoji-btn" data-emoji="😂" title="Laugh">😂</button>
+                    <button type="button" class="quick-emoji-btn" data-emoji="🔥" title="Fire">🔥</button>
+                    <button type="button" class="quick-emoji-btn" data-emoji="🎉" title="Party">🎉</button>
+                    <button type="button" class="quick-emoji-btn" data-emoji="📚" title="Books">📚</button>
+                    <button type="button" class="quick-emoji-btn" data-emoji="🚀" title="Rocket">🚀</button>
+                  </div>
                 </div>
 
                 <div class="lounge-action-buttons">
@@ -751,6 +766,43 @@
                   <button type="submit" class="btn btn-primary btn-sm" id="loungeSendBtn">
                     <span>Send Message</span>
                   </button>
+                </div>
+              </div>
+
+              <!-- Interactive Floating Emoji Popover Panel -->
+              <div class="lounge-popover-panel" id="loungeEmojiPopover" style="display: none;">
+                <div class="popover-panel-header">
+                  <span class="popover-panel-title">😊 Campus Chat Emojis</span>
+                  <button type="button" class="popover-close-btn" id="closeEmojiPopoverBtn" title="Close">&times;</button>
+                </div>
+                <div class="emoji-picker-grid" id="loungeEmojiGrid">
+                  <!-- Populated by JS -->
+                </div>
+              </div>
+
+              <!-- Interactive Floating GIF Popover Panel -->
+              <div class="lounge-popover-panel" id="loungeGifPopover" style="display: none;">
+                <div class="popover-panel-header">
+                  <span class="popover-panel-title">🎞️ Campus Animated GIFs</span>
+                  <button type="button" class="popover-close-btn" id="closeGifPopoverBtn" title="Close">&times;</button>
+                </div>
+                <!-- Custom GIF URL Input -->
+                <div class="custom-gif-url-bar">
+                  <input type="url" id="customGifUrlInput" class="custom-gif-input" placeholder="Paste custom GIF link (Giphy, Tenor, Imgur)...">
+                  <button type="button" class="btn btn-xs btn-primary" id="sendCustomGifBtn">Send GIF</button>
+                </div>
+                <!-- Category Tabs -->
+                <div class="gif-cat-pills-row" id="gifCategoryPills">
+                  <button type="button" class="gif-pill active" data-cat="all">All</button>
+                  <button type="button" class="gif-pill" data-cat="celebrate">Celebrate 🎉</button>
+                  <button type="button" class="gif-pill" data-cat="thumbsup">Thumbs Up 👍</button>
+                  <button type="button" class="gif-pill" data-cat="study">Study 📚</button>
+                  <button type="button" class="gif-pill" data-cat="laugh">Laugh 😂</button>
+                  <button type="button" class="gif-pill" data-cat="team">Team 🤝</button>
+                </div>
+                <!-- Previews Grid -->
+                <div class="gif-picker-grid" id="loungeGifGrid">
+                  <!-- Rendered animated GIFs -->
                 </div>
               </div>
             </form>
@@ -799,7 +851,12 @@
             <div class="profile-bio-box">
               <div class="bio-header-line">
                 <span class="bio-label">Profile Bio:</span>
-                <button type="button" class="btn-text-action" id="toggleEditBioBtn">Edit Bio</button>
+                <div style="display: flex; gap: 8px;">
+                  <button type="button" class="btn-text-action" id="toggleEditBioBtn">Quick Bio</button>
+                  <button type="button" class="btn btn-xs btn-primary" id="toggleCustomizeProfileBtn">
+                    <span>🎨 Customize Profile</span>
+                  </button>
+                </div>
               </div>
               <p class="bio-text" id="profileHeroBioText">Chief System Administrator &amp; Central Notice Dispatch Controller (ATP0925)</p>
               
@@ -810,6 +867,69 @@
                   <button type="button" class="btn btn-xs btn-secondary" id="cancelBioEditBtn">Cancel</button>
                   <button type="button" class="btn btn-xs btn-primary" id="saveBioEditBtn">Save Bio</button>
                 </div>
+              </div>
+            </div>
+
+            <!-- Full Profile Customization Drawer -->
+            <div class="profile-customize-drawer" id="profileCustomizeDrawer" style="display: none; margin-top: 14px;">
+              <div class="customize-drawer-header">
+                <h5 style="margin: 0; font-size: 0.95rem; font-weight: 700; color: var(--text-main);">🎨 Customize Campus Profile</h5>
+                <span class="meta-badge blue-badge">Personal Identity</span>
+              </div>
+              <div class="customize-form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;">
+                <div class="form-group" style="margin-bottom: 0;">
+                  <label for="editProfileFullName" style="font-size: 0.75rem; font-weight: 600; color: var(--text-dim);">Full Name:</label>
+                  <input type="text" id="editProfileFullName" class="form-control-custom" placeholder="e.g. Maruti Atpadkar">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                  <label for="editProfileRollNo" style="font-size: 0.75rem; font-weight: 600; color: var(--text-dim);">Roll No / Campus ID:</label>
+                  <input type="text" id="editProfileRollNo" class="form-control-custom" placeholder="e.g. 23CO045 / ATP0925">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                  <label for="editProfileDept" style="font-size: 0.75rem; font-weight: 600; color: var(--text-dim);">Department / Branch:</label>
+                  <select id="editProfileDept" class="form-control-custom">
+                    <option value="Computer Engineering">Computer Engineering</option>
+                    <option value="Information Technology">Information Technology</option>
+                    <option value="AI & Data Science">AI & Data Science</option>
+                    <option value="Electronics & Telecomm">Electronics & Telecomm</option>
+                    <option value="Mechanical Engineering">Mechanical Engineering</option>
+                    <option value="Civil Engineering">Civil Engineering</option>
+                    <option value="General Science & Humanities">General Science & Humanities</option>
+                    <option value="Administrative Office">Administrative Office</option>
+                  </select>
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                  <label for="editProfileYear" style="font-size: 0.75rem; font-weight: 600; color: var(--text-dim);">Class / Role:</label>
+                  <select id="editProfileYear" class="form-control-custom">
+                    <option value="First Year (FE)">First Year (FE)</option>
+                    <option value="Second Year (SE)">Second Year (SE)</option>
+                    <option value="Third Year (TE)">Third Year (TE)</option>
+                    <option value="Final Year (BE)">Final Year (BE)</option>
+                    <option value="Faculty / Instructor">Faculty / Instructor</option>
+                    <option value="Officer / Staff">Officer / Staff</option>
+                  </select>
+                </div>
+                <div class="form-group" style="grid-column: 1 / -1; margin-bottom: 0;">
+                  <label for="editProfileBio" style="font-size: 0.75rem; font-weight: 600; color: var(--text-dim);">Profile Bio / Status Message:</label>
+                  <textarea id="editProfileBio" class="form-control-custom" rows="2" maxlength="180" placeholder="Tell other students and faculty about yourself..."></textarea>
+                </div>
+                <div class="form-group" style="grid-column: 1 / -1; margin-bottom: 0;">
+                  <label style="font-size: 0.75rem; font-weight: 600; color: var(--text-dim); display: block; margin-bottom: 4px;">Choose Avatar Icon / Style:</label>
+                  <div class="avatar-preset-pills-row" id="avatarPresetPills">
+                    <button type="button" class="avatar-preset-pill active" data-avatar="👨‍🎓">👨‍🎓 Student</button>
+                    <button type="button" class="avatar-preset-pill" data-avatar="👩‍🎓">👩‍🎓 Scholar</button>
+                    <button type="button" class="avatar-preset-pill" data-avatar="💻">💻 Coder</button>
+                    <button type="button" class="avatar-preset-pill" data-avatar="🚀">🚀 Innovator</button>
+                    <button type="button" class="avatar-preset-pill" data-avatar="⚡">⚡ Tech</button>
+                    <button type="button" class="avatar-preset-pill" data-avatar="👑">👑 Leader</button>
+                    <button type="button" class="avatar-preset-pill" data-avatar="🔬">🔬 Research</button>
+                    <button type="button" class="avatar-preset-pill" data-avatar="INIT">👤 Initials</button>
+                  </div>
+                </div>
+              </div>
+              <div class="customize-actions-row" style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 12px;">
+                <button type="button" class="btn btn-xs btn-secondary" id="cancelCustomizeBtn">Cancel</button>
+                <button type="button" class="btn btn-xs btn-primary" id="saveCustomizeBtn">💾 Save Profile</button>
               </div>
             </div>
           </div>
@@ -1163,8 +1283,8 @@
         
         <!-- TAB 1: LOGIN -->
         <div id="authPaneLogin" class="auth-pane active">
-          <!-- Quick Admin Sign-in Banner -->
-          <div class="admin-quick-login-card">
+          <!-- Quick Admin Sign-in Banner (Restricted to Authorized Device) -->
+          <div class="admin-quick-login-card" id="authModalQuickAdminContainer" style="display: none;">
             <div class="admin-quick-info">
               <span class="admin-crown"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="m2 4 3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14"></path></svg></span>
               <div>
@@ -1355,6 +1475,6 @@
   <div class="toast-container" id="toastContainer" aria-live="polite"></div>
 
   <script src="icons.js"></script>
-  <script src="app.js"></script>
+  <script src="app.js?v=20261013"></script>
 </body>
 </html>
