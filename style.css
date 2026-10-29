@@ -183,14 +183,15 @@ body {
   font-family: var(--font-sans);
   background-color: var(--bg-page);
   background-image: 
-    radial-gradient(at 0% 0%, rgba(255, 228, 230, 0.85) 0px, transparent 55%),
-    radial-gradient(at 100% 0%, rgba(254, 215, 170, 0.85) 0px, transparent 55%),
-    radial-gradient(at 100% 100%, rgba(254, 205, 211, 0.7) 0px, transparent 50%),
-    radial-gradient(at 0% 100%, rgba(255, 237, 213, 0.75) 0px, transparent 50%);
+    radial-gradient(at 0% 0%, rgba(29, 78, 216, 0.03) 0px, transparent 55%),
+    radial-gradient(at 100% 0%, rgba(15, 23, 42, 0.02) 0px, transparent 55%),
+    radial-gradient(at 100% 100%, rgba(37, 99, 235, 0.02) 0px, transparent 50%),
+    radial-gradient(at 0% 100%, rgba(15, 23, 42, 0.02) 0px, transparent 50%);
   background-attachment: fixed;
   color: var(--text-main);
   line-height: 1.55;
   min-height: 100vh;
+  min-height: 100dvh;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
@@ -1340,10 +1341,13 @@ button, input, textarea, select {
   border-radius: var(--radius-lg);
   width: 100%;
   max-width: min(100%, 650px);
-  max-height: 92vh;
-  overflow-y: auto;
+  max-height: min(92vh, calc(100dvh - 24px));
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
   box-shadow: var(--shadow-lg);
   margin: auto;
+  position: relative;
 }
 
 .modal-dialog.modal-md {
@@ -1355,12 +1359,15 @@ button, input, textarea, select {
 }
 
 .modal-header {
-  padding: clamp(14px, 3vw, 20px);
+  padding: clamp(12px, 2.5vw, 18px);
   border-bottom: 1px solid var(--border-color);
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: 10px;
+  flex-shrink: 0;
+  background-color: var(--bg-card);
+  z-index: 10;
 }
 
 .modal-dept-badge {
@@ -1450,12 +1457,14 @@ button, input, textarea, select {
 }
 
 .modal-footer {
-  padding: clamp(12px, 3vw, 18px);
+  padding: clamp(12px, 2.5vw, 16px);
   border-top: 1px solid var(--border-color);
   display: flex;
   justify-content: flex-end;
   gap: 10px;
-  background-color: var(--bg-subtle);
+  background-color: var(--bg-card);
+  flex-shrink: 0;
+  z-index: 10;
 }
 
 /* ==========================================================================
@@ -1769,7 +1778,13 @@ button, input, textarea, select {
    MULTI-DEVICE RESPONSIVE BREAKPOINTS (Fluid Multi-Screen Optimization)
    ========================================================================== */
 
-/* Large Tablets & Small Laptops (<= 1024px) */
+/* ==========================================================================
+   MULTI-DEVICE RESPONSIVE BREAKPOINTS (Universal Cross-Device Optimization)
+   Supports: 320px Fold/SE, 360px-430px Smartphones, 768px-834px Tablets,
+   1024px-1366px Laptops, 1440px+ Desktops, and Mobile Landscape Mode
+   ========================================================================== */
+
+/* 1. Large Tablets & Small Laptops (<= 1024px) */
 @media (max-width: 1024px) {
   .feed-container {
     padding: 0 16px 40px;
@@ -1781,12 +1796,12 @@ button, input, textarea, select {
   }
 
   .nav-search-wrap {
-    flex: 1 1 240px;
-    max-width: 320px;
+    flex: 1 1 220px;
+    max-width: 300px;
   }
 }
 
-/* Tablets & Large Phablets (<= 820px) */
+/* 2. Tablets, iPads & Phablets (<= 820px) */
 @media (max-width: 820px) {
   .nav-container {
     flex-wrap: wrap;
@@ -1803,92 +1818,99 @@ button, input, textarea, select {
     margin-left: auto;
   }
 
-  /* Keep Search functional & prominent on tablets/mobile by giving it a full row */
+  /* Dedicated full-width row for Search bar on tablets and mobile */
   .nav-search-wrap {
     order: 3;
     flex: 1 1 100%;
     max-width: 100%;
-    margin: 2px 0 0;
+    margin: 4px 0 0;
   }
 
   .sub-controls-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    align-items: stretch;
+  }
+
+  .sub-filter-group {
+    width: 100%;
+  }
+
+  .control-select {
+    width: 100%;
+  }
+
+  .filter-actions-group {
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+
+  .filter-actions-group .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Notice Card Management Toolbar on Tablets */
+  .card-management-toolbar {
     flex-direction: column;
     align-items: stretch;
     gap: 10px;
   }
 
-  .filter-selects-group {
-    width: 100%;
+  .toolbar-left-actions {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-  }
-
-  .filter-select {
+    grid-template-columns: repeat(auto-fit, minmax(115px, 1fr));
+    gap: 6px;
     width: 100%;
   }
 
-  .feed-view-stats {
-    width: 100%;
-    justify-content: space-between;
-    padding-top: 4px;
-    border-top: 1px dashed var(--border-color);
-  }
-
-  .card-actions-toolbar {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
-    width: 100%;
-  }
-
-  .card-actions-toolbar .btn {
+  .toolbar-left-actions .action-tool-btn {
     width: 100%;
     justify-content: center;
     padding: 8px 10px;
     font-size: var(--font-xs);
   }
 
+  .toolbar-right-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    width: 100%;
+    padding-top: 6px;
+    border-top: 1px dashed var(--border-color);
+  }
+
   .modal-dialog {
-    width: 94vw;
-    max-width: 600px;
-    padding: 20px 18px;
-    margin: 16px auto;
+    width: min(96vw, 600px);
+    margin: 12px auto;
   }
 
-  .letterhead-sheet {
-    padding: 28px 22px;
-  }
-
-  .letterhead-signatory-block {
-    flex-direction: column-reverse;
-    align-items: flex-start;
-    gap: 18px;
-  }
-
-  .letterhead-signatory-wrap {
-    text-align: left;
+  .modal-dialog.modal-letterhead {
+    width: min(96vw, 720px);
   }
 }
 
-/* Standard Smartphones (<= 580px) */
-@media (max-width: 580px) {
-  /* Toggle Responsive Text helpers */
-  .tag-full {
-    display: none;
+/* 3. Standard Smartphones (<= 680px) */
+@media (max-width: 680px) {
+  /* Hide the text in officer card to preserve space for buttons */
+  .officer-card .officer-info {
+    display: none !important;
   }
-  .tag-short {
-    display: inline-block;
+
+  .officer-card {
+    padding: 3px !important;
+    border-radius: 50% !important;
   }
-  .btn-text-full {
-    display: none;
-  }
-  .btn-text-short {
-    display: inline;
+
+  .officer-avatar {
+    width: 32px;
+    height: 32px;
+    font-size: 0.74rem;
   }
 
   .brand-tagline {
-    display: none; /* Hide long sub-tagline on phones to preserve clean bar */
+    display: none; /* Hide institutional tagline on phones to preserve clean bar */
   }
 
   .brand-title {
@@ -1901,22 +1923,6 @@ button, input, textarea, select {
     font-size: 17px;
   }
 
-  /* Compact Officer Info: show avatar only to avoid crowding buttons */
-  .officer-text {
-    display: none;
-  }
-
-  .officer-profile-btn {
-    padding: 4px 6px;
-    border-radius: var(--radius-full);
-  }
-
-  .officer-avatar {
-    width: 28px;
-    height: 28px;
-    font-size: 0.72rem;
-  }
-
   .nav-actions {
     gap: 6px;
   }
@@ -1926,10 +1932,29 @@ button, input, textarea, select {
     font-size: var(--font-xs);
   }
 
-  /* iOS Safari Auto-Zoom Fix: Ensure inputs are at least 16px on touch devices */
+  .btn-text-full {
+    display: none;
+  }
+
+  .btn-text-short {
+    display: inline;
+  }
+
+  .tag-full {
+    display: none;
+  }
+
+  .tag-short {
+    display: inline-block;
+  }
+
+  /* Prevent iOS Safari 16px auto-zoom */
   input[type="text"],
   input[type="search"],
   input[type="date"],
+  input[type="email"],
+  input[type="password"],
+  input[type="url"],
   select,
   textarea {
     font-size: 16px !important;
@@ -1965,100 +1990,252 @@ button, input, textarea, select {
     gap: 12px;
   }
 
-  .filter-selects-group {
+  /* Workspace switcher on phones */
+  .view-mode-buttons-row {
     grid-template-columns: 1fr;
-  }
-
-  .circular-card {
-    padding: 14px 14px 12px;
-  }
-
-  .card-header {
-    flex-direction: column;
-    align-items: flex-start;
     gap: 8px;
   }
 
-  .card-actions-top {
+  .view-mode-tab {
+    padding: 10px 14px;
+  }
+
+  /* Notice items */
+  .notice-item-card {
+    padding: 14px 12px;
+  }
+
+  .card-header-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .card-badges-cluster {
     width: 100%;
-    justify-content: space-between;
+    gap: 4px;
   }
 
-  .card-ref-badge {
-    font-size: 0.7rem;
-    padding: 3px 6px;
+  .card-meta-date {
+    font-size: 0.72rem;
   }
 
-  .card-meta-line {
-    font-size: 0.74rem;
+  .card-subject-title {
+    font-size: 1.05rem;
   }
 
-  .card-actions-toolbar {
+  .card-secondary-meta {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .attachment-pill-btn {
+    width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* Action buttons on phones: 2-column touch grid */
+  .toolbar-left-actions {
     grid-template-columns: 1fr 1fr;
     gap: 6px;
   }
 
+  .toolbar-left-actions .action-tool-btn {
+    padding: 8px 6px;
+    font-size: 0.74rem;
+    min-height: 40px;
+  }
+
+  .toolbar-right-actions {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .toolbar-right-actions .icon-action-btn {
+    padding: 8px 12px;
+    min-height: 38px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border-radius: var(--radius-sm);
+    background-color: var(--bg-subtle);
+  }
+
+  /* Modal responsiveness on phones */
   .modal-dialog {
     width: 96vw;
-    padding: 16px 14px;
+    margin: 8px auto;
     border-radius: var(--radius-md);
+    max-height: calc(100dvh - 16px);
   }
 
   .modal-header {
-    margin-bottom: 14px;
+    padding: 12px 14px;
   }
 
   .modal-title {
     font-size: 1.05rem;
   }
 
+  .modal-body, .modal-form {
+    padding: 14px 12px;
+  }
+
   .modal-footer {
     flex-direction: column-reverse;
     gap: 8px;
-    margin-top: 18px;
+    padding: 12px 14px;
   }
 
   .modal-footer .btn {
     width: 100%;
     justify-content: center;
+    min-height: 44px;
   }
 
-  .letterhead-sheet {
-    padding: 18px 14px;
-    border-radius: 4px;
+  /* Letterhead sheet on mobile */
+  .letterhead-document {
+    padding: 16px 12px;
   }
 
-  .letterhead-univ {
+  .lh-college-name {
     font-size: 1rem;
   }
 
-  .letterhead-ref-line {
-    flex-direction: column;
+  .lh-signatory-block {
+    flex-direction: column-reverse;
     align-items: flex-start;
+    gap: 16px;
+  }
+
+  .lh-signature-details {
+    text-align: left;
+    width: 100%;
+  }
+
+  .lh-sig-line {
+    margin-left: 0;
+  }
+
+  /* Community Lounge on Mobile */
+  .lounge-composer-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .emoji-shortcuts-bar {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 4px;
+  }
+
+  .quick-reactions-strip {
+    display: flex;
+    flex-shrink: 0;
     gap: 4px;
   }
 
-  .letterhead-body {
-    font-size: 0.86rem;
-    line-height: 1.55;
-    margin-bottom: 24px;
+  .lounge-action-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .lounge-action-buttons .btn {
+    width: 100%;
+    justify-content: center;
+    min-height: 42px;
+  }
+
+  /* Theme Studio on Mobile */
+  .preset-palettes-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px;
+  }
+
+  .color-controls-grid {
+    grid-template-columns: 1fr !important;
+    gap: 8px;
+  }
+
+  .theme-studio-footer {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .footer-left-actions {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    width: 100%;
+  }
+
+  .footer-left-actions .btn {
+    width: 100%;
+    justify-content: center;
+    padding: 8px 4px;
+    font-size: 0.72rem;
+  }
+
+  .footer-right-actions {
+    width: 100%;
+  }
+
+  #saveThemePaletteBtn {
+    width: 100%;
+    justify-content: center;
+    min-height: 44px;
+  }
+
+  /* Admin User Card on Mobile */
+  .admin-user-card {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .admin-user-details {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .admin-user-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    width: 100%;
+  }
+
+  .admin-user-actions .btn {
+    width: 100%;
+    justify-content: center;
+    min-height: 38px;
   }
 
   .toast-container {
-    left: 12px;
-    right: 12px;
-    bottom: 12px;
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
   }
 
   .toast {
     width: 100%;
-    font-size: 0.8rem;
+    font-size: 0.82rem;
     padding: 10px 14px;
   }
 }
 
-/* Small / Compact Phones (<= 400px, e.g. iPhone SE, Fold devices) */
-@media (max-width: 400px) {
+/* 4. Small / Compact Phones (<= 420px, e.g. iPhone SE, Fold external screens) */
+@media (max-width: 420px) {
   html {
     font-size: 14.5px;
   }
@@ -2067,39 +2244,99 @@ button, input, textarea, select {
     padding: 8px 10px;
   }
 
+  /* On ultra-narrow screens, turn Theme Studio into an icon-only button so it never crowds */
+  #openThemeStudioBtn .btn-text-short {
+    display: none !important;
+  }
+
+  #openThemeStudioBtn {
+    padding: 6px 8px !important;
+  }
+
+  #navSignOutBtn .btn-text-short {
+    font-size: 0.7rem;
+  }
+
   .metrics-grid {
     grid-template-columns: 1fr 1fr;
     gap: 6px;
   }
 
   .metric-card {
-    padding: 8px 10px;
+    padding: 8px 8px;
+    gap: 6px;
   }
 
   .metric-icon {
     display: none; /* Hide icon on extra-small screens so numbers have maximum space */
   }
 
-  .dept-filter-bar {
-    gap: 4px;
+  .metric-value {
+    font-size: 1.2rem;
   }
 
-  .filter-pill {
-    padding: 5px 10px;
-    font-size: 0.72rem;
+  .metric-label {
+    font-size: 0.65rem;
+    line-height: 1.25;
   }
 
-  .card-actions-toolbar {
-    grid-template-columns: 1fr; /* Single column stack for super narrow screens */
+  .dept-pills-row {
     gap: 6px;
   }
 
-  .card-actions-toolbar .btn {
-    padding: 7px 10px;
+  .dept-pill-btn {
+    padding: 6px 10px;
+    font-size: 0.72rem;
   }
 
-  .btn-ack-count {
-    padding: 1px 5px;
+  .toolbar-left-actions {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .footer-left-actions {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .footer-left-actions .btn:last-child {
+    grid-column: 1 / -1;
+  }
+}
+
+/* 5. Mobile Landscape Mode (height <= 520px and landscape orientation) */
+@media (max-height: 520px) and (orientation: landscape) {
+  .modal-dialog {
+    max-height: calc(100dvh - 12px);
+    margin: 6px auto;
+  }
+
+  .modal-header {
+    padding: 8px 14px;
+  }
+
+  .modal-title {
+    font-size: 0.95rem;
+  }
+
+  .modal-subtitle {
+    display: none; /* Hide subtitle in landscape to give body maximum room */
+  }
+
+  .modal-body, .modal-form {
+    padding: 10px 14px;
+  }
+
+  .modal-footer {
+    padding: 8px 14px;
+    flex-direction: row !important;
+  }
+
+  .modal-footer .btn {
+    width: auto !important;
+    min-height: 36px !important;
+  }
+
+  .navbar {
+    padding: 4px 0;
   }
 }
 
