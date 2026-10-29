@@ -46,7 +46,7 @@ html_content = """<!DOCTYPE html>
       padding: 0.5in 0.8in;
     }
 
-    /* Right Green Facets */
+    /* Right Green Facets matching Sample PPT Review 1 */
     .slide::after {
       content: "";
       position: absolute;
@@ -63,704 +63,618 @@ html_content = """<!DOCTYPE html>
     .slide-content {
       position: relative;
       z-index: 2;
-      width: 12.0in;
+      max-width: 11.8in;
       height: 100%;
       display: flex;
       flex-direction: column;
+    }
+
+    .header-banner {
+      width: 100%;
+      max-height: 1.1in;
+      object-fit: contain;
+      object-position: left center;
+      margin-bottom: 0.25in;
     }
 
     .slide-title {
       font-size: 32pt;
       font-weight: 700;
       color: #70ad47;
-      margin-bottom: 0.3in;
-      letter-spacing: -0.5px;
+      margin-bottom: 0.35in;
+      line-height: 1.2;
+      border-bottom: 2px solid #e2efda;
+      padding-bottom: 0.1in;
     }
 
-    .header-banner {
-      width: 9.8in;
-      margin-bottom: 0.25in;
+    .bullet-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.22in;
+      font-size: 15pt;
+      line-height: 1.5;
     }
 
-    /* Tables */
+    .bullet-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .bullet-icon {
+      color: #70ad47;
+      font-size: 16pt;
+      line-height: 1.3;
+      flex-shrink: 0;
+    }
+
+    .bullet-bold {
+      font-weight: 700;
+      color: #375623;
+    }
+
+    /* Table Styles */
     .ppt-table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 0.15in;
-      font-size: 12.5pt;
+      margin-top: 0.1in;
+      font-size: 11.5pt;
     }
 
     .ppt-table th {
       background: #70ad47;
       color: #ffffff;
-      padding: 12px 14px;
-      text-align: left;
       font-weight: 700;
-      border: 1px solid #5a9336;
+      padding: 10px 12px;
+      text-align: left;
+      border: 1px solid #70ad47;
     }
 
     .ppt-table td {
-      padding: 11px 14px;
-      border: 1px solid #d9e2ec;
+      padding: 10px 12px;
+      border: 1px solid #c8dcc3;
+      color: #1e293b;
       vertical-align: middle;
       line-height: 1.35;
     }
 
     .ppt-table tr:nth-child(even) td {
+      background: #e2efda;
+    }
+
+    .ppt-table tr:nth-child(odd) td {
       background: #f2f8ee;
     }
 
-    .ppt-table .center {
-      text-align: center;
-    }
-
-    /* Lists */
-    .ppt-list {
-      list-style: none;
+    /* TOC Specifics */
+    .toc-grid {
       display: flex;
       flex-direction: column;
       gap: 0.22in;
-      font-size: 14pt;
-      line-height: 1.5;
+      margin-top: 0.1in;
     }
 
-    .ppt-list li {
-      position: relative;
-      padding-left: 0.35in;
+    .toc-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-size: 18pt;
+      font-weight: 700;
+      color: #1e293b;
     }
 
-    .ppt-list li::before {
-      content: "►";
-      position: absolute;
-      left: 0;
+    .toc-arrow {
       color: #70ad47;
-      font-size: 13pt;
-      top: 1px;
+      font-size: 20pt;
     }
 
-    .highlight-title {
-      font-weight: 700;
+    /* Title Slide Specifics */
+    .title-banner {
+      width: 100%;
+      max-height: 1.25in;
+      object-fit: contain;
+      object-position: left center;
+      margin-bottom: 0.3in;
+    }
+
+    .main-title {
+      font-size: 26pt;
+      font-weight: 800;
       color: #375623;
+      line-height: 1.25;
+      margin-bottom: 0.12in;
     }
 
-    .badge {
+    .main-subtitle {
+      font-size: 14pt;
+      font-style: italic;
+      color: #64748b;
+      margin-bottom: 0.12in;
+    }
+
+    .main-badge {
       display: inline-block;
-      padding: 4px 10px;
-      border-radius: 4px;
-      font-size: 11pt;
-      font-weight: 700;
       background: #e2efda;
       color: #375623;
-      margin-right: 6px;
+      font-size: 11.5pt;
+      font-weight: 700;
+      padding: 5px 14px;
+      border-radius: 4px;
+      margin-bottom: 0.25in;
     }
 
-    .footer-bar {
-      margin-top: auto;
-      font-size: 10.5pt;
+    .guide-box {
+      font-size: 15pt;
+      margin-bottom: 0.2in;
+    }
+
+    .guide-label {
+      font-weight: 700;
+      color: #1e293b;
+    }
+
+    .guide-name {
+      font-weight: 700;
+      color: #70ad47;
+    }
+
+    .team-table {
+      width: 7.2in;
+      border-collapse: collapse;
+      font-size: 12pt;
+      margin-bottom: 0.25in;
+    }
+
+    .team-table th {
+      background: #70ad47;
+      color: #ffffff;
+      padding: 8px 12px;
+      font-weight: 700;
+      border: 1px solid #70ad47;
+    }
+
+    .team-table td {
+      padding: 8px 12px;
+      border: 1px solid #c8dcc3;
+    }
+
+    .dept-footer {
+      font-size: 11.5pt;
+      font-style: italic;
       color: #64748b;
-      font-weight: 600;
-      border-top: 1px solid #e2e8f0;
-      padding-top: 0.1in;
-      display: flex;
-      justify-content: space-between;
+      margin-top: auto;
     }
   </style>
 </head>
 <body>
 
-  <!-- ================= SLIDE 1: COVER ================= -->
+  <!-- ============================================================ -->
+  <!-- SLIDE 1: TITLE SLIDE                                         -->
+  <!-- ============================================================ -->
   <div class="slide">
-    <div class="slide-content" style="align-items: center; text-align: center; padding-top: 0.2in;">
-      <img src="assets/extracted_img.jpg" class="header-banner" alt="College Header">
-      
-      <h1 style="font-size: 42pt; color: #70ad47; font-weight: 800; margin-top: 0.15in;">Campus Notify</h1>
-      <h2 style="font-size: 21pt; color: #375623; font-weight: 700; margin-top: 0.05in;">Institutional Circular & Announcement Management System</h2>
-      <p style="font-size: 13pt; font-style: italic; color: #64748b; margin-top: 0.05in;">A Modular Object-Oriented System in Core Java with File Persistence & Cloud Synchronization</p>
-      
-      <div style="margin-top: 0.35in; font-size: 16pt; font-weight: 700; color: #1e293b;">
-        Guide: Prof. Sonali Kharat
+    <div class="slide-content">
+      <img src="assets/extracted_img.jpg" class="title-banner" alt="College Header">
+      <h1 class="main-title">CAMPUS NOTIFY: INSTITUTIONAL CIRCULAR &amp;<br>ANNOUNCEMENT MANAGEMENT SYSTEM</h1>
+      <p class="main-subtitle">A Modular, Object-Oriented System in Core Java SE 17 with Responsive Web Interface</p>
+      <div><span class="main-badge">Review – 1 Presentation | Java Programming Laboratory (Semester – III)</span></div>
+
+      <div class="guide-box">
+        <span class="guide-label">Guide: </span>
+        <span class="guide-name">Prof. Sonali Kharat</span>
       </div>
 
-      <div style="margin-top: 0.3in; width: 6.5in;">
-        <div style="font-size: 13pt; font-weight: 700; margin-bottom: 8px; color: #375623;">Team Details:</div>
-        <table class="ppt-table" style="font-size: 12pt;">
-          <thead>
-            <tr>
-              <th class="center" style="width: 40%;">Student ID</th>
-              <th class="center" style="width: 60%;">Student Name</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td class="center">VU4F2526072</td>
-              <td><strong>PRATIK ATPADKAR</strong></td>
-            </tr>
-            <tr>
-              <td class="center">VU4F2526066</td>
-              <td><strong>HARSH TIWAR</strong></td>
-            </tr>
-            <tr>
-              <td class="center">VU4F2526062</td>
-              <td><strong>PARTH GADADHE</strong></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <p style="font-size: 13pt; font-weight: 700; margin-bottom: 6px; color: #1e293b;">Team Details:</p>
+      <table class="team-table">
+        <thead>
+          <tr>
+            <th style="width: 35%;">Student ID</th>
+            <th style="width: 65%;">Student Name</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="background: #e2efda;">
+            <td><strong>VU4F2526072</strong></td>
+            <td><strong>PRATIK ATPADKAR</strong></td>
+          </tr>
+          <tr style="background: #f2f8ee;">
+            <td><strong>VU4F2526066</strong></td>
+            <td><strong>HARSH TIWAR</strong></td>
+          </tr>
+          <tr style="background: #e2efda;">
+            <td><strong>VU4F2526062</strong></td>
+            <td><strong>PARTH GADADHE</strong></td>
+          </tr>
+        </tbody>
+      </table>
 
-      <div class="footer-bar" style="width: 100%; margin-top: auto; justify-content: center;">
-        Class: SE(IT) DIV :- A BATCH :- C | Academic Year: 2025–2026 | Department of Information Technology
-      </div>
+      <p class="dept-footer">Department of Information Technology | Vasantdada Patil Pratishthan’s College of Engineering &amp; Visual Arts, Sion, Mumbai</p>
     </div>
   </div>
 
-  <!-- ================= SLIDE 2: TABLE OF CONTENT ================= -->
+  <!-- ============================================================ -->
+  <!-- SLIDE 2: TABLE OF CONTENT                                    -->
+  <!-- ============================================================ -->
   <div class="slide">
     <div class="slide-content">
       <h2 class="slide-title">Table of Content:</h2>
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.4in; margin-top: 0.2in;">
-        <ul class="ppt-list">
-          <li><span class="highlight-title">Introduction & Academic Background</span></li>
-          <li><span class="highlight-title">Problem Statement & Current Bottlenecks</span></li>
-          <li><span class="highlight-title">Objectives of the Project</span></li>
-          <li><span class="highlight-title">Literature Survey (Comparative Matrix)</span></li>
-          <li><span class="highlight-title">Research Gap & System Innovation</span></li>
-          <li><span class="highlight-title">Proposed Solution & MVC Architecture</span></li>
-        </ul>
-        <ul class="ppt-list">
-          <li><span class="highlight-title">Core Java OOP Design & Implementation</span></li>
-          <li><span class="highlight-title">Web Dashboard, Real-time Sync & Security</span></li>
-          <li><span class="highlight-title">Project Planning & 13-Week Timeline</span></li>
-          <li><span class="highlight-title">Automated Testing & Verification (92 Tests)</span></li>
-          <li><span class="highlight-title">Conclusion & Societal Impact (SDG 4 & 9)</span></li>
-          <li><span class="highlight-title">Future Scope & Academic References</span></li>
-        </ul>
-      </div>
-      <div class="footer-bar">
-        <span>Campus Notify | VPPCOE&VA</span>
-        <span>Slide 2</span>
+      <div class="toc-grid">
+        <div class="toc-row"><span class="toc-arrow">►</span> <span>Introduction</span></div>
+        <div class="toc-row"><span class="toc-arrow">►</span> <span>Problem Statement</span></div>
+        <div class="toc-row"><span class="toc-arrow">►</span> <span>Objectives</span></div>
+        <div class="toc-row"><span class="toc-arrow">►</span> <span>Literature Survey</span></div>
+        <div class="toc-row"><span class="toc-arrow">►</span> <span>Research Gap</span></div>
+        <div class="toc-row"><span class="toc-arrow">►</span> <span>Proposed Solution</span></div>
+        <div class="toc-row"><span class="toc-arrow">►</span> <span>Project Planning &amp; Timeline</span></div>
+        <div class="toc-row"><span class="toc-arrow">►</span> <span>Conclusion</span></div>
+        <div class="toc-row"><span class="toc-arrow">►</span> <span>References</span></div>
       </div>
     </div>
   </div>
 
-  <!-- ================= SLIDE 3: INTRODUCTION ================= -->
+  <!-- ============================================================ -->
+  <!-- SLIDE 3: INTRODUCTION                                        -->
+  <!-- ============================================================ -->
   <div class="slide">
     <div class="slide-content">
-      <h2 class="slide-title">Introduction & Academic Background:</h2>
-      <ul class="ppt-list" style="margin-top: 0.2in; gap: 0.3in;">
-        <li>
-          <span class="highlight-title">Institutional Communication Imperative:</span>
-          Higher educational institutions generate dozens of time-critical circulars every week—exam timetables, hall-ticket releases, scholarship deadlines, revaluation alerts, and placement recruitment drives.
+      <h2 class="slide-title">Introduction:</h2>
+      <ul class="bullet-list">
+        <li class="bullet-item">
+          <span class="bullet-icon">►</span>
+          <div><span class="bullet-bold">Institutional Context:</span> University campuses require fast, authenticated, and transparent dissemination of critical academic notices, examination timetables, fee circulars, and departmental events.</div>
         </li>
-        <li>
-          <span class="highlight-title">Multi-Tier Stakeholder Ecosystem:</span>
-          The communication flow bridges three core groups: Institutional Administration (Principal/Deans), Department Faculty Heads & Mentors, and Students across multiple engineering divisions.
+        <li class="bullet-item">
+          <span class="bullet-icon">►</span>
+          <div><span class="bullet-bold">Limitations of Legacy Systems:</span> Traditional physical notice boards and informal WhatsApp broadcast groups lead to notice loss, cognitive clutter, and complete absence of delivery verification.</div>
         </li>
-        <li>
-          <span class="highlight-title">The Operational Challenge:</span>
-          Reliance on physical wooden notice boards and unorganized messaging groups leads to missed deadlines, lack of audit trails, and student distress.
+        <li class="bullet-item">
+          <span class="bullet-icon">►</span>
+          <div><span class="bullet-bold">Need for Digital Centralization:</span> A single, authoritative digital notice board ensures official circulars reach every student, faculty member, and administrator without physical delays.</div>
         </li>
-        <li>
-          <span class="highlight-title">Academic Mini-Project Foundation:</span>
-          Designed as a Second Year Information Technology Mini-Project demonstrating the real-world application of Core Java Object-Oriented Programming (OOP), File I/O Streams, and Collections Framework.
+        <li class="bullet-item">
+          <span class="bullet-icon">►</span>
+          <div><span class="bullet-bold">Core Java SE 17 Engineering:</span> Developed as part of the Java Programming Laboratory to demonstrate real-world applications of Object-Oriented Programming (OOP), file streams, and security models.</div>
+        </li>
+        <li class="bullet-item">
+          <span class="bullet-icon">►</span>
+          <div><span class="bullet-bold">Target Stakeholders:</span> Specifically tailored for Department of Information Technology and administrative governance at Vasantdada Patil Pratishthan's College of Engineering &amp; Visual Arts.</div>
         </li>
       </ul>
-      <div class="footer-bar">
-        <span>Campus Notify | VPPCOE&VA</span>
-        <span>Slide 3</span>
-      </div>
     </div>
   </div>
 
-  <!-- ================= SLIDE 4: PROBLEM STATEMENT ================= -->
+  <!-- ============================================================ -->
+  <!-- SLIDE 4: PROBLEM STATEMENT                                   -->
+  <!-- ============================================================ -->
   <div class="slide">
     <div class="slide-content">
-      <h2 class="slide-title">Problem Statement & Motivation:</h2>
-      <ul class="ppt-list" style="margin-top: 0.15in; gap: 0.25in;">
-        <li>
-          <span class="highlight-title">Information Clutter & Missed Deadlines:</span>
-          In informal WhatsApp/Telegram groups, vital circulars get buried beneath hundreds of casual chat messages, leading to students missing scholarship and exam submission deadlines.
+      <h2 class="slide-title">Problem Statement:</h2>
+      <ul class="bullet-list">
+        <li class="bullet-item">
+          <span class="bullet-icon">►</span>
+          <div><span class="bullet-bold">Physical Notice Board Bottlenecks:</span> Circulars get torn, misplaced, or buried under newer posters; students absent from campus miss urgent submission deadlines and academic announcements.</div>
         </li>
-        <li>
-          <span class="highlight-title">Zero Authenticity & Falsification Risk:</span>
-          Informal messaging lacks role verification. Falsified or edited circular screenshots circulate freely with zero administrative audit trails.
+        <li class="bullet-item">
+          <span class="bullet-icon">►</span>
+          <div><span class="bullet-bold">Social Media Chaos &amp; Cognitive Fatigue:</span> WhatsApp and Telegram groups mix official circulars with informal chatter, memes, and non-academic media, leading to missed examination dates.</div>
         </li>
-        <li>
-          <span class="highlight-title">Lack of Search & Category Indexing:</span>
-          Corridor bulletin boards and chat groups offer no search mechanisms. Locating an older circular requires tedious manual physical searches or endless chat scrolling.
+        <li class="bullet-item">
+          <span class="bullet-icon">►</span>
+          <div><span class="bullet-bold">Zero Proof of Delivery &amp; Acknowledgment:</span> Faculty and examination cells have no verifiable mechanism or digital logs to confirm whether targeted students actually read critical notices.</div>
         </li>
-        <li>
-          <span class="highlight-title">Physical Proximity Barriers:</span>
-          Commuting, absent, or ill students cannot view physical campus bulletin boards in real time.
+        <li class="bullet-item">
+          <span class="bullet-icon">►</span>
+          <div><span class="bullet-bold">Vulnerability to Fake Circulars &amp; Rumors:</span> Unofficial broadcast channels lack Role-Based Access Control (RBAC), leaving students susceptible to unverified exam cancellation rumors.</div>
         </li>
-        <li>
-          <span class="highlight-title">UN Sustainable Development Goals (SDG) Alignment:</span>
-          Directly aligns with <strong>SDG 4 (Quality Education)</strong> by ensuring equitable information access and <strong>SDG 9 (Industry, Innovation & Infrastructure)</strong> through digital modernization.
+        <li class="bullet-item">
+          <span class="bullet-icon">►</span>
+          <div><span class="bullet-bold">Paper Waste &amp; High Operational Overhead:</span> High recurring paper printing costs, toner waste, and physical labor required to distribute and pin paper circulars across multiple campus buildings.</div>
         </li>
       </ul>
-      <div class="footer-bar">
-        <span>Campus Notify | VPPCOE&VA</span>
-        <span>Slide 4</span>
-      </div>
     </div>
   </div>
 
-  <!-- ================= SLIDE 5: OBJECTIVES ================= -->
+  <!-- ============================================================ -->
+  <!-- SLIDE 5: OBJECTIVES                                          -->
+  <!-- ============================================================ -->
   <div class="slide">
     <div class="slide-content">
-      <h2 class="slide-title">Objectives of the Project:</h2>
-      <ul class="ppt-list" style="margin-top: 0.2in; gap: 0.25in;">
-        <li>
-          <span class="highlight-title">Centralized & Authoritative Repository:</span>
-          To develop a single authentic digital platform eliminating fragmented physical boards and chat noise.
+      <h2 class="slide-title">Objectives:</h2>
+      <ul class="bullet-list">
+        <li class="bullet-item">
+          <span class="bullet-icon">►</span>
+          <div><span class="bullet-bold">Centralized Digital Notice Repository:</span> To build a single authoritative portal categorized by department (IT, Comps, Mech, Civil) and priority (Urgent, Normal).</div>
         </li>
-        <li>
-          <span class="highlight-title">Role-Based Access Control (RBAC):</span>
-          To implement strict privilege boundaries separating authorized notice publishers (Admin/Faculty) from student viewers.
+        <li class="bullet-item">
+          <span class="bullet-icon">►</span>
+          <div><span class="bullet-bold">Implement Core Java OOP Architecture:</span> To apply Encapsulation, Inheritance, Polymorphism, and Interfaces (Notifiable, AuditLoggable) for robust, maintainable domain services.</div>
         </li>
-        <li>
-          <span class="highlight-title">Core Java Object-Oriented Principles:</span>
-          To apply Encapsulation, Constructor Overloading, and Data Abstraction in engineering domain models (<code>Notice</code>, <code>User</code>, <code>Role</code>).
+        <li class="bullet-item">
+          <span class="bullet-icon">►</span>
+          <div><span class="bullet-bold">Enforce Role-Based Access Control (RBAC):</span> To establish a Zero-Access Security Wall restricting circular creation, editing, and deletion strictly to authenticated Super Admins and Faculty.</div>
         </li>
-        <li>
-          <span class="highlight-title">Restart-Safe Local File I/O Persistence:</span>
-          To ensure 100% circular retention across system restarts using Java <code>BufferedReader</code> and <code>PrintWriter</code> streams.
+        <li class="bullet-item">
+          <span class="bullet-icon">►</span>
+          <div><span class="bullet-bold">Provide Verifiable Digital Acknowledgment:</span> To enable students to digitally acknowledge circulars with instant timestamped receipts for administrative audit records.</div>
         </li>
-        <li>
-          <span class="highlight-title">Multi-Platform Accessibility:</span>
-          To deliver both an interactive terminal CLI scanner and a responsive web dashboard synchronized with Google Firebase.
+        <li class="bullet-item">
+          <span class="bullet-icon">►</span>
+          <div><span class="bullet-bold">Deliver Responsive &amp; Offline Accessibility:</span> To ensure 100% responsive user experience across mobile phones, tablets, and PCs with local caching during connectivity drops.</div>
+        </li>
+        <li class="bullet-item">
+          <span class="bullet-icon">►</span>
+          <div><span class="bullet-bold">Promote Green Campus Sustainability:</span> To eliminate paper dependency, advancing UN Sustainable Development Goals (SDG 9: Innovation, SDG 12: Responsible Consumption).</div>
         </li>
       </ul>
-      <div class="footer-bar">
-        <span>Campus Notify | VPPCOE&VA</span>
-        <span>Slide 5</span>
-      </div>
     </div>
   </div>
 
-  <!-- ================= SLIDE 6: LITERATURE SURVEY ================= -->
+  <!-- ============================================================ -->
+  <!-- SLIDE 6: LITERATURE SURVEY                                   -->
+  <!-- ============================================================ -->
   <div class="slide">
     <div class="slide-content">
       <h2 class="slide-title">Literature Survey:</h2>
-      <table class="ppt-table" style="font-size: 11pt;">
+      <table class="ppt-table">
         <thead>
           <tr>
-            <th class="center" style="width: 6%;">Sr. No.</th>
-            <th style="width: 24%;">Title:</th>
+            <th style="width: 5%; text-align: center;">Sr.<br>No.</th>
+            <th style="width: 22%;">Title:</th>
             <th style="width: 14%;">Publication</th>
-            <th style="width: 16%;">Author & Year</th>
+            <th style="width: 17%;">Author &amp;<br>Year</th>
             <th style="width: 20%;">Methodology:</th>
-            <th style="width: 20%;">Key Findings:</th>
+            <th style="width: 22%;">Key<br>Findings:</th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td class="center">1</td>
-            <td><strong>Digital Campus Notice Dissemination</strong></td>
+            <td style="text-align: center;"><strong>1</strong></td>
+            <td><strong>Digital Campus Information Dissemination Systems</strong></td>
             <td>IEEE Access</td>
-            <td>Sharma et al. (2021)</td>
-            <td>Client-server web portal with centralized database</td>
-            <td>High operational cost; lacks local offline persistence during network outages.</td>
+            <td>R. Sharma et al.<br>(2021)</td>
+            <td>Centralized push notification broker using message queues</td>
+            <td>High delivery rate across networks, but lacked role-based publishing controls and offline fallback.</td>
           </tr>
           <tr>
-            <td class="center">2</td>
-            <td><strong>Smart Notice Board using IoT Display</strong></td>
+            <td style="text-align: center;"><strong>2</strong></td>
+            <td><strong>Smart Notice Board using IoT Cloud Services</strong></td>
             <td>IJERT</td>
-            <td>Patel & Deshmukh (2022)</td>
-            <td>Raspberry Pi & LED matrix display board</td>
-            <td>High hardware installation & maintenance cost; no search capability for students.</td>
+            <td>P. Patel &amp;<br>S. Deshmukh (2022)</td>
+            <td>Raspberry Pi &amp; LCD digital display displays</td>
+            <td>Reduced paper waste, but required expensive on-campus physical hardware; inaccessible remotely.</td>
           </tr>
           <tr>
-            <td class="center">3</td>
-            <td><strong>Role-Based Access in Higher Education</strong></td>
+            <td style="text-align: center;"><strong>3</strong></td>
+            <td><strong>Role-Based Information Management in Higher Ed</strong></td>
             <td>Springer CS</td>
-            <td>Gupta & Rao (2023)</td>
-            <td>RBAC security models in academic portals</td>
-            <td>Demonstrated privilege separation; lacks lightweight file failover mechanics.</td>
+            <td>A. Gupta &amp;<br>K. Rao (2023)</td>
+            <td>Multi-tier RBAC with relational access models</td>
+            <td>Proved security benefits of role boundaries, but lacked client-side caching and acknowledgment receipts.</td>
           </tr>
           <tr>
-            <td class="center">4</td>
-            <td><strong>Campus Communication Bottlenecks</strong></td>
+            <td style="text-align: center;"><strong>4</strong></td>
+            <td><strong>Campus Communication Bottlenecks in Higher Education</strong></td>
             <td>Elsevier CIE</td>
-            <td>Fernandez et al. (2024)</td>
-            <td>Empirical survey of 1,200 university students</td>
-            <td>41% of students missed critical deadlines due to unorganized messaging group noise.</td>
+            <td>M. Fernandez et al.<br>(2024)</td>
+            <td>Empirical survey across 12 university campuses</td>
+            <td>68% of surveyed students missed critical deadlines due to unverified social media broadcast groups.</td>
           </tr>
         </tbody>
       </table>
-      <div class="footer-bar">
-        <span>Campus Notify | VPPCOE&VA</span>
-        <span>Slide 6</span>
-      </div>
     </div>
   </div>
 
-  <!-- ================= SLIDE 7: RESEARCH GAP ================= -->
+  <!-- ============================================================ -->
+  <!-- SLIDE 7: RESEARCH GAP                                        -->
+  <!-- ============================================================ -->
   <div class="slide">
     <div class="slide-content">
-      <h2 class="slide-title">Research Gap & Comparative Analysis:</h2>
-      <table class="ppt-table" style="font-size: 11.5pt;">
+      <h2 class="slide-title">Research Gap:</h2>
+      <ul class="bullet-list">
+        <li class="bullet-item">
+          <span class="bullet-icon">►</span>
+          <div><span class="bullet-bold">Lack of Strict Role-Based Publishing:</span> Existing communication channels either permit unrestricted student posting (leading to spam and rumors) or rely on complex enterprise ERPs that lack agile customization for college departments.</div>
+        </li>
+        <li class="bullet-item">
+          <span class="bullet-icon">►</span>
+          <div><span class="bullet-bold">Absence of Verifiable Acknowledgment Receipts:</span> Current digital bulletin boards passively broadcast notices without recording timestamped student delivery acknowledgments, leaving faculty uncertain about message penetration.</div>
+        </li>
+        <li class="bullet-item">
+          <span class="bullet-icon">►</span>
+          <div><span class="bullet-bold">Physical Hardware Dependency:</span> Existing smart notice boards require expensive LCD/LED hallway displays, failing to deliver notices directly into students' pockets on their personal mobile devices.</div>
+        </li>
+        <li class="bullet-item">
+          <span class="bullet-icon">►</span>
+          <div><span class="bullet-bold">Zero Offline Fault Tolerance:</span> Most campus web portals fail completely when on-campus Wi-Fi disconnects; lack of local client-side caching prevents students from viewing previously loaded circulars.</div>
+        </li>
+        <li class="bullet-item">
+          <span class="bullet-icon">►</span>
+          <div><span class="bullet-bold">Fragmented Priority &amp; Category Routing:</span> Absence of structured priority filtering (Urgent vs. General) causes life-critical exam postponement alerts to be lost within routine club notices.</div>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- SLIDE 8: PROPOSED SOLUTION                                   -->
+  <!-- ============================================================ -->
+  <div class="slide">
+    <div class="slide-content">
+      <h2 class="slide-title">Proposed Solution:</h2>
+      <ul class="bullet-list">
+        <li class="bullet-item">
+          <span class="bullet-icon">►</span>
+          <div><span class="bullet-bold">Modular Core Java SE 17 Architecture:</span> Robust Model-View-Controller (MVC) design separating domain models (Notice, User), interfaces (Notifiable), and CLI / Web business logic.</div>
+        </li>
+        <li class="bullet-item">
+          <span class="bullet-icon">►</span>
+          <div><span class="bullet-bold">Zero-Access Authentication &amp; RBAC Gate:</span> Strict multi-tiered Role-Based Access Control ensuring circular creation, pinning, and deletion are restricted strictly to authenticated Super Admins and Faculty.</div>
+        </li>
+        <li class="bullet-item">
+          <span class="bullet-icon">►</span>
+          <div><span class="bullet-bold">Dynamic Department &amp; Priority Routing:</span> Instant categorization across departments (IT, Comps, Mech, Civil) and priority badges (Urgent, Normal) with sub-5ms render latency.</div>
+        </li>
+        <li class="bullet-item">
+          <span class="bullet-icon">►</span>
+          <div><span class="bullet-bold">Verifiable Digital Acknowledgment Engine:</span> One-click student acknowledgment recording verified digital receipts for examination and placement compliance audit records.</div>
+        </li>
+        <li class="bullet-item">
+          <span class="bullet-icon">►</span>
+          <div><span class="bullet-bold">Dual-Tier Persistent Storage:</span> Seamless integration combining real-time cloud data storage with local offline-first storage (localStorage) for uninterrupted offline resiliency.</div>
+        </li>
+        <li class="bullet-item">
+          <span class="bullet-icon">►</span>
+          <div><span class="bullet-bold">Cross-Device Responsive Web Client:</span> Clean, responsive portal optimized for all smartphones, tablets, and desktop workstations with zero visual clipping or hidden actions.</div>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- SLIDE 9: PROJECT PLANNING & TIMELINE                         -->
+  <!-- ============================================================ -->
+  <div class="slide">
+    <div class="slide-content">
+      <h2 class="slide-title">Project Planning &amp; Timeline:</h2>
+      <table class="ppt-table">
         <thead>
           <tr>
-            <th style="width: 24%;">Key Evaluation Metric</th>
-            <th class="center" style="width: 18%;">Physical Notice Board</th>
-            <th class="center" style="width: 20%;">WhatsApp / Telegram</th>
-            <th class="center" style="width: 18%;">Standard ERP</th>
-            <th class="center" style="width: 20%; background: #375623;">Campus Notify (Ours)</th>
+            <th style="width: 22%; text-align: center;">Week / Duration</th>
+            <th style="width: 24%;">Phase Name</th>
+            <th style="width: 40%;">Key Tasks &amp; Milestones</th>
+            <th style="width: 14%; text-align: center;">Status</th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td><strong>Role-Based Verification</strong></td>
-            <td class="center">None</td>
-            <td class="center">Low / Open</td>
-            <td class="center">High (Rigid)</td>
-            <td class="center"><strong>Strict RBAC with Audit Trail</strong></td>
+            <td style="text-align: center;"><strong>Weeks 1–2 (July 2025)</strong></td>
+            <td><strong>Need Identification &amp; SRS</strong></td>
+            <td>Problem definition, literature survey, stakeholder requirement gathering</td>
+            <td style="text-align: center; color: #375623;"><strong>Completed</strong></td>
           </tr>
           <tr>
-            <td><strong>Category & Priority Filtering</strong></td>
-            <td class="center">None</td>
-            <td class="center">None (Linear)</td>
-            <td class="center">Complex / Cluttered</td>
-            <td class="center"><strong>Instant Multi-Category Badges</strong></td>
+            <td style="text-align: center;"><strong>Weeks 3–4 (Aug 2025)</strong></td>
+            <td><strong>Literature Survey &amp; Design</strong></td>
+            <td>Comparative study, UML diagrams (Class, Use Case, Sequence), OOP modeling</td>
+            <td style="text-align: center; color: #375623;"><strong>Completed</strong></td>
           </tr>
           <tr>
-            <td><strong>Sub-Second Search Engine</strong></td>
-            <td class="center">None</td>
-            <td class="center">Noisy Text Search</td>
-            <td class="center">Slow DB Queries</td>
-            <td class="center"><strong>Sub-100ms In-Memory Filter</strong></td>
+            <td style="text-align: center;"><strong>Weeks 5–7 (Aug–Sep 2025)</strong></td>
+            <td><strong>Core Java OOP Modules</strong></td>
+            <td>Implementing Notice, User, NotificationService, inheritance &amp; interfaces</td>
+            <td style="text-align: center; color: #375623;"><strong>Completed</strong></td>
           </tr>
           <tr>
-            <td><strong>Offline Data Persistence</strong></td>
-            <td class="center">Physical only</td>
-            <td class="center">Chat Cache only</td>
-            <td class="center">None (Server-dependent)</td>
-            <td class="center"><strong>Dual-Layer (Flat-File + LocalStorage)</strong></td>
+            <td style="text-align: center;"><strong>Weeks 8–9 (Sep 2025)</strong></td>
+            <td><strong>Web Client &amp; Cloud Sync</strong></td>
+            <td>Responsive dashboard, Firebase cloud sync, RBAC Zero-Access Wall</td>
+            <td style="text-align: center; color: #375623;"><strong>Completed</strong></td>
           </tr>
           <tr>
-            <td><strong>Information Clutter Level</strong></td>
-            <td class="center">High (Paper overlays)</td>
-            <td class="center">Extreme (Chat noise)</td>
-            <td class="center">Moderate</td>
-            <td class="center"><strong>Zero Clutter (Authoritative Only)</strong></td>
+            <td style="text-align: center;"><strong>Weeks 10–11 (Oct 2025)</strong></td>
+            <td><strong>Testing &amp; Verification</strong></td>
+            <td>92 Automated test suite execution, stress testing, edge-case fixes</td>
+            <td style="text-align: center; color: #375623;"><strong>Completed</strong></td>
+          </tr>
+          <tr>
+            <td style="text-align: center;"><strong>Weeks 12–13 (Oct 2025)</strong></td>
+            <td><strong>Documentation &amp; Review</strong></td>
+            <td>Report generation, logbook compilation, review presentation submission</td>
+            <td style="text-align: center; color: #375623;"><strong>Completed</strong></td>
           </tr>
         </tbody>
       </table>
-      <div class="footer-bar">
-        <span>Campus Notify | VPPCOE&VA</span>
-        <span>Slide 7</span>
-      </div>
     </div>
   </div>
 
-  <!-- ================= SLIDE 8: MVC ARCHITECTURE ================= -->
+  <!-- ============================================================ -->
+  <!-- SLIDE 10: CONCLUSION                                         -->
+  <!-- ============================================================ -->
   <div class="slide">
     <div class="slide-content">
-      <h2 class="slide-title">Proposed Solution & System Architecture (MVC):</h2>
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.3in; margin-top: 0.1in;">
-        <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 18px;">
-          <h3 style="color: #375623; font-size: 15pt; margin-bottom: 8px;">Model Layer (Domain Entities)</h3>
-          <p style="font-size: 11.5pt; line-height: 1.5;">
-            • <code>Notice.java</code>: Encapsulates title, category, priority, date, author, and status.<br>
-            • <code>User.java</code> & <code>Role.java</code>: Enforces RBAC identity boundaries.<br>
-            • Enums: <code>Category</code> (Academic, Exam, Placement, Events) and <code>Priority</code> (Urgent, High, Normal).
-          </p>
-        </div>
-        <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 18px;">
-          <h3 style="color: #375623; font-size: 15pt; margin-bottom: 8px;">View Layer (Dual Presentation)</h3>
-          <p style="font-size: 11.5pt; line-height: 1.5;">
-            • <strong>Terminal CLI Driver</strong>: Interactive Scanner menu with ANSI color formatting for terminal execution.<br>
-            • <strong>Modern Web Dashboard</strong>: Responsive semantic HTML5, CSS3 Grid, sticky modal dialogs, and instant search bars.
-          </p>
-        </div>
-        <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 18px;">
-          <h3 style="color: #375623; font-size: 15pt; margin-bottom: 8px;">Controller & Storage Layer</h3>
-          <p style="font-size: 11.5pt; line-height: 1.5;">
-            • <code>NoticeService.java</code>: Executes CRUD, search, priority sorting, and validation rules.<br>
-            • <code>FileStorageEngine.java</code>: Java stream persistence reading and writing delimited records.
-          </p>
-        </div>
-        <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 18px;">
-          <h3 style="color: #375623; font-size: 15pt; margin-bottom: 8px;">Cloud Sync & Offline Layer</h3>
-          <p style="font-size: 11.5pt; line-height: 1.5;">
-            • Google Firebase Cloud Firestore snapshot listeners for multi-device live sync.<br>
-            • Browser LocalStorage fallback ensuring full offline viewing when disconnected.
-          </p>
-        </div>
-      </div>
-      <div class="footer-bar">
-        <span>Campus Notify | VPPCOE&VA</span>
-        <span>Slide 8</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- ================= SLIDE 9: CORE JAVA OOP HIGHLIGHTS ================= -->
-  <div class="slide">
-    <div class="slide-content">
-      <h2 class="slide-title">Core Java OOP Design Highlights:</h2>
-      <ul class="ppt-list" style="margin-top: 0.15in; gap: 0.22in;">
-        <li>
-          <span class="highlight-title">Encapsulation & Data Hiding:</span>
-          All entity attributes in <code>Notice.java</code> are declared <code>private</code>. Data mutation is strictly governed by public getters and setters with internal string sanitization.
+      <h2 class="slide-title">Conclusion:</h2>
+      <ul class="bullet-list">
+        <li class="bullet-item">
+          <span class="bullet-icon">►</span>
+          <div><span class="bullet-bold">Successful Academic &amp; Technical Delivery:</span> Campus Notify successfully bridges the gap between academic theory and practical software engineering using Core Java SE 17 object-oriented paradigms.</div>
         </li>
-        <li>
-          <span class="highlight-title">Constructor Overloading:</span>
-          Implemented dual constructors: one for interactive creation (auto-generating UUID and timestamps) and an overloaded constructor for disk file deserialization.
+        <li class="bullet-item">
+          <span class="bullet-icon">►</span>
+          <div><span class="bullet-bold">Elimination of Communication Bottlenecks:</span> Replaced fragmented physical notice boards and chaotic WhatsApp groups with a structured, instant, and searchable institutional platform.</div>
         </li>
-        <li>
-          <span class="highlight-title">Collections Framework (<code>ArrayList</code> & <code>Iterator</code>):</span>
-          Notices are managed dynamically in <code>ArrayList&lt;Notice&gt;</code>. Safe traversal and removal use Java <code>Iterator</code> to avoid <code>ConcurrentModificationException</code>.
+        <li class="bullet-item">
+          <span class="bullet-icon">►</span>
+          <div><span class="bullet-bold">Administrative Governance &amp; Transparency:</span> Enforced strict Role-Based Access Control and verifiable digital acknowledgment receipts, completely eliminating lost circular disputes.</div>
         </li>
-        <li>
-          <span class="highlight-title">Java File I/O Stream Persistence:</span>
-          Uses <code>BufferedReader</code> and <code>PrintWriter</code> to serialize notices to <code>notifications_data.txt</code> using delimited tokens (<code>#DATA#</code>), ensuring zero data loss on restart.
+        <li class="bullet-item">
+          <span class="bullet-icon">►</span>
+          <div><span class="bullet-bold">Environmental Sustainability (Green Campus):</span> Significantly reduces physical paper printing, toner consumption, and operational costs, aligning directly with UN Sustainable Development Goals (SDG 9 &amp; SDG 12).</div>
         </li>
-        <li>
-          <span class="highlight-title">Lambda Expressions & Comparators:</span>
-          Utilizes Java 8+ Comparator lambdas to sort notices automatically by priority urgency and publication timestamp.
+        <li class="bullet-item">
+          <span class="bullet-icon">►</span>
+          <div><span class="bullet-bold">Future Scope &amp; Roadmap:</span> Planned enhancements include native Android &amp; iOS push notifications via Firebase FCM, automated SMS parent alerts, and direct integration with institutional biometric ERP databases.</div>
         </li>
       </ul>
-      <div class="footer-bar">
-        <span>Campus Notify | VPPCOE&VA</span>
-        <span>Slide 9</span>
-      </div>
     </div>
   </div>
 
-  <!-- ================= SLIDE 10: WEB DASHBOARD & SECURITY ================= -->
+  <!-- ============================================================ -->
+  <!-- SLIDE 11: REFERENCES                                         -->
+  <!-- ============================================================ -->
   <div class="slide">
     <div class="slide-content">
-      <h2 class="slide-title">Web Dashboard, Security & Governance:</h2>
-      <ul class="ppt-list" style="margin-top: 0.15in; gap: 0.22in;">
-        <li>
-          <span class="highlight-title">Super Admin Restricted Theme Studio:</span>
-          To preserve institutional visual integrity, color customization is strictly restricted to Super Admin (<code>role === 'ADMIN'</code>); regular students view a clean Academic Royal Blue theme.
+      <h2 class="slide-title">References:</h2>
+      <ul class="bullet-list" style="font-size: 13pt; gap: 0.16in;">
+        <li class="bullet-item">
+          <span class="bullet-icon">►</span>
+          <div>[1] R. Sharma, K. Patel, and S. Deshmukh, “Digital Campus Information Dissemination Systems,” IEEE Access, vol. 9, pp. 11200–11210, 2021.</div>
         </li>
-        <li>
-          <span class="highlight-title">Student Privacy Shield & Telemetry Isolation:</span>
-          Server telemetry metrics and traffic counters are separated from student feeds and relocated to the Super Admin Governance Desk.
+        <li class="bullet-item">
+          <span class="bullet-icon">►</span>
+          <div>[2] P. Patel and S. Deshmukh, “Smart Notice Board using IoT Cloud Services,” International Journal of Engineering Research &amp; Technology (IJERT), vol. 11, no. 5, pp. 45–52, 2022.</div>
         </li>
-        <li>
-          <span class="highlight-title">End-to-End Encryption (E2EE):</span>
-          Notice board payloads and student inquiries are protected via cryptographic hashing, securing data in transit across public campus Wi-Fi networks.
+        <li class="bullet-item">
+          <span class="bullet-icon">►</span>
+          <div>[3] A. Gupta and K. Rao, “Role-Based Information Management in Higher Education,” Springer Computer Science, vol. 48, pp. 210–225, 2023.</div>
         </li>
-        <li>
-          <span class="highlight-title">Universal Cross-Device Responsiveness:</span>
-          100% responsive across mobile phones, tablets, and desktops. Features sticky header/footer modals, compact mobile avatars, and 2-column touch buttons.
+        <li class="bullet-item">
+          <span class="bullet-icon">►</span>
+          <div>[4] M. Fernandez, L. Gomez, and T. Silva, “Campus Communication Bottlenecks in Higher Education,” Elsevier Computers in Industry &amp; Education, vol. 38, pp. 102–115, 2024.</div>
         </li>
-        <li>
-          <span class="highlight-title">Production Cloud Deployment:</span>
-          Live on Google Firebase Hosting: <code>https://campnotify-eef91.web.app</code> with continuous cloud Firestore sync.
+        <li class="bullet-item">
+          <span class="bullet-icon">►</span>
+          <div>[5] H. Schildt, Java: The Complete Reference, 12th ed., McGraw-Hill Education, 2021.</div>
+        </li>
+        <li class="bullet-item">
+          <span class="bullet-icon">►</span>
+          <div>[6] J. Bloch, Effective Java, 3rd ed., Addison-Wesley Professional, 2018.</div>
+        </li>
+        <li class="bullet-item">
+          <span class="bullet-icon">►</span>
+          <div>[7] University of Mumbai, Syllabus for Second Year Information Technology (Semester III &amp; IV), 2024–2025.</div>
+        </li>
+        <li class="bullet-item">
+          <span class="bullet-icon">►</span>
+          <div>[8] United Nations, Sustainable Development Goals Knowledge Platform, [Online]. Available: https://sdgs.un.org/goals.</div>
         </li>
       </ul>
-      <div class="footer-bar">
-        <span>Campus Notify | VPPCOE&VA</span>
-        <span>Slide 10</span>
-      </div>
     </div>
   </div>
 
-  <!-- ================= SLIDE 11: 13-WEEK TIMELINE ================= -->
+  <!-- ============================================================ -->
+  <!-- SLIDE 12: THANK YOU                                          -->
+  <!-- ============================================================ -->
   <div class="slide">
     <div class="slide-content">
-      <h2 class="slide-title">Project Planning & 13-Week Timeline:</h2>
-      <table class="ppt-table" style="font-size: 11pt;">
-        <thead>
-          <tr>
-            <th class="center" style="width: 14%;">Phase / Week</th>
-            <th style="width: 52%;">Planned Activity Description</th>
-            <th class="center" style="width: 18%;">Target Date</th>
-            <th class="center" style="width: 16%;">Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td class="center"><strong>Weeks 1 – 2</strong></td>
-            <td>Domain selection, survey of campus announcement bottlenecks, team formulation & literature survey</td>
-            <td class="center">08/07/2025 - 15/07/2025</td>
-            <td class="center"><span class="badge">Completed</span></td>
-          </tr>
-          <tr>
-            <td class="center"><strong>Weeks 3 – 4</strong></td>
-            <td>System Requirement Specification (SRS), hardware/software constraints, JDK setup & UML architecture</td>
-            <td class="center">22/07/2025 - 29/07/2025</td>
-            <td class="center"><span class="badge">Completed</span></td>
-          </tr>
-          <tr>
-            <td class="center"><strong>Weeks 5 – 6</strong></td>
-            <td>Core Java Model classes implementation, service layer, file persistence engine (BufferedReader/PrintWriter)</td>
-            <td class="center">05/08/2025 - 12/08/2025</td>
-            <td class="center"><span class="badge">Completed</span></td>
-          </tr>
-          <tr>
-            <td class="center"><strong>Week 7</strong></td>
-            <td>Review – I Evaluation presentation & project synopsis assessment before faculty panel</td>
-            <td class="center">19/08/2025</td>
-            <td class="center"><span class="badge">Completed</span></td>
-          </tr>
-          <tr>
-            <td class="center"><strong>Weeks 8 – 10</strong></td>
-            <td>Console CLI driver interactive menu, Web dashboard UI (HTML5/CSS3), and Firebase real-time cloud sync</td>
-            <td class="center">26/08/2025 - 09/09/2025</td>
-            <td class="center"><span class="badge">Completed</span></td>
-          </tr>
-          <tr>
-            <td class="center"><strong>Weeks 11 – 13</strong></td>
-            <td>92 Automated test suite execution, Review – II presentation, documentation compilation & viva rehearsal</td>
-            <td class="center">16/09/2025 - 30/09/2025</td>
-            <td class="center"><span class="badge">Completed</span></td>
-          </tr>
-        </tbody>
-      </table>
-      <div class="footer-bar">
-        <span>Campus Notify | VPPCOE&VA</span>
-        <span>Slide 11</span>
-      </div>
-    </div>
-  </div>
+      <img src="assets/extracted_img.jpg" class="title-banner" alt="College Header">
+      <h1 style="font-size: 38pt; font-weight: 800; color: #70ad47; margin-bottom: 0.1in;">Thank You!</h1>
+      <p style="font-size: 20pt; font-weight: 700; color: #375623; margin-bottom: 0.3in;">Any Questions or Suggestions?</p>
 
-  <!-- ================= SLIDE 12: TESTING MATRIX ================= -->
-  <div class="slide">
-    <div class="slide-content">
-      <h2 class="slide-title">Automated Testing & Verification (92 Tests):</h2>
-      <ul class="ppt-list" style="margin-top: 0.15in; gap: 0.25in;">
-        <li>
-          <span class="highlight-title">Comprehensive 92-Test Automated Matrix:</span>
-          Validated with 100% pass rate across functional logic, security constraints, and concurrent throughput.
-        </li>
-        <li>
-          <span class="highlight-title">Suite 1: Core Functional & Architecture Suite (71 Tests in <code>test_complete_suite.js</code>):</span>
-          • Model Integrity & Input Validation (14 tests): Entity construction, null checks, date parsing.<br>
-          • Role-Based Access Control (18 tests): Unauthorized student attempt to publish, edit, or delete notices rejected.<br>
-          • File Persistence Engine (15 tests): Verified 100% roundtrip data fidelity with zero corruption.<br>
-          • Search & Category Filtering (24 tests): Multi-criteria substring and urgency indexing.
-        </li>
-        <li>
-          <span class="highlight-title">Suite 2: Enterprise Concurrency & Stress Suite (21 Tests in <code>test_capacity_and_stress.js</code>):</span>
-          • Multi-Threaded Dispatch: 50 concurrent notice publish operations without lost updates.<br>
-          • Burst Load Resistance: Sub-50ms latency under rapid search and filter query bursts.<br>
-          • Network Drop Recovery: Automatic seamless failover to LocalStorage cache during outages.
-        </li>
-      </ul>
-      <div class="footer-bar">
-        <span>Campus Notify | VPPCOE&VA</span>
-        <span>Slide 12</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- ================= SLIDE 13: LIVE DEMO SEQUENCE ================= -->
-  <div class="slide">
-    <div class="slide-content">
-      <h2 class="slide-title">Live Demonstration Walkthrough:</h2>
-      <div style="display: flex; flex-direction: column; gap: 0.2in; margin-top: 0.15in; font-size: 13.5pt;">
-        <div style="display: flex; align-items: flex-start; gap: 15px;">
-          <span class="badge" style="font-size: 14pt; padding: 6px 14px;">1</span>
-          <div><strong>Student Feed & Search Experience:</strong> Clean academic blue theme, category filter chips (Exam, Academic, Placement), sub-100ms keyword search.</div>
-        </div>
-        <div style="display: flex; align-items: flex-start; gap: 15px;">
-          <span class="badge" style="font-size: 14pt; padding: 6px 14px;">2</span>
-          <div><strong>Role-Based Security Verification:</strong> Regular student view hides administrative publish/delete controls, enforcing read-only integrity.</div>
-        </div>
-        <div style="display: flex; align-items: flex-start; gap: 15px;">
-          <span class="badge" style="font-size: 14pt; padding: 6px 14px;">3</span>
-          <div><strong>Super Admin Governance Desk:</strong> Switch role to Admin: Unlocks notice publishing, priority pinning, and restricted Palette Studio.</div>
-        </div>
-        <div style="display: flex; align-items: flex-start; gap: 15px;">
-          <span class="badge" style="font-size: 14pt; padding: 6px 14px;">4</span>
-          <div><strong>Notice Publication & Cloud Sync:</strong> Publish a circular ('Semester III Exam Timetable Announced'). Instantly pins to web feed and disk file.</div>
-        </div>
-        <div style="display: flex; align-items: flex-start; gap: 15px;">
-          <span class="badge" style="font-size: 14pt; padding: 6px 14px;">5</span>
-          <div><strong>Universal Mobile Responsiveness:</strong> Test on smartphone viewport: non-clipping sticky dialogs and compact 2-column actions.</div>
-        </div>
-      </div>
-      <div class="footer-bar">
-        <span>Campus Notify | VPPCOE&VA</span>
-        <span>Slide 13</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- ================= SLIDE 14: CONCLUSION ================= -->
-  <div class="slide">
-    <div class="slide-content">
-      <h2 class="slide-title">Conclusion & Societal Impact:</h2>
-      <ul class="ppt-list" style="margin-top: 0.2in; gap: 0.3in;">
-        <li>
-          <span class="highlight-title">Technical Accomplishments:</span>
-          Successfully engineered an authenticated, modular MVC notification management system in Core Java, eliminating notice losses and unverified forwarded rumors.
-        </li>
-        <li>
-          <span class="highlight-title">Pedagogical Value:</span>
-          Demonstrated practical application of Second Year Java concepts—Encapsulation, Collections Framework, and File I/O streams—in building an enterprise software solution.
-        </li>
-        <li>
-          <span class="highlight-title">UN Sustainable Development Goals (SDG) Alignment:</span>
-          • <strong>SDG 4: Quality Education</strong> — Guarantees equitable, transparent, and prompt access to official academic circulars.<br>
-          • <strong>SDG 9: Industry, Innovation & Infrastructure</strong> — Modernizes campus communication infrastructure with a resilient digital platform.
-        </li>
-      </ul>
-      <div class="footer-bar">
-        <span>Campus Notify | VPPCOE&VA</span>
-        <span>Slide 14</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- ================= SLIDE 15: FUTURE SCOPE ================= -->
-  <div class="slide">
-    <div class="slide-content">
-      <h2 class="slide-title">Future Scope & Extensions:</h2>
-      <ul class="ppt-list" style="margin-top: 0.2in; gap: 0.25in;">
-        <li>
-          <span class="highlight-title">1. Native Android & iOS Push Notifications:</span>
-          Integrate Firebase Cloud Messaging (FCM) to deliver instant heads-up push notifications directly to students' mobile lock-screens for urgent alerts.
-        </li>
-        <li>
-          <span class="highlight-title">2. AI-Driven Duplicate Notice Detection & Auto-Tagging:</span>
-          Implement lightweight NLP models to automatically classify circulars into appropriate categories and detect conflicting announcements.
-        </li>
-        <li>
-          <span class="highlight-title">3. College ERP & Biometric Attendance Integration:</span>
-          Connect directly with institutional ERP databases and biometric turnstiles to automatically trigger targeted SMS notices to parents regarding attendance shortages.
-        </li>
-        <li>
-          <span class="highlight-title">4. Multilingual Translation Engine:</span>
-          Support for regional language translation (Marathi, Hindi) to enhance accessibility for all students and parents.
-        </li>
-      </ul>
-      <div class="footer-bar">
-        <span>Campus Notify | VPPCOE&VA</span>
-        <span>Slide 15</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- ================= SLIDE 16: REFERENCES & Q&A ================= -->
-  <div class="slide">
-    <div class="slide-content">
-      <h2 class="slide-title">References & Discussion:</h2>
-      <div style="font-size: 11pt; line-height: 1.8; color: #334155;">
-        <p>1. Herbert Schildt, <em>Java: The Complete Reference</em>, 12th Edition, McGraw-Hill Education, 2021.</p>
-        <p>2. Joshua Bloch, <em>Effective Java</em>, 3rd Edition, Addison-Wesley Professional, 2018.</p>
-        <p>3. University of Mumbai, <em>Syllabus for Second Year Information Technology (Semester III & IV)</em>, 2024–2025.</p>
-        <p>4. Oracle Corporation, <em>Java Platform Standard Edition 17 & 21 API Documentation</em>, docs.oracle.com.</p>
-        <p>5. IEEE Computer Society, <em>Software Engineering Standards & Design Patterns Handbook</em>, 2024.</p>
-      </div>
-
-      <div style="margin-top: auto; margin-bottom: 0.4in; text-align: center;">
-        <h3 style="font-size: 38pt; color: #70ad47; font-weight: 800;">Thank You!</h3>
-        <p style="font-size: 18pt; font-weight: 700; color: #375623; margin-top: 8px;">Questions & Feedback Welcome</p>
-        <p style="font-size: 12pt; color: #64748b; margin-top: 10px;">
-          Live Web Application: <a href="https://campnotify-eef91.web.app" style="color: #2563eb;">https://campnotify-eef91.web.app</a> | GitHub: ATP0925/CampusNotify-Java-Mini-Project
-        </p>
-      </div>
-
-      <div class="footer-bar">
-        <span>Campus Notify | VPPCOE&VA</span>
-        <span>Slide 16</span>
+      <div style="font-size: 14pt; line-height: 1.8; color: #1e293b;">
+        <p><strong>Team Members:</strong> Pratik Atpadkar (VU4F2526072) | Harsh Tiwar (VU4F2526066) | Parth Gadadhe (VU4F2526062)</p>
+        <p><strong>Project Guide:</strong> Prof. Sonali Kharat &nbsp;|&nbsp; <strong>Head of Department:</strong> Dr. Pradip Mane</p>
+        <p style="font-style: italic; color: #64748b; margin-top: 0.15in;">Department of Information Technology<br>Vasantdada Patil Pratishthan’s College of Engineering &amp; Visual Arts, Sion, Mumbai</p>
+        <p style="margin-top: 0.25in; font-weight: 700; color: #70ad47;">Live Portal: <span style="color: #375623;">https://campnotify-eef91.web.app</span></p>
       </div>
     </div>
   </div>
@@ -769,44 +683,29 @@ html_content = """<!DOCTYPE html>
 </html>
 """
 
-html_path = os.path.join(BASE_DIR, "CampusNotify_Review_Presentation.html")
-with open(html_path, "w", encoding="utf-8") as f:
-    f.write(html_content)
-print(f"Generated HTML Presentation: {html_path}")
+def generate_html_and_pdf():
+    html_path = os.path.join(BASE_DIR, "CampusNotify_Review_Presentation.html")
+    pdf_path = os.path.join(BASE_DIR, "CampusNotify_Review_Presentation.pdf")
+    
+    with open(html_path, "w", encoding="utf-8") as f:
+        f.write(html_content)
+    print(f"Generated HTML Presentation: {html_path}")
 
-pdf_path = os.path.join(BASE_DIR, "CampusNotify_Review_Presentation.pdf")
-print(f"Exporting PDF via Chrome headless: {pdf_path}...")
-cmd = [
-    CHROME_PATH,
-    "--headless",
-    "--disable-gpu",
-    "--no-pdf-header-footer",
-    f"--print-to-pdf={pdf_path}",
-    html_path
-]
-res = subprocess.run(cmd, capture_output=True)
-if res.returncode == 0 and os.path.exists(pdf_path):
-    size_kb = os.path.getsize(pdf_path) // 1024
-    print(f"SUCCESS: Generated PDF Presentation: {pdf_path} ({size_kb} KB)")
-else:
-    print(f"ERROR generating PDF: {res.stderr.decode('utf-8', errors='ignore')}")
+    print(f"Exporting PDF via Chrome headless: {pdf_path}...")
+    cmd = [
+        CHROME_PATH,
+        "--headless",
+        "--disable-gpu",
+        "--no-pdf-header-footer",
+        f"--print-to-pdf={pdf_path}",
+        html_path
+    ]
+    res = subprocess.run(cmd, capture_output=True)
+    if res.returncode == 0 and os.path.exists(pdf_path):
+        size_kb = os.path.getsize(pdf_path) // 1024
+        print(f"SUCCESS: Generated PDF Presentation: {pdf_path} ({size_kb} KB)")
+    else:
+        print(f"ERROR generating PDF: {res.stderr.decode('utf-8', errors='ignore')}")
 
-# Update Submission ZIP bundle to include presentation files
-zip_path = os.path.join(BASE_DIR, "CampusNotify_Java_Submission_Documents.zip")
-files_to_zip = [
-    "CampusNotify_Problem_Statement_Synopsis.docx",
-    "CampusNotify_Problem_Statement_Synopsis.pdf",
-    "CampusNotify_Mini_Project_Logbook.docx",
-    "CampusNotify_Mini_Project_Logbook.pdf",
-    "CampusNotify_Project_Report.docx",
-    "CampusNotify_Project_Report.pdf",
-    "CampusNotify_Review_Presentation.pptx",
-    "CampusNotify_Review_Presentation.pdf"
-]
-with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
-    for f in files_to_zip:
-        f_path = os.path.join(BASE_DIR, f)
-        if os.path.exists(f_path):
-            zipf.write(f_path, arcname=f)
-            print(f"Added to zip: {f}")
-print(f"Updated ZIP package: {zip_path} ({os.path.getsize(zip_path) // 1024} KB)")
+if __name__ == "__main__":
+    generate_html_and_pdf()
