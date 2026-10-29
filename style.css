@@ -3814,11 +3814,12 @@ button, input, textarea, select {
 
 /* Auth Cards Column on Right */
 .insta-auth-forms-wrapper {
-  width: 350px;
-  max-width: 100%;
+  width: 400px;
+  max-width: 95%;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
 }
 
 .insta-card {
