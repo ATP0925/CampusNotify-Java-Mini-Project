@@ -14,6 +14,7 @@ notifications_data.txt
 *.nar
 *.ear
 *.zip
+!CampusNotify_Java_Submission_Documents.zip
 *.tar.gz
 *.rar
 

@@ -19,15 +19,16 @@
 <br>
 
 **Submitted By:**  
-**Name:** ______________________________  
-**Roll No:** ____________________  
-**Class / Division:** SE IT Div B  
+1. **PRATIK ATPADKAR** (Student ID: VU4F2526072)  
+2. **HARSH TIWAR** (Student ID: VU4F2526066)  
+3. **PARTH GADADHE** (Student ID: VU4F2526062)  
+**Class / Division:** SE(IT) DIV :- A BATCH :- C  
 **Department:** Department of Information Technology  
 
 <br>
 
 **Under the Guidance of:**  
-**Project Guide:** Prof. ______________________________  
+**Project Guide:** Prof. Sonali Kharat  
 **Designation:** Assistant Professor / Associate Professor  
 
 <br>
@@ -511,7 +512,7 @@ The software underwent rigorous verification using automated testing suites. Tes
 | **Pillar 9** | New user registration | Status initialized to `PENDING` | **PASS** |
 | **Pillar 9** | Pending user login block | Blocked until Admin approves | **PASS** |
 
-**Summary: 36 / 36 Automated Test Cases Passed (100.0% Pass Rate). Zero Regressions.**
+**Summary: 92 / 92 Automated Test Cases Passed (100.0% Pass Rate). 71 Core Architecture Tests (test_complete_suite.js) + 21 Concurrency Benchmark Tests (test_capacity_and_stress.js). Zero Regressions.**
 
 ---
 

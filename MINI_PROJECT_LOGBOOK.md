@@ -16,7 +16,7 @@
 
 ### Academic Year: 2025–2026
 **Course:** Mini Project – 1 A: Semester III  
-**Class & Division:** SE IT Div B  
+**Class & Division:** SE(IT) DIV :- A BATCH :- C  
 
 </div>
 
@@ -94,7 +94,7 @@
 |---|---|---|---|---|
 | **Student ID** | `VU4F2425-_____` | `VU4F2425-_____` | `VU4F2425-_____` | `VU4F2425-_____` |
 | **Name** | ____________________ | ____________________ | ____________________ | ____________________ |
-| **Class & Division** | SE IT Div B | SE IT Div B | SE IT Div B | SE IT Div B |
+| **Class & Division** | SE(IT) DIV :- A BATCH :- C | SE(IT) DIV :- A BATCH :- C | SE(IT) DIV :- A BATCH :- C | SE(IT) DIV :- A BATCH :- C |
 | **Contact No.** | ________________ | ________________ | ________________ | ________________ |
 | **E-mail** | ________________ | ________________ | ________________ | ________________ |
 | **Address** | ________________ | ________________ | ________________ | ________________ |
@@ -158,7 +158,7 @@ ___________________________ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ___
 ## 9. Progress / Attendance Report (Weeks 1 to 13)
 
 **Title of the Project:** Campus Notify: Institutional Circular & Announcement Management System  
-**Group No:** SE-IT-B-_____  
+**Group No:** SE-IT-A-C-_____  
 **Supervisor/Guide:** Prof. ________________________________________  
 **Students:** ____________________, ____________________, ____________________, ____________________  
 
@@ -183,7 +183,7 @@ ___________________________ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ___
 ## 10. Review-I Form Evaluation
 
 **Date of Review-I:** 12/08/2025  
-**Group No:** SE-IT-B-_____  
+**Group No:** SE-IT-A-C-_____  
 
 | Sr. No. | Observation | Rating |
 |---|---|:---:|
@@ -203,7 +203,7 @@ ___________________________ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ___
 ## 11. Review-II Form Evaluation
 
 **Date of Review-II:** 23/09/2025  
-**Group No:** SE-IT-B-_____  
+**Group No:** SE-IT-A-C-_____  
 
 | Sr. No. | Observation | Rating |
 |---|---|:---:|

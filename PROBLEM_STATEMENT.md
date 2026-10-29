@@ -15,12 +15,11 @@
 **Date:** ____ / ____ / 2026  
 
 ## Problem Statement for Mini Project
-### Submitted By SE IT Div B
+### Submitted By SE IT Div A Batch C
 
-- **VU4F2425 - ____________________**
-- **VU4F2425 - ____________________**
-- **VU4F2425 - ____________________**
-- **VU4F2425 - ____________________**
+- **VU4F2526072 - PRATIK ATPADKAR** (Class: SE IT Div A, Batch C)
+- **VU4F2526066 - HARSH TIWAR** (Class: SE IT Div A, Batch C)
+- **VU4F2526062 - PARTH GADADHE** (Class: SE IT Div A, Batch C)
 
 ---
 
@@ -79,7 +78,7 @@ To bridge laboratory Java concepts with modern industry application, a responsiv
 - Sub-second keyword search and category filtering across hundreds of active announcements.
 - Reliable data persistence surviving system restarts via Java File I/O and cloud synchronization.
 - Clear role segregation between institutional administrators, faculty coordinators, and student viewers.
-- 100% verified system reliability validated through an automated 36-test architectural verification suite.
+- 100% verified system reliability validated through an automated 92-test architectural & stress verification suite (71 core tests + 21 concurrency benchmark tests).
 
 ---
 
