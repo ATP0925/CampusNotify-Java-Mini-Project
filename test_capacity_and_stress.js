@@ -108,7 +108,44 @@ vm.runInThisContext(fs.readFileSync(iconsJsPath, 'utf8'));
 global.CNMS_ICONS = CNMS_ICONS;
 
 const seedJsPath = path.join(__dirname, 'seed_data.js');
-vm.runInThisContext(fs.readFileSync(seedJsPath, 'utf8'));
+if (fs.existsSync(seedJsPath)) {
+  vm.runInThisContext(fs.readFileSync(seedJsPath, 'utf8'));
+} else {
+  global.AUTHENTIC_CAMPUS_USERS = [
+    { name: "Dr. Pradip Mane", role: "FACULTY", branch: "Information Technology", bio: "Head of Department" },
+    { name: "Dr. Exam Controller", role: "FACULTY", branch: "Examination Cell", bio: "Controller of Examinations" },
+    { name: "Prof. TPO Lead", role: "FACULTY", branch: "Training & Placements", bio: "TPO Officer" },
+    { name: "Pratik Atpadkar", role: "STUDENT", branch: "Information Technology", bio: "SE IT Lead" },
+    { name: "Harsh Tiwar", role: "STUDENT", branch: "Computer", bio: "SE Comp Scholar" },
+    { name: "Parth Gadadhe", role: "STUDENT", branch: "Mechanical", bio: "SE Mech Scholar" },
+    { name: "Aarav Patil", role: "STUDENT", branch: "Civil", bio: "SE Civil Scholar" },
+    { name: "Riya Sharma", role: "STUDENT", branch: "AI & Data Science", bio: "SE AI&DS Scholar" },
+    { name: "Sneha Deshmukh", role: "STUDENT", branch: "Information Technology", bio: "Scholar" },
+    { name: "Aditya Kulkarni", role: "STUDENT", branch: "Computer", bio: "Scholar" },
+    { name: "Neha Joshi", role: "STUDENT", branch: "Mechanical", bio: "Scholar" },
+    { name: "Rohan Shinde", role: "STUDENT", branch: "Civil", bio: "Scholar" },
+    { name: "Ananya Mehta", role: "STUDENT", branch: "AI & Data Science", bio: "Scholar" },
+    { name: "Tanvi Gaikwad", role: "STUDENT", branch: "Information Technology", bio: "Scholar" },
+    { name: "Vikram Salunke", role: "STUDENT", branch: "Computer", bio: "Scholar" }
+  ];
+  global.AUTHENTIC_CAMPUS_NOTICES = [
+    { refNo: "CNMS/2026/EXAM/01", attachment: "circular_1.pdf", acknowledgedCount: 250, comments: [1, 2] },
+    { refNo: "CNMS/2026/TPO/02", attachment: "circular_2.pdf", acknowledgedCount: 300, comments: [1] },
+    { refNo: "CNMS/2026/ACAD/03", attachment: "circular_3.pdf", acknowledgedCount: 200, comments: [1, 2] },
+    { refNo: "CNMS/2026/IT/04", attachment: "circular_4.pdf", acknowledgedCount: 150, comments: [1] },
+    { refNo: "CNMS/2026/EXAM/05", attachment: "circular_5.pdf", acknowledgedCount: 180, comments: [1, 2] },
+    { refNo: "CNMS/2026/SPORTS/06", attachment: "circular_6.pdf", acknowledgedCount: 120, comments: [1] },
+    { refNo: "CNMS/2026/LIB/07", attachment: "circular_7.pdf", acknowledgedCount: 100, comments: [1] }
+  ];
+  global.AUTHENTIC_LOUNGE_MESSAGES = [{ id: 1, text: "Hello Campus!" }];
+  global.REALTIME_ACTIVITY_STREAM = [{ id: 1, type: "NOTICE_VIEW" }];
+  global.CAMPUS_TELEMETRY = {
+    baselineTrafficEvents: 1248930,
+    concurrencyTested: 10000,
+    cacheHeadroomPercent: 96.4,
+    dailyActivePeersBase: 154
+  };
+}
 
 const appJsPath = path.join(__dirname, 'app.js');
 vm.runInThisContext(fs.readFileSync(appJsPath, 'utf8'));
