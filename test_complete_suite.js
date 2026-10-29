@@ -30,8 +30,9 @@ global.window = {
 global.document = {
   title: 'Campus Notify',
   documentElement: {
-    setAttribute: () => {},
-    getAttribute: () => 'dark'
+    _attrs: { 'data-theme': 'light' },
+    setAttribute: function(k, v) { this._attrs[k] = v; },
+    getAttribute: function(k) { return this._attrs[k] || null; }
   },
   addEventListener: () => {},
   querySelector: () => null,
@@ -304,42 +305,20 @@ async function runTests() {
   await cnms.handleInstaLoginSubmit();
   assert('Approved account logs in successfully', loginSuccess && cnms.currentUser.username === 'pooja_verma');
 
-  // --- TEST PILLAR 6: Theme Studio & Live Dynamic Color Customization ---
-  console.log('\n--- PILLAR 6: Theme Studio & Dynamic Color Customizer ---');
-  assert('CNMS_PRESET_PALETTES provides at least 8 curated presets', Object.keys(CNMS_PRESET_PALETTES).length >= 8);
-  assert('Sapphire preset has valid royal blue brandPrimary', CNMS_PRESET_PALETTES.sapphire.brandPrimary === '#2563eb');
-  assert('Emerald preset has valid forest green brandPrimary', CNMS_PRESET_PALETTES.emerald.brandPrimary === '#059669');
-  assert('Midnight preset has cyber dark background #090d16', CNMS_PRESET_PALETTES.midnight.bgPage === '#090d16');
+  // --- TEST PILLAR 6: Professional Academic Blue/White/Black Theme & Toggle ---
+  console.log('\n--- PILLAR 6: Professional Academic Blue/White/Black Theme & Toggle ---');
+  assert('Default theme is light mode for academic presentation', document.documentElement.getAttribute('data-theme') === 'light');
+  
+  // Test theme toggle to dark
+  cnms.toggleTheme();
+  assert('Toggling theme switches to dark mode', document.documentElement.getAttribute('data-theme') === 'dark');
+  assert('Dark theme is persisted to localStorage', localStorage.getItem('cnms_theme') === 'dark');
 
-  // Test applying a preset
-  cnms.applyCustomTheme(CNMS_PRESET_PALETTES.sapphire, true);
-  assert('activeCustomPalette is updated with sapphire preset', cnms.activeCustomPalette.brandPrimary === '#2563eb');
-  const storedCustomPalette = JSON.parse(localStorage.getItem('cnms_custom_palette') || '{}');
-  assert('Custom palette is persisted in localStorage', storedCustomPalette.brandPrimary === '#2563eb');
-
-  // Test custom user arbitrary color customization ("koi bhi color aapne according use krsake")
-  const userPersonalChoice = {
-    brandPrimary: '#ff007f',
-    brandSecondary: '#00e5ff',
-    bgPage: '#121212',
-    bgCard: '#1e1e1e',
-    bgSubtle: '#2a2a2a',
-    borderColor: '#3a3a3a',
-    textMain: '#ffffff',
-    textMuted: '#aaaaaa'
-  };
-  cnms.applyCustomTheme(userPersonalChoice, true);
-  assert('User custom color choice #ff007f is applied live', cnms.activeCustomPalette.brandPrimary === '#ff007f');
-  assert('User custom secondary #00e5ff is applied live', cnms.activeCustomPalette.brandSecondary === '#00e5ff');
-  assert('User custom background #121212 is applied live', cnms.activeCustomPalette.bgPage === '#121212');
-
-  // Test Randomize Palette
-  cnms.randomizeTheme();
-  assert('Randomize theme generates valid palette with brandPrimary', !!cnms.activeCustomPalette.brandPrimary && cnms.activeCustomPalette.brandPrimary.startsWith('#'));
-
-  // Test Reset Default
-  cnms.resetDefaultTheme();
-  assert('Reset removes custom palette from localStorage', localStorage.getItem('cnms_custom_palette') === null);
+  // Test theme toggle back to light
+  cnms.toggleTheme();
+  assert('Toggling theme switches back to light mode', document.documentElement.getAttribute('data-theme') === 'light');
+  assert('Light theme is persisted to localStorage', localStorage.getItem('cnms_theme') === 'light');
+  assert('Custom arbitrary color palette is discarded', localStorage.getItem('cnms_custom_palette') === null);
 
   // --- TEST PILLAR 10: Cryptographic E2EE, User Privacy Shield & Profile Customization ---
   console.log('\n--- PILLAR 10: E2EE 256-Bit Cryptography, Privacy Shield & Profile Customizer ---');
