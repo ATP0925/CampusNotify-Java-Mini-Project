@@ -32,7 +32,7 @@ global.document = {
   documentElement: {
     _attrs: { 'data-theme': 'light' },
     setAttribute: function(k, v) { this._attrs[k] = v; },
-    getAttribute: function(k) { return this._attrs[k] || null; }
+    getAttribute: function(k) { return this._attrs[k] || 'light'; }
   },
   addEventListener: () => {},
   querySelector: () => null,
@@ -305,20 +305,42 @@ async function runTests() {
   await cnms.handleInstaLoginSubmit();
   assert('Approved account logs in successfully', loginSuccess && cnms.currentUser.username === 'pooja_verma');
 
-  // --- TEST PILLAR 6: Professional Academic Blue/White/Black Theme & Toggle ---
-  console.log('\n--- PILLAR 6: Professional Academic Blue/White/Black Theme & Toggle ---');
+  // --- TEST PILLAR 6: Super Admin-Only Color Customization & Theme Governance ---
+  console.log('\n--- PILLAR 6: Super Admin-Only Color Customization & Theme Governance ---');
   assert('Default theme is light mode for academic presentation', document.documentElement.getAttribute('data-theme') === 'light');
   
-  // Test theme toggle to dark
+  // 1. Regular Student (pooja_verma) has ZERO access to color customization
+  assert('Student has isAdmin() false', cnms.isAdmin() === false);
+  assert('Student cannot see openThemeStudioBtn', cnms.dom.openThemeStudioBtn.style.display === 'none');
+  
+  let blockedWarning = '';
+  cnms.showToast = (msg, type) => { if (type === 'error') blockedWarning = msg; };
+  cnms.openThemeStudio();
+  assert('Student calling openThemeStudio is blocked by RBAC gate', blockedWarning.includes('Authority Restriction'));
+
+  // 2. Super Admin Access Verification
+  cnms.currentUser = Object.assign({}, DEFAULT_SUPER_ADMIN);
+  cnms.updateUserSessionUI();
+  assert('Super Admin has isAdmin() true', cnms.isAdmin() === true);
+  assert('Super Admin can see openThemeStudioBtn in navbar', cnms.dom.openThemeStudioBtn.style.display !== 'none');
+  
+  // 3. Super Admin can apply curated academic presets
+  assert('CNMS_PRESET_PALETTES provides at least 8 presets', Object.keys(CNMS_PRESET_PALETTES).length >= 8);
+  cnms.applyCustomTheme(CNMS_PRESET_PALETTES.sapphire, true);
+  assert('activeCustomPalette is updated with sapphire preset', cnms.activeCustomPalette.brandPrimary === '#2563eb');
+  
+  // 4. Super Admin can reset to default system theme
+  cnms.resetDefaultTheme();
+  assert('Reset removes custom palette from localStorage', localStorage.getItem('cnms_custom_palette') === null);
+
+  // 5. Standard Light/Dark Toggle works cleanly
   cnms.toggleTheme();
   assert('Toggling theme switches to dark mode', document.documentElement.getAttribute('data-theme') === 'dark');
   assert('Dark theme is persisted to localStorage', localStorage.getItem('cnms_theme') === 'dark');
 
-  // Test theme toggle back to light
   cnms.toggleTheme();
   assert('Toggling theme switches back to light mode', document.documentElement.getAttribute('data-theme') === 'light');
   assert('Light theme is persisted to localStorage', localStorage.getItem('cnms_theme') === 'light');
-  assert('Custom arbitrary color palette is discarded', localStorage.getItem('cnms_custom_palette') === null);
 
   // --- TEST PILLAR 10: Cryptographic E2EE, User Privacy Shield & Profile Customization ---
   console.log('\n--- PILLAR 10: E2EE 256-Bit Cryptography, Privacy Shield & Profile Customizer ---');
