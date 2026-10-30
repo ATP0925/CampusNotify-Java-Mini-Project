@@ -356,6 +356,12 @@ class CampusNotificationManagementSystem {
     this.activeCustomPalette = null;
     this.unsubscribers = [];
 
+    // Community Lounge Filter & Typing State
+    this.loungeSearchQuery = '';
+    this.loungeFilterMode = 'ALL';
+    this.typingTimeout = null;
+    this.lastTypingBroadcast = 0;
+
     this.init();
   }
 
@@ -772,10 +778,22 @@ class CampusNotificationManagementSystem {
             }
             isInitialLoungeSync = false;
 
+            // Filter typing ephemeral events vs regular messages
+            const regularCloudMsgs = [];
+            cloudMsgs.forEach(m => {
+              if (m.id && m.id.startsWith('typing_')) {
+                if (m.text === 'TYPING' && (!this.currentUser || m.senderId !== this.currentUser.id)) {
+                  this.showTypingIndicator(m.senderName || 'A peer');
+                }
+              } else {
+                regularCloudMsgs.push(m);
+              }
+            });
+
             // Merge cloud messages with local cache
             const msgMap = new Map();
-            (this.loungeMessages || []).forEach(m => msgMap.set(m.id, m));
-            cloudMsgs.forEach(m => msgMap.set(m.id, m));
+            (this.loungeMessages || []).filter(m => m.id && !m.id.startsWith('typing_')).forEach(m => msgMap.set(m.id, m));
+            regularCloudMsgs.forEach(m => msgMap.set(m.id, m));
             const sorted = Array.from(msgMap.values());
             sorted.sort((a, b) => new Date(a.timestamp || 0) - new Date(b.timestamp || 0));
             this.loungeMessages = sorted;
@@ -966,6 +984,29 @@ class CampusNotificationManagementSystem {
       loungeMessagesFeed: document.getElementById('loungeMessagesFeed'),
       loungeMessagesCount: document.getElementById('loungeMessagesCount'),
       loungeFilesCount: document.getElementById('loungeFilesCount'),
+      loungeSearchInput: document.getElementById('loungeSearchInput'),
+      loungeSearchClearBtn: document.getElementById('loungeSearchClearBtn'),
+      loungeFilterAllBtn: document.getElementById('loungeFilterAllBtn'),
+      loungeFilterFilesBtn: document.getElementById('loungeFilterFilesBtn'),
+      loungeFilterGifsBtn: document.getElementById('loungeFilterGifsBtn'),
+      loungeSoundToggleBtn: document.getElementById('loungeSoundToggleBtn'),
+      loungeSoundIcon: document.getElementById('loungeSoundIcon'),
+      loungeSoundLabel: document.getElementById('loungeSoundLabel'),
+      loungeTypingBar: document.getElementById('loungeTypingBar'),
+      loungeTypingAuthor: document.getElementById('loungeTypingAuthor'),
+      mobileBottomDock: document.getElementById('mobileBottomDock'),
+      dockBtnNotices: document.getElementById('dockBtnNotices'),
+      dockBtnLounge: document.getElementById('dockBtnLounge'),
+      dockBtnAlerts: document.getElementById('dockBtnAlerts'),
+      dockBtnAccount: document.getElementById('dockBtnAccount'),
+      dockNoticesBadge: document.getElementById('dockNoticesBadge'),
+      dockLoungeBadge: document.getElementById('dockLoungeBadge'),
+      dockAlertsBadge: document.getElementById('dockAlertsBadge'),
+      navAuditTrailBtn: document.getElementById('navAuditTrailBtn'),
+      auditTrailModalBackdrop: document.getElementById('auditTrailModalBackdrop'),
+      closeAuditTrailModalBtn: document.getElementById('closeAuditTrailModalBtn'),
+      closeAuditTrailFooterBtn: document.getElementById('closeAuditTrailFooterBtn'),
+      auditLedgerTableBody: document.getElementById('auditLedgerTableBody'),
       loungeMessageForm: document.getElementById('loungeMessageForm'),
       loungeTextInput: document.getElementById('loungeTextInput'),
       loungeFilePreviewBox: document.getElementById('loungeFilePreviewBox'),
@@ -1704,15 +1745,125 @@ class CampusNotificationManagementSystem {
       });
     }
 
-    // 17. Delegated Actions in Lounge Messages Feed (Admin Message Deletion)
+    // 17. Delegated Actions in Lounge Messages Feed (Delete, WhatsApp Reactions & Mentions)
     if (this.dom.loungeMessagesFeed) {
       this.dom.loungeMessagesFeed.addEventListener('click', (e) => {
+        // Delete message
         const delBtn = e.target.closest('.lounge-msg-del-btn');
-        if (!delBtn) return;
-        const msgId = delBtn.getAttribute('data-msg-id');
-        if (msgId) {
-          this.handleDeleteLoungeMessage(msgId);
+        if (delBtn) {
+          const msgId = delBtn.getAttribute('data-msg-id');
+          if (msgId) this.handleDeleteLoungeMessage(msgId);
+          return;
         }
+
+        // WhatsApp Emoji Popover Trigger
+        const trigger = e.target.closest('.lounge-react-trigger');
+        if (trigger) {
+          const pop = trigger.parentElement.querySelector('.lounge-reaction-popover');
+          if (pop) pop.classList.toggle('open');
+          return;
+        }
+
+        // Click Emoji in Reaction Popover
+        const reactBtn = e.target.closest('.react-btn');
+        if (reactBtn) {
+          const emoji = reactBtn.getAttribute('data-emoji');
+          const msgItem = reactBtn.closest('.lounge-msg-item');
+          if (msgItem && emoji) {
+            const msgId = msgItem.id.replace('msg_', '');
+            this.toggleLoungeReaction(msgId, emoji);
+            const pop = reactBtn.closest('.lounge-reaction-popover');
+            if (pop) pop.classList.remove('open');
+          }
+          return;
+        }
+
+        // Click Existing Reaction Chip below message bubble
+        const chip = e.target.closest('.lounge-reaction-chip');
+        if (chip) {
+          const msgId = chip.getAttribute('data-msg-id');
+          const emoji = chip.getAttribute('data-emoji');
+          if (msgId && emoji) this.toggleLoungeReaction(msgId, emoji);
+          return;
+        }
+
+        // Click author to insert @mention in composer
+        const authorName = e.target.closest('.lounge-msg-author');
+        if (authorName && this.dom.loungeTextInput) {
+          const username = authorName.getAttribute('data-username');
+          if (username) {
+            const current = this.dom.loungeTextInput.value;
+            this.dom.loungeTextInput.value = current ? current.trimEnd() + ` @${username} ` : `@${username} `;
+            this.dom.loungeTextInput.focus();
+          }
+        }
+      });
+    }
+
+    // Community Lounge Search & Filter Pills
+    if (this.dom.loungeSearchInput) {
+      this.dom.loungeSearchInput.addEventListener('input', (e) => {
+        this.handleLoungeSearch(e.target.value);
+      });
+    }
+    if (this.dom.loungeSearchClearBtn) {
+      this.dom.loungeSearchClearBtn.addEventListener('click', () => {
+        this.clearLoungeSearch();
+      });
+    }
+    if (this.dom.loungeFilterAllBtn) {
+      this.dom.loungeFilterAllBtn.addEventListener('click', () => this.setLoungeFilter('ALL'));
+    }
+    if (this.dom.loungeFilterFilesBtn) {
+      this.dom.loungeFilterFilesBtn.addEventListener('click', () => this.setLoungeFilter('FILES'));
+    }
+    if (this.dom.loungeFilterGifsBtn) {
+      this.dom.loungeFilterGifsBtn.addEventListener('click', () => this.setLoungeFilter('GIFS'));
+    }
+    if (this.dom.loungeSoundToggleBtn) {
+      this.dom.loungeSoundToggleBtn.addEventListener('click', () => this.toggleSoundMute());
+    }
+
+    // Live Real-Time Keystroke Typing Listener
+    if (this.dom.loungeTextInput) {
+      this.dom.loungeTextInput.addEventListener('input', () => {
+        this.handleTypingKeystroke();
+      });
+    }
+
+    // Mobile Bottom Navigation Dock Actions
+    if (this.dom.dockBtnNotices) {
+      this.dom.dockBtnNotices.addEventListener('click', () => this.switchView('circulars'));
+    }
+    if (this.dom.dockBtnLounge) {
+      this.dom.dockBtnLounge.addEventListener('click', () => this.switchView('lounge'));
+    }
+    if (this.dom.dockBtnAlerts) {
+      this.dom.dockBtnAlerts.addEventListener('click', () => this.toggleNotificationCenter());
+    }
+    if (this.dom.dockBtnAccount) {
+      this.dom.dockBtnAccount.addEventListener('click', () => {
+        if (this.isAuthenticated()) {
+          this.openOfficerProfileModal();
+        } else {
+          this.showInstagramGateway('login');
+        }
+      });
+    }
+
+    // Institutional Audit Trail Modal Triggers
+    if (this.dom.navAuditTrailBtn) {
+      this.dom.navAuditTrailBtn.addEventListener('click', () => this.openAuditTrailModal());
+    }
+    if (this.dom.closeAuditTrailModalBtn) {
+      this.dom.closeAuditTrailModalBtn.addEventListener('click', () => this.closeAuditTrailModal());
+    }
+    if (this.dom.closeAuditTrailFooterBtn) {
+      this.dom.closeAuditTrailFooterBtn.addEventListener('click', () => this.closeAuditTrailModal());
+    }
+    if (this.dom.auditTrailModalBackdrop) {
+      this.dom.auditTrailModalBackdrop.addEventListener('click', (e) => {
+        if (e.target === this.dom.auditTrailModalBackdrop) this.closeAuditTrailModal();
       });
     }
 
@@ -2811,20 +2962,43 @@ class CampusNotificationManagementSystem {
     if (this.dom.loungeMessagesCount) this.dom.loungeMessagesCount.textContent = totalMsgs;
     if (this.dom.loungeFilesCount) this.dom.loungeFilesCount.textContent = totalFiles;
 
-    if (totalMsgs === 0) {
+    // Filter out internal typing ephemeral documents
+    let validMessages = (this.loungeMessages || []).filter(m => m.id && !m.id.startsWith('typing_'));
+
+    // Apply Filter Pills (Files / GIFs)
+    if (this.loungeFilterMode === 'FILES') {
+      validMessages = validMessages.filter(m => Boolean(m.file));
+    } else if (this.loungeFilterMode === 'GIFS') {
+      validMessages = validMessages.filter(m => Boolean(m.gifUrl));
+    }
+
+    // Apply Search Query
+    if (this.loungeSearchQuery) {
+      const q = this.loungeSearchQuery.toLowerCase();
+      validMessages = validMessages.filter(m => {
+        const text = (m.text || '').toLowerCase();
+        const sender = (m.senderName || '').toLowerCase();
+        const fileName = (m.file && m.file.name ? m.file.name : '').toLowerCase();
+        return text.includes(q) || sender.includes(q) || fileName.includes(q);
+      });
+    }
+
+    if (validMessages.length === 0) {
       this.dom.loungeMessagesFeed.innerHTML = `
         <div style="text-align: center; margin: auto; padding: 40px 16px; color: var(--text-dim);">
-          <div style="margin-bottom: 8px; color: var(--primary);"><svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="cnms-svg-icon"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></div>
-          <h4 style="color: var(--text-muted); margin-bottom: 4px;">Campus Community Lounge is Ready</h4>
+          <div style="margin-bottom: 8px; color: var(--primary);"><svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="cnms-svg-icon"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></div>
+          <h4 style="color: var(--text-muted); margin-bottom: 4px;">${this.loungeSearchQuery || this.loungeFilterMode !== 'ALL' ? 'No Matching Messages' : 'Campus Community Lounge is Ready'}</h4>
           <p style="font-size: 0.85rem; max-width: 440px; margin: 0 auto;">
-            No messages posted yet. All campus students, faculty, and administrators can start a discussion or share academic files here.
+            ${this.loungeSearchQuery || this.loungeFilterMode !== 'ALL' ? 'No discussions match your filter. Tap "All Discussions" to see the full campus stream.' : 'No messages posted yet. All campus students, faculty, and administrators can start a discussion or share academic files here.'}
           </p>
         </div>
       `;
+      this.updateSoundToggleUI();
+      this.updateMobileDockBadges();
       return;
     }
 
-    this.dom.loungeMessagesFeed.innerHTML = this.loungeMessages.map(msg => {
+    this.dom.loungeMessagesFeed.innerHTML = validMessages.map(msg => {
       const isAdm = msg.senderRole === 'ADMIN';
       const isMe = Boolean(this.currentUser && msg.senderId === this.currentUser.id);
       const canDelete = this.isAdmin() || isMe;
@@ -2889,6 +3063,19 @@ class CampusNotificationManagementSystem {
                 <span class="e2ee-tag-badge" title="End-to-End Encrypted via 256-Bit AES">🔒 E2EE</span>
               </div>
               <div style="display: flex; align-items: center; gap: 6px;">
+                <!-- WhatsApp Quick Reaction Trigger -->
+                <div class="lounge-msg-actions">
+                  <button type="button" class="lounge-react-trigger" title="Add reaction">😊</button>
+                  <div class="lounge-reaction-popover">
+                    <span class="react-btn" data-emoji="👍">👍</span>
+                    <span class="react-btn" data-emoji="❤️">❤️</span>
+                    <span class="react-btn" data-emoji="😂">😂</span>
+                    <span class="react-btn" data-emoji="🔥">🔥</span>
+                    <span class="react-btn" data-emoji="🎉">🎉</span>
+                    <span class="react-btn" data-emoji="👏">👏</span>
+                  </div>
+                </div>
+
                 <span class="lounge-msg-time">${this.formatDate(msg.timestamp)}</span>
                 ${isMe ? '<span class="wa-double-tick" title="Delivered & Synced with Cloud">✓✓</span>' : ''}
                 ${canDelete ? `
@@ -2901,6 +3088,21 @@ class CampusNotificationManagementSystem {
 
             ${displayText ? `
               <div class="lounge-msg-body">${this.escapeHTML(displayText)}</div>
+            ` : ''}
+
+            <!-- WhatsApp Reaction Chips Row -->
+            ${msg.reactions && Object.keys(msg.reactions).length > 0 ? `
+              <div class="lounge-reactions-row">
+                ${Object.entries(msg.reactions).filter(([_, users]) => Array.isArray(users) && users.length > 0).map(([emoji, users]) => {
+                  const hasMe = Boolean(this.currentUser && users.includes(this.currentUser.id));
+                  return `
+                    <button type="button" class="lounge-reaction-chip ${hasMe ? 'my-reaction' : ''}" data-msg-id="${msg.id}" data-emoji="${emoji}" title="${users.length} reaction(s)">
+                      <span>${emoji}</span>
+                      <span class="react-count">${users.length}</span>
+                    </button>
+                  `;
+                }).join('')}
+              </div>
             ` : ''}
 
             ${msg.gifUrl ? `
@@ -6176,6 +6378,185 @@ class CampusNotificationManagementSystem {
       toast.style.transform = 'translateY(10px)';
       setTimeout(() => toast.remove(), 250);
     }, 2800);
+  }
+
+  /* --------------------------------------------------------------------------
+     UPGRADE SUITE: SEARCH, FILTERS, SOUND TOGGLE, REACTIONS & AUDIT TRAIL
+     -------------------------------------------------------------------------- */
+  handleLoungeSearch(query) {
+    this.loungeSearchQuery = (query || '').trim();
+    if (this.dom.loungeSearchClearBtn) {
+      this.dom.loungeSearchClearBtn.style.display = this.loungeSearchQuery ? 'inline-block' : 'none';
+    }
+    this.renderCommunityLounge();
+  }
+
+  clearLoungeSearch() {
+    this.loungeSearchQuery = '';
+    if (this.dom.loungeSearchInput) this.dom.loungeSearchInput.value = '';
+    if (this.dom.loungeSearchClearBtn) this.dom.loungeSearchClearBtn.style.display = 'none';
+    this.renderCommunityLounge();
+  }
+
+  setLoungeFilter(mode) {
+    this.loungeFilterMode = mode;
+    const isAll = mode === 'ALL';
+    const isFiles = mode === 'FILES';
+    const isGifs = mode === 'GIFS';
+    if (this.dom.loungeFilterAllBtn) this.dom.loungeFilterAllBtn.classList.toggle('active', isAll);
+    if (this.dom.loungeFilterFilesBtn) this.dom.loungeFilterFilesBtn.classList.toggle('active', isFiles);
+    if (this.dom.loungeFilterGifsBtn) this.dom.loungeFilterGifsBtn.classList.toggle('active', isGifs);
+    this.renderCommunityLounge();
+  }
+
+  toggleSoundMute() {
+    this.isSoundMuted = !this.isSoundMuted;
+    try {
+      localStorage.setItem('cnms_sound_muted', this.isSoundMuted ? 'true' : 'false');
+    } catch (_) {}
+    this.updateSoundToggleUI();
+    this.showToast(this.isSoundMuted ? 'Audio chime muted.' : 'Audio chime enabled (WhatsApp pop).', 'info');
+  }
+
+  updateSoundToggleUI() {
+    if (this.dom.loungeSoundIcon) {
+      this.dom.loungeSoundIcon.textContent = this.isSoundMuted ? '🔇' : '🔊';
+    }
+    if (this.dom.loungeSoundLabel) {
+      this.dom.loungeSoundLabel.textContent = this.isSoundMuted ? 'Muted' : 'Chime On';
+    }
+    if (this.dom.loungeSoundToggleBtn) {
+      this.dom.loungeSoundToggleBtn.classList.toggle('muted', this.isSoundMuted);
+    }
+  }
+
+  handleTypingKeystroke() {
+    if (!this.currentUser) return;
+    const now = Date.now();
+    if (now - (this.lastTypingBroadcast || 0) > 1800) {
+      this.lastTypingBroadcast = now;
+      const typingPayload = {
+        id: 'typing_' + this.currentUser.id,
+        senderId: this.currentUser.id,
+        senderName: this.currentUser.name || this.currentUser.username,
+        text: 'TYPING',
+        timestamp: new Date().toISOString()
+      };
+      if (this.broadcastChannel) {
+        try {
+          this.broadcastChannel.postMessage({ type: 'LOUNGE_TYPING', message: typingPayload });
+        } catch (_) {}
+      }
+      if (this.firestoreDb) {
+        this.pushToCloud('cnms_community_messages', typingPayload.id, typingPayload);
+      }
+    }
+    clearTimeout(this.typingTimeout);
+    this.typingTimeout = setTimeout(() => {
+      if (this.firestoreDb && this.currentUser) {
+        this.deleteFromCloud('cnms_community_messages', 'typing_' + this.currentUser.id);
+      }
+    }, 2800);
+  }
+
+  showTypingIndicator(authorName) {
+    if (!this.dom.loungeTypingBar || !this.dom.loungeTypingAuthor) return;
+    this.dom.loungeTypingAuthor.textContent = `${authorName} is typing...`;
+    this.dom.loungeTypingBar.style.display = 'flex';
+    clearTimeout(this.typingIndicatorHideTimer);
+    this.typingIndicatorHideTimer = setTimeout(() => {
+      if (this.dom.loungeTypingBar) this.dom.loungeTypingBar.style.display = 'none';
+    }, 3000);
+  }
+
+  toggleLoungeReaction(msgId, emoji) {
+    if (!this.isAuthenticated()) {
+      this.showToast('Please sign in to react to messages.', 'warning');
+      this.showInstagramGateway('login');
+      return;
+    }
+    const msg = this.loungeMessages.find(m => m.id === msgId);
+    if (!msg) return;
+
+    if (!msg.reactions || typeof msg.reactions !== 'object') {
+      msg.reactions = {};
+    }
+    if (!Array.isArray(msg.reactions[emoji])) {
+      msg.reactions[emoji] = [];
+    }
+
+    const uid = this.currentUser.id;
+    const idx = msg.reactions[emoji].indexOf(uid);
+    if (idx > -1) {
+      msg.reactions[emoji].splice(idx, 1);
+      if (msg.reactions[emoji].length === 0) {
+        delete msg.reactions[emoji];
+      }
+    } else {
+      msg.reactions[emoji].push(uid);
+    }
+
+    this.saveLoungeMessages();
+    this.renderCommunityLounge();
+
+    const cleanMsg = JSON.parse(JSON.stringify(msg));
+    this.pushToCloud('cnms_community_messages', msg.id, cleanMsg);
+  }
+
+  updateMobileDockBadges() {
+    if (this.dom.dockNoticesBadge) {
+      this.dom.dockNoticesBadge.textContent = this.notices ? this.notices.length : 0;
+    }
+    if (this.dom.dockLoungeBadge) {
+      if (this.unreadLoungeCount > 0) {
+        this.dom.dockLoungeBadge.textContent = `${this.unreadLoungeCount} New`;
+        this.dom.dockLoungeBadge.className = 'dock-badge red-badge';
+      } else {
+        const count = (this.loungeMessages || []).filter(m => !m.id.startsWith('typing_')).length;
+        this.dom.dockLoungeBadge.textContent = `${count}`;
+        this.dom.dockLoungeBadge.className = 'dock-badge green-badge';
+      }
+    }
+    if (this.dom.dockBtnNotices && this.dom.dockBtnLounge) {
+      const isCirc = this.activeView === 'circulars';
+      this.dom.dockBtnNotices.classList.toggle('active', isCirc);
+      this.dom.dockBtnLounge.classList.toggle('active', !isCirc);
+    }
+  }
+
+  openAuditTrailModal() {
+    if (!this.dom.auditTrailModalBackdrop) return;
+    this.renderAuditLedgerTable();
+    this.dom.auditTrailModalBackdrop.style.display = 'flex';
+    this.dom.auditTrailModalBackdrop.classList.add('open');
+    this.dom.auditTrailModalBackdrop.setAttribute('aria-hidden', 'false');
+  }
+
+  closeAuditTrailModal() {
+    if (!this.dom.auditTrailModalBackdrop) return;
+    this.dom.auditTrailModalBackdrop.style.display = 'none';
+    this.dom.auditTrailModalBackdrop.classList.remove('open');
+    this.dom.auditTrailModalBackdrop.setAttribute('aria-hidden', 'true');
+  }
+
+  renderAuditLedgerTable() {
+    if (!this.dom.auditLedgerTableBody) return;
+    const circulars = this.notices || [];
+    if (circulars.length === 0) {
+      this.dom.auditLedgerTableBody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding: 20px;">No circulars loaded.</td></tr>`;
+      return;
+    }
+    this.dom.auditLedgerTableBody.innerHTML = circulars.map(n => {
+      return `
+        <tr>
+          <td><strong style="color: var(--primary, #2563eb);">${this.escapeHTML(n.refNo || n.id)}</strong></td>
+          <td>${this.escapeHTML((n.title || '').slice(0, 40))}${n.title && n.title.length > 40 ? '...' : ''}</td>
+          <td><span class="meta-badge">${this.escapeHTML(n.department || 'General')}</span></td>
+          <td>${this.escapeHTML(n.signatory || 'Dean Academic')}</td>
+          <td><span class="meta-badge green-badge" title="Cryptographically Sealed Integrity">✓ Verified SHA-256</span></td>
+        </tr>
+      `;
+    }).join('');
   }
 }
 

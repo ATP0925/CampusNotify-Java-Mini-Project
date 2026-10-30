@@ -6323,3 +6323,508 @@ button, input, textarea, select {
 .lounge-toast-action-btn:hover {
   background: #1eb956;
 }
+
+
+/* ==========================================================================
+   UPGRADE SUITE: WHATSAPP LOUNGE TOOLBAR, TYPING INDICATOR & EMOJI REACTIONS
+   ========================================================================== */
+
+/* Lounge Toolbar Card */
+.lounge-toolbar-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: var(--bg-card, #ffffff);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: var(--radius-md, 12px);
+  padding: 10px 14px;
+  margin-bottom: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  flex-wrap: wrap;
+}
+
+[data-theme="dark"] .lounge-toolbar-card {
+  background: #111827;
+  border-color: #1f293d;
+}
+
+.lounge-search-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-subtle, #f8fafc);
+  border: 1px solid var(--border-color, #cbd5e1);
+  border-radius: 20px;
+  padding: 6px 14px;
+  flex: 1 1 240px;
+  min-width: 180px;
+}
+
+[data-theme="dark"] .lounge-search-wrapper {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+.lounge-search-wrapper svg {
+  color: var(--text-dim, #94a3b8);
+  flex-shrink: 0;
+}
+
+.lounge-search-wrapper input {
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 0.85rem;
+  color: var(--text-main, #0f172a);
+  width: 100%;
+}
+
+[data-theme="dark"] .lounge-search-wrapper input {
+  color: #f8fafc;
+}
+
+.lounge-search-clear-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-dim, #94a3b8);
+  cursor: pointer;
+  font-size: 0.8rem;
+  padding: 0 4px;
+}
+
+.lounge-filter-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.lounge-filter-pill {
+  background: var(--bg-subtle, #f1f5f9);
+  color: var(--text-muted, #475569);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 20px;
+  padding: 5px 12px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+[data-theme="dark"] .lounge-filter-pill {
+  background: #1e293b;
+  color: #94a3b8;
+  border-color: #334155;
+}
+
+.lounge-filter-pill:hover,
+.lounge-filter-pill.active {
+  background: var(--primary, #2563eb);
+  color: #ffffff !important;
+  border-color: var(--primary, #2563eb);
+}
+
+.lounge-sound-toggle-pill {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--bg-subtle, #f1f5f9);
+  color: var(--text-main, #0f172a);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 20px;
+  padding: 5px 12px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+[data-theme="dark"] .lounge-sound-toggle-pill {
+  background: #1e293b;
+  color: #f8fafc;
+  border-color: #334155;
+}
+
+.lounge-sound-toggle-pill:hover {
+  border-color: var(--primary, #2563eb);
+}
+
+.lounge-sound-toggle-pill.muted {
+  opacity: 0.6;
+}
+
+/* WhatsApp-Style Typing Indicator */
+.lounge-typing-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px;
+  background: rgba(37, 211, 102, 0.08);
+  border-left: 3px solid #25d366;
+  border-radius: 6px;
+  margin-top: 6px;
+  animation: fadeIn 0.25s ease;
+}
+
+[data-theme="dark"] .lounge-typing-bar {
+  background: rgba(37, 211, 102, 0.12);
+}
+
+.typing-bubble {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.typing-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #25d366;
+  animation: waTypingBounce 1.4s infinite ease-in-out both;
+}
+
+.typing-dot:nth-child(1) { animation-delay: -0.32s; }
+.typing-dot:nth-child(2) { animation-delay: -0.16s; }
+.typing-dot:nth-child(3) { animation-delay: 0s; }
+
+@keyframes waTypingBounce {
+  0%, 80%, 100% {
+    transform: scale(0.6);
+    opacity: 0.4;
+  }
+  40% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+}
+
+.typing-author {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #128c7e;
+}
+
+[data-theme="dark"] .typing-author {
+  color: #25d366;
+}
+
+/* WhatsApp Message Hover Actions & Reaction Bar */
+.lounge-msg-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  position: relative;
+}
+
+.lounge-msg-item:hover .lounge-msg-actions,
+.lounge-msg-actions.open {
+  opacity: 1;
+}
+
+.lounge-react-trigger {
+  background: transparent;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 4px;
+  line-height: 1;
+}
+
+.lounge-react-trigger:hover {
+  background: rgba(0, 0, 0, 0.06);
+}
+
+.lounge-reaction-popover {
+  display: none;
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  background: var(--bg-card, #ffffff);
+  border: 1px solid var(--border-color, #cbd5e1);
+  border-radius: 24px;
+  padding: 4px 8px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+  z-index: 50;
+  white-space: nowrap;
+  animation: fadeIn 0.15s ease;
+}
+
+.lounge-reaction-popover.open {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+[data-theme="dark"] .lounge-reaction-popover {
+  background: #1e293b;
+  border-color: #334155;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+}
+
+.react-btn {
+  font-size: 1.15rem;
+  cursor: pointer;
+  transition: transform 0.12s cubic-bezier(0.34, 1.56, 0.64, 1);
+  user-select: none;
+  padding: 2px;
+}
+
+.react-btn:hover {
+  transform: scale(1.35);
+}
+
+/* Reaction Chips below message bubble */
+.lounge-reactions-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.lounge-reaction-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  padding: 2px 7px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.12s ease;
+  color: var(--text-muted, #475569);
+}
+
+[data-theme="dark"] .lounge-reaction-chip {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.12);
+  color: #cbd5e1;
+}
+
+.lounge-reaction-chip:hover {
+  background: rgba(37, 211, 102, 0.15);
+  border-color: #25d366;
+}
+
+.lounge-reaction-chip.my-reaction {
+  background: rgba(37, 211, 102, 0.18);
+  border-color: #25d366;
+  color: #075e54;
+}
+
+[data-theme="dark"] .lounge-reaction-chip.my-reaction {
+  background: rgba(37, 211, 102, 0.25);
+  border-color: #25d366;
+  color: #a7f3d0;
+}
+
+/* ==========================================================================
+   MOBILE BOTTOM NAVIGATION DOCK (App-like mobile experience)
+   ========================================================================== */
+.mobile-bottom-dock {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: var(--bg-card, #ffffff);
+  border-top: 1.5px solid var(--border-color, #e2e8f0);
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.06);
+  z-index: 900;
+  justify-content: space-around;
+  align-items: center;
+  padding: 0 8px;
+}
+
+[data-theme="dark"] .mobile-bottom-dock {
+  background: #0f172a;
+  border-top-color: #1e293b;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.35);
+}
+
+.dock-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  background: transparent;
+  border: none;
+  color: var(--text-muted, #64748b);
+  cursor: pointer;
+  padding: 6px 12px;
+  border-radius: 8px;
+  transition: color 0.15s ease;
+  min-width: 60px;
+}
+
+.dock-item:hover,
+.dock-item.active {
+  color: var(--primary, #2563eb);
+}
+
+.dock-icon-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dock-label {
+  font-size: 0.68rem;
+  font-weight: 600;
+}
+
+.dock-badge {
+  position: absolute;
+  top: -6px;
+  right: -10px;
+  background: var(--primary, #2563eb);
+  color: #ffffff;
+  font-size: 0.62rem;
+  font-weight: 700;
+  border-radius: 10px;
+  padding: 1px 5px;
+  line-height: 1.2;
+}
+
+.dock-badge.green-badge {
+  background: #10b981;
+}
+
+.dock-badge.red-badge {
+  background: #ef4444;
+}
+
+@media (max-width: 768px) {
+  .mobile-bottom-dock {
+    display: flex !important;
+  }
+  body {
+    padding-bottom: 68px !important;
+  }
+  .lounge-msg-actions {
+    opacity: 1 !important;
+  }
+}
+
+/* ==========================================================================
+   INSTITUTIONAL AUDIT TRAIL MODAL (Examiner Defense Suite)
+   ========================================================================== */
+.audit-grid-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.audit-metric-card {
+  background: var(--bg-subtle, #f8fafc);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 10px;
+  padding: 14px;
+  text-align: center;
+}
+
+[data-theme="dark"] .audit-metric-card {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+.audit-metric-card .metric-icon {
+  font-size: 1.5rem;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.audit-metric-card .metric-val {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-main, #0f172a);
+}
+
+[data-theme="dark"] .audit-metric-card .metric-val {
+  color: #f8fafc;
+}
+
+.audit-metric-card .metric-lbl {
+  font-size: 0.72rem;
+  color: var(--text-muted, #64748b);
+  margin-top: 2px;
+}
+
+.audit-ledger-table-wrap {
+  max-height: 240px;
+  overflow-y: auto;
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 8px;
+}
+
+.audit-ledger-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+  text-align: left;
+}
+
+.audit-ledger-table th {
+  background: var(--bg-subtle, #f1f5f9);
+  padding: 8px 12px;
+  font-weight: 700;
+  color: var(--text-main, #0f172a);
+  border-bottom: 1px solid var(--border-color, #cbd5e1);
+  position: sticky;
+  top: 0;
+}
+
+[data-theme="dark"] .audit-ledger-table th {
+  background: #1e293b;
+  color: #f8fafc;
+  border-bottom-color: #334155;
+}
+
+.audit-ledger-table td {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border-color, #e2e8f0);
+  color: var(--text-muted, #475569);
+}
+
+[data-theme="dark"] .audit-ledger-table td {
+  border-bottom-color: #334155;
+  color: #cbd5e1;
+}
+
+.audit-ledger-table tr:hover td {
+  background: rgba(37, 99, 235, 0.04);
+}
+
+.audit-security-invariants-box {
+  margin-top: 14px;
+  padding: 12px 16px;
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  border-radius: 8px;
+  font-size: 0.8rem;
+}
+
+.audit-box-header {
+  font-weight: 700;
+  color: #10b981;
+  margin-bottom: 6px;
+}
+
+.audit-box-item {
+  color: var(--text-main, #0f172a);
+  line-height: 1.5;
+}
+
+[data-theme="dark"] .audit-box-item {
+  color: #e2e8f0;
+}

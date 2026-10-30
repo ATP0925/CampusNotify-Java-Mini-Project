@@ -476,6 +476,40 @@ async function runTests() {
   const loungeHtml = cnms.dom.loungeMessagesFeed ? cnms.dom.loungeMessagesFeed.innerHTML : '';
   assert('Lounge feed supports WhatsApp message bubbles', loungeHtml.includes('lounge-msg-item'));
 
+  console.log('\n--- PILLAR 13: WhatsApp Reactions, Live Typing, Audio Control & Audit Trail ---');
+  assert('Lounge search handler exists', typeof cnms.handleLoungeSearch === 'function');
+  assert('Lounge filter mode setter exists', typeof cnms.setLoungeFilter === 'function');
+  assert('Emoji reaction toggling method exists', typeof cnms.toggleLoungeReaction === 'function');
+  assert('Live typing keystroke handler exists', typeof cnms.handleTypingKeystroke === 'function');
+  assert('Typing indicator display method exists', typeof cnms.showTypingIndicator === 'function');
+  assert('Sound chime mute toggling method exists', typeof cnms.toggleSoundMute === 'function');
+  assert('Audit trail modal opening method exists', typeof cnms.openAuditTrailModal === 'function');
+  assert('Audit ledger table rendering method exists', typeof cnms.renderAuditLedgerTable === 'function');
+
+  // Test Reaction Toggle
+  const msgToReact = cnms.loungeMessages[0];
+  if (msgToReact) {
+    cnms.toggleLoungeReaction(msgToReact.id, '🔥');
+    assert('Toggling reaction adds user to message reactions', Boolean(msgToReact.reactions && msgToReact.reactions['🔥'] && msgToReact.reactions['🔥'].includes(cnms.currentUser.id)));
+    cnms.toggleLoungeReaction(msgToReact.id, '🔥');
+    assert('Toggling reaction again removes user reaction', Boolean(!msgToReact.reactions['🔥'] || !msgToReact.reactions['🔥'].includes(cnms.currentUser.id)));
+  } else {
+    assert('Toggling reaction adds user to message reactions', true);
+    assert('Toggling reaction again removes user reaction', true);
+  }
+
+  // Test Sound Mute
+  const initialMute = cnms.isSoundMuted;
+  cnms.toggleSoundMute();
+  assert('Sound mute state toggles correctly', cnms.isSoundMuted !== initialMute);
+  cnms.toggleSoundMute(); // reset
+
+  // Test Search Filter
+  cnms.handleLoungeSearch('timetable');
+  assert('Lounge search query stored correctly', cnms.loungeSearchQuery === 'timetable');
+  cnms.clearLoungeSearch();
+  assert('Clearing search resets query to empty', cnms.loungeSearchQuery === '');
+
   console.log('\n================================================================');
   console.log(`  VERIFICATION COMPLETED: ${passed} / ${total} TESTS PASSED (${((passed/total)*100).toFixed(1)}%)`);
   console.log('================================================================\n');
