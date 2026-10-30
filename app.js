@@ -365,6 +365,7 @@ class CampusNotificationManagementSystem {
     // Voice Memo State
     this.isRecordingVoice = false;
     this.voiceMediaRecorder = null;
+    this.voiceStream = null;
     this.voiceAudioChunks = [];
     this.voiceRecordStartTime = null;
     this.voiceRecordTimerInterval = null;
@@ -6866,23 +6867,50 @@ class CampusNotificationManagementSystem {
       }
     }, 1000);
 
+    // Request actual microphone stream
     if (typeof navigator !== 'undefined' && navigator.mediaDevices && typeof navigator.mediaDevices.getUserMedia === 'function') {
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const stream = await navigator.mediaDevices.getUserMedia({ 
+          audio: {
+            echoCancellation: true,
+            noiseSuppression: true,
+            autoGainControl: true
+          } 
+        });
+        this.voiceStream = stream;
+
         if (typeof MediaRecorder !== 'undefined') {
-          this.voiceMediaRecorder = new MediaRecorder(stream);
+          let mimeType = '';
+          if (typeof MediaRecorder.isTypeSupported === 'function') {
+            if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
+              mimeType = 'audio/webm;codecs=opus';
+            } else if (MediaRecorder.isTypeSupported('audio/webm')) {
+              mimeType = 'audio/webm';
+            } else if (MediaRecorder.isTypeSupported('audio/mp4')) {
+              mimeType = 'audio/mp4';
+            } else if (MediaRecorder.isTypeSupported('audio/ogg;codecs=opus')) {
+              mimeType = 'audio/ogg;codecs=opus';
+            }
+          }
+
+          this.voiceMediaRecorder = mimeType ? new MediaRecorder(stream, { mimeType }) : new MediaRecorder(stream);
+          this.voiceAudioChunks = [];
+
           this.voiceMediaRecorder.ondataavailable = (e) => {
             if (e.data && e.data.size > 0) {
               this.voiceAudioChunks.push(e.data);
             }
           };
-          this.voiceMediaRecorder.start();
+
+          // Continuous live audio streaming in 200ms slices
+          this.voiceMediaRecorder.start(200);
         }
       } catch (err) {
-        console.warn('Microphone stream fallback:', err);
+        console.warn('Microphone stream error / permission denied:', err);
+        this.showToast('Microphone permission needed to record your voice. Please allow microphone in browser.', 'warning');
       }
     }
-    this.showToast('🎙️ Recording voice note... Speak clearly.', 'info');
+    this.showToast('🎙️ Recording voice... Speak into your microphone.', 'info');
   }
 
   async stopVoiceRecording(send = true) {
@@ -6894,7 +6922,7 @@ class CampusNotificationManagementSystem {
       this.voiceRecordTimerInterval = null;
     }
 
-    const elapsedSeconds = this.voiceRecordStartTime ? Math.max(1, Math.floor((Date.now() - this.voiceRecordStartTime) / 1000)) : 3;
+    const elapsedSeconds = this.voiceRecordStartTime ? Math.max(1, Math.floor((Date.now() - this.voiceRecordStartTime) / 1000)) : 1;
     this.voiceRecordStartTime = null;
 
     if (this.dom.loungeVoiceRecordingCard) {
@@ -6903,12 +6931,11 @@ class CampusNotificationManagementSystem {
 
     if (!send) {
       if (this.voiceMediaRecorder && this.voiceMediaRecorder.state !== 'inactive') {
-        try {
-          this.voiceMediaRecorder.stop();
-          if (this.voiceMediaRecorder.stream) {
-            this.voiceMediaRecorder.stream.getTracks().forEach(t => t.stop());
-          }
-        } catch (_) {}
+        try { this.voiceMediaRecorder.stop(); } catch (_) {}
+      }
+      if (this.voiceStream) {
+        try { this.voiceStream.getTracks().forEach(t => t.stop()); } catch (_) {}
+        this.voiceStream = null;
       }
       this.voiceMediaRecorder = null;
       this.voiceAudioChunks = [];
@@ -6919,32 +6946,54 @@ class CampusNotificationManagementSystem {
     let finalDataUrl = null;
     let mimeType = 'audio/webm';
 
-    if (this.voiceMediaRecorder && this.voiceAudioChunks.length > 0) {
+    // Await MediaRecorder stop event to flush all final microphone audio data into chunks
+    if (this.voiceMediaRecorder && this.voiceMediaRecorder.state !== 'inactive') {
       try {
-        const mime = this.voiceMediaRecorder.mimeType || 'audio/webm';
-        mimeType = mime;
-        const blob = new Blob(this.voiceAudioChunks, { type: mime });
-        finalDataUrl = await new Promise((resolve) => {
-          const reader = new FileReader();
-          reader.onloadend = () => resolve(reader.result);
-          reader.readAsDataURL(blob);
+        await new Promise((resolve) => {
+          this.voiceMediaRecorder.onstop = () => resolve();
+          // Safety timeout in case onstop doesn't fire within 800ms
+          setTimeout(resolve, 800);
+          try {
+            this.voiceMediaRecorder.stop();
+          } catch (_) {
+            resolve();
+          }
         });
       } catch (err) {
-        console.warn('Voice blob conversion fallback:', err);
+        console.warn('Error stopping media recorder:', err);
       }
     }
 
-    if (this.voiceMediaRecorder) {
+    // Stop real stream tracks to immediately release the hardware microphone
+    if (this.voiceStream) {
       try {
-        if (this.voiceMediaRecorder.state !== 'inactive') this.voiceMediaRecorder.stop();
-        if (this.voiceMediaRecorder.stream) {
-          this.voiceMediaRecorder.stream.getTracks().forEach(t => t.stop());
-        }
+        this.voiceStream.getTracks().forEach(t => t.stop());
       } catch (_) {}
-      this.voiceMediaRecorder = null;
+      this.voiceStream = null;
     }
+
+    // Convert real microphone audio chunks to Base64 Data URL
+    if (this.voiceAudioChunks && this.voiceAudioChunks.length > 0) {
+      try {
+        const mime = (this.voiceMediaRecorder && this.voiceMediaRecorder.mimeType) || 'audio/webm';
+        mimeType = mime;
+        const blob = new Blob(this.voiceAudioChunks, { type: mime });
+        if (blob.size > 150) {
+          finalDataUrl = await new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result);
+            reader.readAsDataURL(blob);
+          });
+        }
+      } catch (err) {
+        console.warn('Voice blob conversion error:', err);
+      }
+    }
+
+    this.voiceMediaRecorder = null;
     this.voiceAudioChunks = [];
 
+    // Fallback if no real audio blob produced (e.g. headless unit tests or denied mic)
     if (!finalDataUrl) {
       finalDataUrl = this.generateFallbackAudioDataUrl(elapsedSeconds);
       mimeType = 'audio/wav';
@@ -6987,7 +7036,7 @@ class CampusNotificationManagementSystem {
 
     this.renderCommunityLounge();
     this.scrollLoungeToBottom();
-    this.showToast('Voice note broadcasted to campus network.', 'success');
+    this.showToast('Voice note sent to campus network.', 'success');
   }
 
   cancelVoiceRecording() {
@@ -7033,10 +7082,36 @@ class CampusNotificationManagementSystem {
         this.voicePlaybackAudio = audio;
         this.activePlayingVoiceId = msgId;
 
+        // Progressively color soundwave bars during playback
+        audio.ontimeupdate = () => {
+          if (!audio.duration) return;
+          const progress = audio.currentTime / audio.duration;
+          const msgEl = document.getElementById('msg_' + msgId);
+          if (msgEl) {
+            const bars = msgEl.querySelectorAll('.voice-mini-bar');
+            const playedCount = Math.floor(bars.length * progress);
+            bars.forEach((bar, idx) => {
+              if (idx <= playedCount) bar.classList.add('played');
+              else bar.classList.remove('played');
+            });
+            const durText = msgEl.querySelector('.voice-duration-text');
+            if (durText) {
+              durText.textContent = `${this.formatVoiceDuration(Math.floor(audio.currentTime))} / ${this.formatVoiceDuration(msg.file.duration || Math.floor(audio.duration))}`;
+            }
+          }
+        };
+
         audio.onended = () => {
           this.activePlayingVoiceId = null;
           this.updateVoicePlayButtons(null);
+          const msgEl = document.getElementById('msg_' + msgId);
+          if (msgEl) {
+            msgEl.querySelectorAll('.voice-mini-bar').forEach(b => b.classList.remove('played'));
+            const durText = msgEl.querySelector('.voice-duration-text');
+            if (durText) durText.textContent = this.formatVoiceDuration(msg.file.duration || 5);
+          }
         };
+
         audio.onerror = () => {
           this.activePlayingVoiceId = null;
           this.updateVoicePlayButtons(null);
