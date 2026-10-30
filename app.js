@@ -354,6 +354,7 @@ class CampusNotificationManagementSystem {
     this.firestoreDb = null;
     this.firebaseConnected = false;
     this.activeCustomPalette = null;
+    this.unsubscribers = [];
 
     this.init();
   }
@@ -661,12 +662,11 @@ class CampusNotificationManagementSystem {
           if (firebaseUser) {
             console.log('[Firebase Auth] Active user:', firebaseUser.email || firebaseUser.phoneNumber || firebaseUser.uid);
             this.syncFirebaseUserToLocal(firebaseUser);
+            if (this.dom.instagramAuthGateway && this.dom.instagramAuthGateway.style.display !== 'none') {
+              this.enterCampusPortal();
+            }
           }
         });
-        // Ensure immediate authenticated connection across all devices
-        if (!this.firebaseAuth.currentUser) {
-          this.firebaseAuth.signInAnonymously().catch(e => console.log('[Firebase Anon Auth note]', e.message));
-        }
       }
       if (firebase.analytics && config.measurementId) {
         try {
@@ -703,6 +703,16 @@ class CampusNotificationManagementSystem {
 
   setupFirestoreListeners() {
     if (!this.firestoreDb) return;
+    if (!Array.isArray(this.unsubscribers)) {
+      this.unsubscribers = [];
+    } else {
+      this.unsubscribers.forEach(unsub => {
+        if (typeof unsub === 'function') {
+          try { unsub(); } catch (_) {}
+        }
+      });
+      this.unsubscribers = [];
+    }
 
     try {
       // 1. Synchronize Notices Collection (Capped at 50 most recent for high-scale network & read efficiency)
@@ -771,6 +781,7 @@ class CampusNotificationManagementSystem {
             this.loungeMessages = sorted;
             this.saveLoungeMessages();
             this.renderCommunityLounge();
+            this.scrollLoungeToBottom();
 
             // Update Lounge Tab Badge counter
             if (this.dom.loungeTabBadge && this.activeView !== 'lounge') {
@@ -2916,6 +2927,7 @@ class CampusNotificationManagementSystem {
         </div>
       `;
     }).join('');
+    this.scrollLoungeToBottom();
   }
 
   scrollLoungeToBottom() {
@@ -4099,6 +4111,8 @@ class CampusNotificationManagementSystem {
     this.currentUser = syncedUser;
     this.updateUserSessionUI();
     this.render();
+    this.renderCommunityLounge();
+    this.scrollLoungeToBottom();
   }
 
   /* --------------------------------------------------------------------------
