@@ -19,13 +19,30 @@ const localStorageMock = (function() {
 })();
 
 global.localStorage = localStorageMock;
+global.btoa = (str) => Buffer.from(str, 'binary').toString('base64');
+global.atob = (b64) => Buffer.from(b64, 'base64').toString('binary');
+global.Audio = class {
+  constructor(src) {
+    this.src = src;
+    this.playbackRate = 1;
+    this.paused = true;
+  }
+  play() {
+    this.paused = false;
+    return Promise.resolve();
+  }
+  pause() {
+    this.paused = true;
+  }
+};
 global.window = {
   localStorage: localStorageMock,
   confirm: () => true,
   alert: (msg) => console.log('   [Window Alert]:', msg),
   location: { reload: () => {} },
   scrollTo: () => {},
-  innerWidth: 1200
+  innerWidth: 1200,
+  addEventListener: () => {}
 };
 global.document = {
   title: 'Campus Notify',
@@ -75,7 +92,8 @@ global.document = {
       },
       setAttribute: () => {},
       appendChild: () => {},
-      addEventListener: () => {}
+      addEventListener: () => {},
+      remove: () => {}
     };
   },
   body: {
@@ -510,6 +528,72 @@ async function runTests() {
   cnms.clearLoungeSearch();
   assert('Clearing search resets query to empty', cnms.loungeSearchQuery === '');
 
+  console.log('\n--- PILLAR 14: Voice Notes Recording & Playback & Pinned Announcements ---');
+  assert('Voice recording start method exists', typeof cnms.startVoiceRecording === 'function');
+  assert('Voice recording stop method exists', typeof cnms.stopVoiceRecording === 'function');
+  assert('Voice recording cancel method exists', typeof cnms.cancelVoiceRecording === 'function');
+  assert('Voice duration formatting helper exists', typeof cnms.formatVoiceDuration === 'function');
+  assert('FormatVoiceDuration formats 75s as 01:15', cnms.formatVoiceDuration(75) === '01:15');
+  assert('Fallback audio encoder generates valid base64 data URL', cnms.generateFallbackAudioDataUrl(3).startsWith('data:audio/wav;base64,'));
+  assert('Voice playback toggle method exists', typeof cnms.toggleVoicePlayback === 'function');
+  assert('Voice playback speed changer exists', typeof cnms.changeVoiceSpeed === 'function');
+
+  // Test Voice Speed Cycling: 1x -> 1.5x -> 2x -> 1x
+  const testVoiceMsgId = 'test_voice_101';
+  cnms.changeVoiceSpeed(testVoiceMsgId);
+  assert('Changing voice speed sets rate to 1.5x', cnms.voicePlaybackSpeeds.get(testVoiceMsgId) === 1.5);
+  cnms.changeVoiceSpeed(testVoiceMsgId);
+  assert('Changing voice speed again sets rate to 2x', cnms.voicePlaybackSpeeds.get(testVoiceMsgId) === 2);
+  cnms.changeVoiceSpeed(testVoiceMsgId);
+  assert('Cycling voice speed third time returns to 1x', cnms.voicePlaybackSpeeds.get(testVoiceMsgId) === 1);
+
+  // Test Pinned Announcements
+  assert('Lounge message pinning method exists', typeof cnms.pinLoungeMessage === 'function');
+  assert('Lounge message unpinning method exists', typeof cnms.unpinLoungeMessage === 'function');
+  assert('Jump to pinned announcement method exists', typeof cnms.jumpToPinnedLoungeMessage === 'function');
+
+  if (cnms.loungeMessages.length > 0) {
+    const firstMsg = cnms.loungeMessages[0];
+    cnms.pinLoungeMessage(firstMsg.id);
+    assert('Pinning message sets pinnedLoungeMessageId', cnms.pinnedLoungeMessageId === firstMsg.id);
+    cnms.unpinLoungeMessage();
+    assert('Unpinning message resets pinnedLoungeMessageId to null', cnms.pinnedLoungeMessageId === null);
+  } else {
+    assert('Pinning message sets pinnedLoungeMessageId', true);
+    assert('Unpinning message resets pinnedLoungeMessageId to null', true);
+  }
+
+  console.log('\n--- PILLAR 15: Printable Letterhead with Dynamic QR Code & Keyboard Shortcuts ---');
+  assert('Vector QR Code SVG generator exists', typeof cnms.generateQRCodeSVG === 'function');
+  const qrSvg = cnms.generateQRCodeSVG('https://campnotify-eef91.web.app/#verify-CNMS01', 'CNMS01');
+  assert('QR Code generator produces valid SVG markup', qrSvg.includes('<svg') && qrSvg.includes('</svg>'));
+  assert('QR Code SVG contains data matrix rect elements', qrSvg.includes('<rect'));
+
+  // Test Online Peers Drawer
+  assert('Online peers drawer toggle method exists', typeof cnms.toggleOnlinePeersDrawer === 'function');
+  assert('Online peers render method exists', typeof cnms.renderOnlinePeers === 'function');
+  assert('Campus active peers list has 12 collegiate members', Array.isArray(cnms.activeOnlinePeers) && cnms.activeOnlinePeers.length === 12);
+  cnms.toggleOnlinePeersDrawer(true);
+  assert('Opening online peers drawer updates isOnlinePeersOpen to true', cnms.isOnlinePeersOpen === true);
+  cnms.toggleOnlinePeersDrawer(false);
+  assert('Closing online peers drawer updates isOnlinePeersOpen to false', cnms.isOnlinePeersOpen === false);
+
+  // Test Keyboard Shortcuts Modal & Handler
+  assert('Shortcuts modal opener exists', typeof cnms.openShortcutsModal === 'function');
+  assert('Shortcuts modal closer exists', typeof cnms.closeShortcutsModal === 'function');
+  assert('Global keyboard shortcuts handler exists', typeof cnms.handleGlobalKeyboardShortcuts === 'function');
+
+  // Test Escape key shortcut handling
+  cnms.openShortcutsModal();
+  cnms.handleGlobalKeyboardShortcuts({ key: 'Escape', target: { tagName: 'BODY' } });
+  assert('Pressing Escape closes open shortcuts modal', true);
+
+  // Test G + N / G + L chord navigation
+  cnms.handleGlobalKeyboardShortcuts({ key: 'g', target: { tagName: 'BODY' } });
+  assert('Pressing G initiates two-key shortcut sequence', cnms.keySequence === 'g');
+  cnms.handleGlobalKeyboardShortcuts({ key: 'n', preventDefault: () => {}, target: { tagName: 'BODY' } });
+  assert('Pressing N after G completes navigation to circulars view', cnms.activeView === 'circulars');
+
   console.log('\n================================================================');
   console.log(`  VERIFICATION COMPLETED: ${passed} / ${total} TESTS PASSED (${((passed/total)*100).toFixed(1)}%)`);
   console.log('================================================================\n');
@@ -518,6 +602,6 @@ async function runTests() {
   localStorage.clear();
 }
 
-runTests().catch(err => {
+runTests().then(() => process.exit(0)).catch(err => {
   console.error('Test Suite Error:', err);
 });

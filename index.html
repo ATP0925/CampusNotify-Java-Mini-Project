@@ -132,6 +132,11 @@
           </div>
         </div>
 
+        <!-- Keyboard Shortcuts Help -->
+        <button class="icon-btn" id="openShortcutsBtn" title="Keyboard Shortcuts (?)" aria-label="Keyboard Shortcuts">
+          <span style="font-size: 0.95rem; font-weight: 700;">⌨️</span>
+        </button>
+
         <!-- Theme Toggle -->
         <button class="icon-btn" id="themeToggleBtn" title="Toggle Dark/Light Mode" aria-label="Toggle Theme">
           <span class="theme-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line></svg></span>
@@ -690,6 +695,35 @@
             </div>
           </div>
 
+          <!-- Lounge Pinned Announcement Sticky Banner -->
+          <div class="lounge-pinned-banner" id="loungePinnedBanner" style="display: none;">
+            <div class="lounge-pinned-left">
+              <span class="lounge-pinned-badge">📌 PINNED</span>
+              <div class="lounge-pinned-details">
+                <strong class="lounge-pinned-author" id="loungePinnedAuthor">Academic Directorate</strong>
+                <p class="lounge-pinned-snippet" id="loungePinnedSnippet">Important announcement pinned by campus administrator.</p>
+              </div>
+            </div>
+            <div class="lounge-pinned-right">
+              <button type="button" class="btn btn-xs btn-primary" id="loungePinnedJumpBtn">Jump to Message</button>
+              <button type="button" class="lounge-pinned-unpin-btn" id="loungePinnedUnpinBtn" title="Unpin Announcement">✕</button>
+            </div>
+          </div>
+
+          <!-- Active Online Peers Drawer (Collapsible) -->
+          <div class="lounge-peers-drawer" id="loungeOnlinePeersPanel" style="display: none;">
+            <div class="peers-drawer-header">
+              <div class="peers-drawer-title">
+                <span class="active-dot-live"></span>
+                <span>Active Campus Members Connected Now (12 Online)</span>
+              </div>
+              <button type="button" class="peers-close-btn" id="closeOnlinePeersBtn">&times;</button>
+            </div>
+            <div class="peers-grid" id="loungeOnlinePeersList">
+              <!-- Populated dynamically -->
+            </div>
+          </div>
+
           <!-- Lounge Search, Filter Pills & Audio Chime Control -->
           <div class="lounge-toolbar-card">
             <div class="lounge-search-wrapper">
@@ -701,6 +735,10 @@
               <button type="button" class="lounge-filter-pill active" id="loungeFilterAllBtn" data-filter="ALL">All Discussions</button>
               <button type="button" class="lounge-filter-pill" id="loungeFilterFilesBtn" data-filter="FILES">📎 Shared Files</button>
               <button type="button" class="lounge-filter-pill" id="loungeFilterGifsBtn" data-filter="GIFS">🎬 GIFs</button>
+              <button type="button" class="lounge-filter-pill" id="loungeOnlinePeersToggleBtn" title="View Active Online Members">
+                <span class="active-dot-live"></span>
+                <span id="loungeOnlinePeersLabel">Online (12)</span>
+              </button>
               <button type="button" class="lounge-sound-toggle-pill" id="loungeSoundToggleBtn" title="Toggle real-time WhatsApp audio pop chime">
                 <span id="loungeSoundIcon">🔊</span>
                 <span id="loungeSoundLabel">Chime On</span>
@@ -735,6 +773,26 @@
                 </div>
               </div>
               <button type="button" class="file-remove-btn" id="removeAttachedFileBtn" title="Remove attachment">&times;</button>
+            </div>
+
+            <!-- Voice Recording Status & Audio Waveform Card -->
+            <div class="lounge-voice-recording-card" id="loungeVoiceRecordingCard" style="display: none;">
+              <div class="recording-meta">
+                <span class="recording-pulse-circle"></span>
+                <span class="recording-status-text">Recording Voice Memo...</span>
+                <span class="recording-timer" id="voiceRecordingTimer">00:00</span>
+              </div>
+              <div class="recording-waveform" id="voiceRecordingWaveform">
+                <span class="wave-bar"></span><span class="wave-bar"></span><span class="wave-bar"></span>
+                <span class="wave-bar"></span><span class="wave-bar"></span><span class="wave-bar"></span>
+                <span class="wave-bar"></span><span class="wave-bar"></span><span class="wave-bar"></span>
+                <span class="wave-bar"></span><span class="wave-bar"></span><span class="wave-bar"></span>
+                <span class="wave-bar"></span><span class="wave-bar"></span><span class="wave-bar"></span>
+              </div>
+              <div class="recording-actions">
+                <button type="button" class="btn btn-secondary btn-xs" id="cancelVoiceRecordBtn">✕ Discard</button>
+                <button type="button" class="btn btn-primary btn-xs" id="sendVoiceRecordBtn">✈️ Send Note</button>
+              </div>
             </div>
 
             <form id="loungeMessageForm" class="lounge-form">
@@ -774,6 +832,10 @@
                   <input type="file" id="loungeFileInput" style="display: none;" accept=".pdf,.doc,.docx,.txt,.png,.jpg,.jpeg,.zip,.ppt,.pptx">
                   <button type="button" class="btn btn-secondary btn-sm" id="triggerLoungeFileBtn" title="Attach Document, PDF or Image">
                     <span>Share File</span>
+                  </button>
+
+                  <button type="button" class="btn btn-secondary btn-sm lounge-voice-record-btn" id="loungeVoiceRecordBtn" title="Record Voice Memo (WhatsApp style)">
+                    <span>🎙️ Voice Note</span>
                   </button>
 
                   <button type="submit" class="btn btn-primary btn-sm" id="loungeSendBtn">
@@ -2063,10 +2125,78 @@
     </button>
   </nav>
 
+  <!-- Modal: Keyboard Shortcuts Cheat Sheet -->
+  <div class="modal-backdrop" id="shortcutsModalBackdrop" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog modal-md" role="dialog" aria-modal="true">
+      <div class="modal-header">
+        <div class="modal-header-text">
+          <span class="modal-dept-badge">POWER SHORTCUTS</span>
+          <h3 class="modal-title">Keyboard Navigation &amp; Hotkeys</h3>
+          <p class="modal-subtitle">Instant campus productivity shortcuts for faculty &amp; students</p>
+        </div>
+        <button class="modal-close-btn" id="closeShortcutsModalBtn" title="Close">&times;</button>
+      </div>
+
+      <div class="modal-body shortcuts-modal-body">
+        <div class="shortcuts-section">
+          <h4 class="shortcuts-section-title">Navigation Shortcuts</h4>
+          <div class="shortcut-row">
+            <span class="shortcut-desc">Switch to Official Circulars</span>
+            <div class="shortcut-keys"><kbd>G</kbd> then <kbd>N</kbd></div>
+          </div>
+          <div class="shortcut-row">
+            <span class="shortcut-desc">Switch to Community Lounge (Chat)</span>
+            <div class="shortcut-keys"><kbd>G</kbd> then <kbd>L</kbd></div>
+          </div>
+          <div class="shortcut-row">
+            <span class="shortcut-desc">Switch to Analytics &amp; Capacity</span>
+            <div class="shortcut-keys"><kbd>G</kbd> then <kbd>D</kbd></div>
+          </div>
+        </div>
+
+        <div class="shortcuts-section">
+          <h4 class="shortcuts-section-title">Actions &amp; Operations</h4>
+          <div class="shortcut-row">
+            <span class="shortcut-desc">Compose New Circular (Admin / Faculty)</span>
+            <div class="shortcut-keys"><kbd>C</kbd></div>
+          </div>
+          <div class="shortcut-row">
+            <span class="shortcut-desc">Focus Community Lounge Message Input</span>
+            <div class="shortcut-keys"><kbd>M</kbd></div>
+          </div>
+          <div class="shortcut-row">
+            <span class="shortcut-desc">Focus Circular Search</span>
+            <div class="shortcut-keys"><kbd>S</kbd></div>
+          </div>
+          <div class="shortcut-row">
+            <span class="shortcut-desc">Toggle Theme Studio (Customizer)</span>
+            <div class="shortcut-keys"><kbd>T</kbd></div>
+          </div>
+          <div class="shortcut-row">
+            <span class="shortcut-desc">Close Open Modal / Dialog</span>
+            <div class="shortcut-keys"><kbd>Esc</kbd></div>
+          </div>
+          <div class="shortcut-row">
+            <span class="shortcut-desc">Send Community Message</span>
+            <div class="shortcut-keys"><kbd>Enter</kbd></div>
+          </div>
+          <div class="shortcut-row">
+            <span class="shortcut-desc">Toggle this Shortcuts Hub</span>
+            <div class="shortcut-keys"><kbd>?</kbd> or <kbd>Ctrl</kbd> + <kbd>/</kbd></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary btn-sm" id="closeShortcutsFooterBtn">Close Shortcuts</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast Notification Container -->
   <div class="toast-container" id="toastContainer" aria-live="polite"></div>
 
   <script src="icons.js"></script>
-  <script src="app.js?v=20261030_upgrade_v5"></script>
+  <script src="app.js?v=20261030_upgrade_v6"></script>
 </body>
 </html>
