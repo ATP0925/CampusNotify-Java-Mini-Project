@@ -772,6 +772,16 @@ class CampusNotificationManagementSystem {
             this.saveLoungeMessages();
             this.renderCommunityLounge();
 
+            // Update Lounge Tab Badge counter
+            if (this.dom.loungeTabBadge && this.activeView !== 'lounge') {
+              if (this.unreadLoungeCount > 0) {
+                this.dom.loungeTabBadge.textContent = this.unreadLoungeCount + ' New';
+                this.dom.loungeTabBadge.className = 'tab-badge green-badge pulse-badge';
+              } else if (sorted.length > 0) {
+                this.dom.loungeTabBadge.textContent = 'Live (' + sorted.length + ')';
+              }
+            }
+
             // Trigger real-time alert (audio chime, toast, unread tab badge) for incoming messages
             if (newIncomingList.length > 0) {
               newIncomingList.forEach(incoming => {
@@ -2811,20 +2821,27 @@ class CampusNotificationManagementSystem {
         ? `<span class="comment-role-tag comment-role-admin">Admin</span>`
         : `<span class="comment-role-tag comment-role-viewer">Member</span>`;
 
-      // Decrypt or fallback
+      // Decrypt or fallback: Prefer cleartext if available and not encrypted
       const cipherToDecrypt = (msg.ciphertext && msg.ciphertext.startsWith('E2EE:AES256GCM:'))
         ? msg.ciphertext
         : (msg.text && msg.text.startsWith('E2EE:AES256GCM:') ? msg.text : null);
 
-      let displayText = msg.text || '';
-      if (cipherToDecrypt && this.e2ee) {
+      let displayText = '';
+      if (msg.text && !msg.text.startsWith('E2EE:AES256GCM:')) {
+        displayText = msg.text;
+        if (cipherToDecrypt && this.e2ee && this.e2ee.decryptedCache) {
+          this.e2ee.decryptedCache.set(cipherToDecrypt, msg.text);
+        }
+      } else if (cipherToDecrypt && this.e2ee) {
         const syncDec = this.e2ee.decryptSync(cipherToDecrypt, msg.iv);
         if (syncDec && syncDec !== cipherToDecrypt) {
           displayText = syncDec;
+          msg.text = syncDec;
         } else {
           displayText = '🔒 Decrypting message...';
           this.e2ee.decrypt(cipherToDecrypt).then(plain => {
             if (plain && plain !== cipherToDecrypt) {
+              msg.text = plain;
               const bodyEl = document.querySelector(`#msg_${msg.id} .lounge-msg-body`);
               if (bodyEl) bodyEl.textContent = plain;
             }
@@ -2832,6 +2849,8 @@ class CampusNotificationManagementSystem {
             console.warn('E2EE background decryption error:', err);
           });
         }
+      } else {
+        displayText = msg.text || '';
       }
 
       // Avatar rendering: Custom Photo vs Initials/Emoji (Strictly wrapped in fixed-dimension container)
@@ -3039,6 +3058,12 @@ class CampusNotificationManagementSystem {
     this.render();
     this.initRealtimeBroadcastBus();
     this.renderNotificationCenter();
+    this.renderCommunityLounge();
+    if (this.dom.loungeTabBadge && this.loungeMessages && this.loungeMessages.length > 0) {
+      if (!this.unreadLoungeCount || this.unreadLoungeCount === 0) {
+        this.dom.loungeTabBadge.textContent = 'Live (' + this.loungeMessages.length + ')';
+      }
+    }
   }
 
   switchInstaAuthMode(mode) {
@@ -4862,25 +4887,34 @@ class CampusNotificationManagementSystem {
       // Admin has full restriction authority to delete ANY comment in the system
       const canDelete = this.isAdmin() || Boolean(this.currentUser && q.userId === this.currentUser.id);
 
-      // Decrypt if E2EE
+      // Decrypt if E2EE: Prefer cleartext if available and not encrypted
       const commentCipher = (q.ciphertext && q.ciphertext.startsWith('E2EE:AES256GCM:'))
         ? q.ciphertext
         : (q.text && q.text.startsWith('E2EE:AES256GCM:') ? q.text : null);
 
-      let displayText = q.text || '';
-      if (commentCipher && this.e2ee) {
+      let displayText = '';
+      if (q.text && !q.text.startsWith('E2EE:AES256GCM:')) {
+        displayText = q.text;
+        if (commentCipher && this.e2ee && this.e2ee.decryptedCache) {
+          this.e2ee.decryptedCache.set(commentCipher, q.text);
+        }
+      } else if (commentCipher && this.e2ee) {
         const dec = this.e2ee.decryptSync(commentCipher, q.iv);
         if (dec && dec !== commentCipher) {
           displayText = dec;
+          q.text = dec;
         } else {
           displayText = '🔒 Decrypting...';
           this.e2ee.decrypt(commentCipher).then(plain => {
             if (plain && plain !== commentCipher) {
+              q.text = plain;
               const el = document.querySelector(`#comment_${q.id} .comment-text`);
               if (el) el.textContent = plain;
             }
           }).catch(err => console.warn('Comment decrypt error:', err));
         }
+      } else {
+        displayText = q.text || '';
       }
 
       // Avatar (Strictly bounded 26px circular avatar or initials)
@@ -5419,8 +5453,6 @@ class CampusNotificationManagementSystem {
 
   }
 
-
-
   escapeHTML(str) {
     if (!str) return '';
     return String(str)
@@ -5894,132 +5926,228 @@ class CampusNotificationManagementSystem {
     }
   }
 
-
-  /* ==========================================================================
-     WHATSAPP-STYLE LIVE COMMUNITY CHAT ENGINE (MULTI-DEVICE & ONLINE)
-     ========================================================================== */
-
-  broadcastLoungeMessage(message) {
-    if (!message || !message.id) return;
-    if (this.broadcastChannel) {
-      try {
-        this.broadcastChannel.postMessage({
-          type: 'NEW_LOUNGE_MESSAGE',
-          message: message,
-          timestamp: Date.now()
-        });
-      } catch (e) {}
-    }
-    try {
-      localStorage.setItem('cnms_lounge_broadcast_signal', JSON.stringify({
-        message: message,
-        timestamp: Date.now()
-      }));
-    } catch (e) {}
-  }
-
-  receiveBroadcastedLoungeMessage(msg, fromCloud = false) {
-    if (!msg || !msg.id) return;
-
-    // Do not notify self if sent in this session
-    if (this.currentUser && msg.senderId === this.currentUser.id) {
-      return;
-    }
-
-    // Deduplicate in list
-    if (!this.loungeMessages.some(m => m.id === msg.id)) {
-      this.loungeMessages.push(msg);
-      this.loungeMessages.sort((a, b) => new Date(a.timestamp || 0) - new Date(b.timestamp || 0));
-      this.saveLoungeMessages();
-      this.renderCommunityLounge();
-    }
-
-    // 1. Play WhatsApp bubble message chime
-    this.playMessagePopChime();
-
-    // 2. Scroll if currently inside lounge
-    const isLoungeActive = this.activeView === 'lounge' || (this.dom.communityLoungeViewSection && this.dom.communityLoungeViewSection.style.display !== 'none');
-    if (isLoungeActive) {
-      this.scrollLoungeToBottom();
-    } else {
-      // 3. Increment unread counter on Campus Lounge tab
-      this.unreadLoungeCount = (this.unreadLoungeCount || 0) + 1;
-      if (this.dom.loungeTabBadge) {
-        this.dom.loungeTabBadge.textContent = `${this.unreadLoungeCount} New`;
-        this.dom.loungeTabBadge.className = 'tab-badge green-badge pulse-badge';
-      }
-      this.showLoungeMessageToast(msg);
-    }
-
-    // 4. Desktop native push notification
-    if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
-      try {
-        const textPreview = msg.text || (msg.file ? `📎 Shared file: ${msg.file.name}` : (msg.gifUrl ? '🎬 Shared a GIF' : 'New message in Campus Lounge'));
-        new Notification(`${msg.senderName} (Campus Lounge)`, {
-          body: textPreview,
-          icon: msg.avatarUrl || 'assets/favicon.svg'
-        });
-      } catch (e) {}
-    }
-  }
-
-  playMessagePopChime() {
-    if (this.isSoundMuted) return;
-    try {
-      const AudioCtx = (typeof window !== 'undefined') ? (window.AudioContext || window.webkitAudioContext) : null;
-      if (!AudioCtx) return;
-      const ctx = new AudioCtx();
-      const now = ctx.currentTime;
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(587.33, now); // D5
-      osc.frequency.exponentialRampToValueAtTime(880, now + 0.08); // A5 bubble sweep
-      gain.gain.setValueAtTime(0.28, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.start(now);
-      osc.stop(now + 0.14);
-    } catch (e) {}
-  }
-
-  showLoungeMessageToast(msg) {
-    if (typeof document === 'undefined' || !document.body) return;
-    try {
-      const existing = document.querySelector('.lounge-incoming-toast');
-      if (existing) existing.remove();
-
-      const toast = document.createElement('div');
-      toast.className = 'lounge-incoming-toast';
-      const textPreview = msg.text || (msg.file ? `📎 ${msg.file.name}` : (msg.gifUrl ? '🎬 Shared a GIF' : 'New message'));
-      const effectivePhoto = msg.avatarUrl || (msg.avatar && msg.avatar.startsWith('http') ? msg.avatar : '');
-      const avatarHtml = effectivePhoto
-        ? `<img src="${this.escapeHTML(effectivePhoto)}" alt="${this.escapeHTML(msg.senderName)}">`
-        : (msg.avatar && msg.avatar.length <= 4 && !msg.avatar.includes('http') ? msg.avatar : this.getInitials(msg.senderName));
-
-      toast.innerHTML = `
-        <div class="lounge-toast-avatar">${avatarHtml}</div>
-        <div class="lounge-toast-info">
-          <div class="lounge-toast-author">${this.escapeHTML(msg.senderName)} <span class="wa-badge">Campus Lounge</span></div>
-          <div class="lounge-toast-preview">${this.escapeHTML(textPreview.slice(0, 70))}</div>
-        </div>
-        <button type="button" class="lounge-toast-action-btn">Reply</button>
-      `;
-
-      toast.addEventListener('click', () => {
-        this.switchView('lounge');
-        toast.remove();
-      });
-
-      document.body.appendChild(toast);
-      setTimeout(() => {
-        toast.classList.add('hide');
-        setTimeout(() => toast.remove(), 400);
-      }, 5000);
-    } catch (e) {}
-  }
-
+  /* ==========================================================================
+
+     WHATSAPP-STYLE LIVE COMMUNITY CHAT ENGINE (MULTI-DEVICE & ONLINE)
+
+     ========================================================================== */
+
+  broadcastLoungeMessage(message) {
+
+    if (!message || !message.id) return;
+
+    if (this.broadcastChannel) {
+
+      try {
+
+        this.broadcastChannel.postMessage({
+
+          type: 'NEW_LOUNGE_MESSAGE',
+
+          message: message,
+
+          timestamp: Date.now()
+
+        });
+
+      } catch (e) {}
+
+    }
+
+    try {
+
+      localStorage.setItem('cnms_lounge_broadcast_signal', JSON.stringify({
+
+        message: message,
+
+        timestamp: Date.now()
+
+      }));
+
+    } catch (e) {}
+
+  }
+
+  receiveBroadcastedLoungeMessage(msg, fromCloud = false) {
+
+    if (!msg || !msg.id) return;
+
+    // Do not notify self if sent in this session
+
+    if (this.currentUser && msg.senderId === this.currentUser.id) {
+
+      return;
+
+    }
+
+    // Deduplicate in list
+
+    if (!this.loungeMessages.some(m => m.id === msg.id)) {
+
+      this.loungeMessages.push(msg);
+
+      this.loungeMessages.sort((a, b) => new Date(a.timestamp || 0) - new Date(b.timestamp || 0));
+
+      this.saveLoungeMessages();
+
+      this.renderCommunityLounge();
+
+    }
+
+    // 1. Play WhatsApp bubble message chime
+
+    this.playMessagePopChime();
+
+    // 2. Scroll if currently inside lounge
+
+    const isLoungeActive = this.activeView === 'lounge' || (this.dom.communityLoungeViewSection && this.dom.communityLoungeViewSection.style.display !== 'none');
+
+    if (isLoungeActive) {
+
+      this.scrollLoungeToBottom();
+
+    } else {
+
+      // 3. Increment unread counter on Campus Lounge tab
+
+      this.unreadLoungeCount = (this.unreadLoungeCount || 0) + 1;
+
+      if (this.dom.loungeTabBadge) {
+
+        this.dom.loungeTabBadge.textContent = `${this.unreadLoungeCount} New`;
+
+        this.dom.loungeTabBadge.className = 'tab-badge green-badge pulse-badge';
+
+      }
+
+      this.showLoungeMessageToast(msg);
+
+    }
+
+    // 4. Desktop native push notification
+
+    if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+
+      try {
+
+        const textPreview = msg.text || (msg.file ? `📎 Shared file: ${msg.file.name}` : (msg.gifUrl ? '🎬 Shared a GIF' : 'New message in Campus Lounge'));
+
+        new Notification(`${msg.senderName} (Campus Lounge)`, {
+
+          body: textPreview,
+
+          icon: msg.avatarUrl || 'assets/favicon.svg'
+
+        });
+
+      } catch (e) {}
+
+    }
+
+  }
+
+  playMessagePopChime() {
+
+    if (this.isSoundMuted) return;
+
+    try {
+
+      const AudioCtx = (typeof window !== 'undefined') ? (window.AudioContext || window.webkitAudioContext) : null;
+
+      if (!AudioCtx) return;
+
+      const ctx = new AudioCtx();
+
+      const now = ctx.currentTime;
+
+      const osc = ctx.createOscillator();
+
+      const gain = ctx.createGain();
+
+      osc.type = 'sine';
+
+      osc.frequency.setValueAtTime(587.33, now); // D5
+
+      osc.frequency.exponentialRampToValueAtTime(880, now + 0.08); // A5 bubble sweep
+
+      gain.gain.setValueAtTime(0.28, now);
+
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
+
+      osc.connect(gain);
+
+      gain.connect(ctx.destination);
+
+      osc.start(now);
+
+      osc.stop(now + 0.14);
+
+    } catch (e) {}
+
+  }
+
+  showLoungeMessageToast(msg) {
+
+    if (typeof document === 'undefined' || !document.body) return;
+
+    try {
+
+      const existing = document.querySelector('.lounge-incoming-toast');
+
+      if (existing) existing.remove();
+
+      const toast = document.createElement('div');
+
+      toast.className = 'lounge-incoming-toast';
+
+      const textPreview = msg.text || (msg.file ? `📎 ${msg.file.name}` : (msg.gifUrl ? '🎬 Shared a GIF' : 'New message'));
+
+      const effectivePhoto = msg.avatarUrl || (msg.avatar && msg.avatar.startsWith('http') ? msg.avatar : '');
+
+      const avatarHtml = effectivePhoto
+
+        ? `<img src="${this.escapeHTML(effectivePhoto)}" alt="${this.escapeHTML(msg.senderName)}">`
+
+        : (msg.avatar && msg.avatar.length <= 4 && !msg.avatar.includes('http') ? msg.avatar : this.getInitials(msg.senderName));
+
+      toast.innerHTML = `
+
+        <div class="lounge-toast-avatar">${avatarHtml}</div>
+
+        <div class="lounge-toast-info">
+
+          <div class="lounge-toast-author">${this.escapeHTML(msg.senderName)} <span class="wa-badge">Campus Lounge</span></div>
+
+          <div class="lounge-toast-preview">${this.escapeHTML(textPreview.slice(0, 70))}</div>
+
+        </div>
+
+        <button type="button" class="lounge-toast-action-btn">Reply</button>
+
+      `;
+
+      toast.addEventListener('click', () => {
+
+        this.switchView('lounge');
+
+        toast.remove();
+
+      });
+
+      document.body.appendChild(toast);
+
+      setTimeout(() => {
+
+        toast.classList.add('hide');
+
+        setTimeout(() => toast.remove(), 400);
+
+      }, 5000);
+
+    } catch (e) {}
+
+  }
+
   showToast(message, type = 'info') {
     if (!this.dom.toastContainer) return;
     const toast = document.createElement('div');
