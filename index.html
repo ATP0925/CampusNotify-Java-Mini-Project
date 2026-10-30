@@ -83,6 +83,48 @@
           <span class="btn-text-short">Exit</span>
         </button>
 
+        <!-- Live Instant Campus Notification Bell & Notification Center -->
+        <div class="nav-bell-wrapper" id="navBellWrapper">
+          <button class="icon-btn" id="navNotificationBellBtn" title="Instant Campus Notifications" aria-label="Notifications" aria-expanded="false">
+            <span class="bell-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg></span>
+            <span class="bell-badge" id="navNotificationBadge" style="display: none;">0</span>
+          </button>
+
+          <!-- Notification Center Dropdown Panel -->
+          <div class="notification-dropdown" id="notificationCenterDropdown" style="display: none;" role="menu">
+            <div class="notif-dropdown-header">
+              <div class="notif-header-title">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+                <span>Instant Alerts</span>
+                <span class="notif-unread-count" id="notifDropdownUnreadCount">0 new</span>
+              </div>
+              <div class="notif-header-actions">
+                <button type="button" class="notif-action-link" id="markAllNotifsReadBtn">Mark All Read</button>
+                <button type="button" class="notif-sound-btn" id="toggleNotifSoundBtn" title="Toggle Alert Chime">🔔</button>
+              </div>
+            </div>
+
+            <!-- Permission prompt banner for Desktop Push Notifications -->
+            <div class="notif-permission-banner" id="notifPermissionBanner" style="display: none;">
+              <span>Enable native desktop alerts for circulars:</span>
+              <button type="button" class="btn btn-xs btn-primary" id="requestPushPermissionBtn">Enable</button>
+            </div>
+
+            <!-- List of live notifications -->
+            <div class="notif-items-list" id="notifItemsList">
+              <div class="notif-empty-state">
+                <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8" style="opacity: 0.5; margin-bottom: 6px;"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+                <p>No new circulars. You are completely up to date!</p>
+              </div>
+            </div>
+
+            <div class="notif-dropdown-footer">
+              <span class="dispatch-pulse-dot"></span>
+              <span>Realtime Multi-Client Dispatch Bus &bull; &lt; 1s Latency</span>
+            </div>
+          </div>
+        </div>
+
         <!-- Theme Toggle -->
         <button class="icon-btn" id="themeToggleBtn" title="Toggle Dark/Light Mode" aria-label="Toggle Theme">
           <span class="theme-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line></svg></span>

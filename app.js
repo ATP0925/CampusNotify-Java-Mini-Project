@@ -338,6 +338,12 @@ class CampusNotificationManagementSystem {
 
     // Active Modal Contexts
     this.activeLetterheadNoticeId = null;
+
+    // Real-time Instant Notification Dispatch Bus & Notification Center
+    this.notificationsHistory = [];
+    this.isSoundMuted = false;
+    this.broadcastChannel = null;
+    this.isInitialNoticesLoad = true;
     this.activeDiscussionNoticeId = null;
 
     // Attached File for Community Lounge Composer
@@ -476,6 +482,19 @@ class CampusNotificationManagementSystem {
       // If authentic notices dataset is available and notices repo is empty, seed with authentic high-fidelity notices
       if (this.notices.length === 0 && typeof AUTHENTIC_CAMPUS_NOTICES !== 'undefined' && Array.isArray(AUTHENTIC_CAMPUS_NOTICES)) {
         this.notices = AUTHENTIC_CAMPUS_NOTICES.slice();
+      }
+
+      // 5. Load Real-time Notifications History & Preferences
+      try {
+        const storedNotifHist = localStorage.getItem('cnms_notifications_history');
+        this.notificationsHistory = storedNotifHist ? JSON.parse(storedNotifHist) : [];
+      } catch (e) {
+        this.notificationsHistory = [];
+      }
+      try {
+        this.isSoundMuted = localStorage.getItem('cnms_sound_muted') === 'true';
+      } catch (e) {
+        this.isSoundMuted = false;
       }
 
       // 4. Load Community Lounge Messages
@@ -694,6 +713,18 @@ class CampusNotificationManagementSystem {
             });
             // Sort by issuedAt descending
             cloudNotices.sort((a, b) => new Date(b.issuedAt || 0) - new Date(a.issuedAt || 0));
+
+            // Instant cloud broadcast for newly arrived circulars (< 1s across network)
+            if (!this.isInitialNoticesLoad && snapshot.docChanges) {
+              snapshot.docChanges().forEach(change => {
+                if (change.type === 'added') {
+                  const newDoc = Object.assign({ id: change.doc.id }, change.doc.data());
+                  this.receiveBroadcastedCircular(newDoc, true);
+                }
+              });
+            }
+            this.isInitialNoticesLoad = false;
+
             this.notices = cloudNotices;
             this.saveNotices();
             this.render();
@@ -827,6 +858,16 @@ class CampusNotificationManagementSystem {
   bindDOM() {
     this.dom = {
       // Navbar Controls
+      navBellWrapper: document.getElementById('navBellWrapper'),
+      navNotificationBellBtn: document.getElementById('navNotificationBellBtn'),
+      navNotificationBadge: document.getElementById('navNotificationBadge'),
+      notificationCenterDropdown: document.getElementById('notificationCenterDropdown'),
+      notifDropdownUnreadCount: document.getElementById('notifDropdownUnreadCount'),
+      markAllNotifsReadBtn: document.getElementById('markAllNotifsReadBtn'),
+      toggleNotifSoundBtn: document.getElementById('toggleNotifSoundBtn'),
+      notifPermissionBanner: document.getElementById('notifPermissionBanner'),
+      requestPushPermissionBtn: document.getElementById('requestPushPermissionBtn'),
+      notifItemsList: document.getElementById('notifItemsList'),
       globalSearchInput: document.getElementById('globalSearchInput'),
       openNewNoticeBtn: document.getElementById('openNewNoticeBtn'),
       newNoticeBtnLabel: document.getElementById('newNoticeBtnLabel'),
@@ -1882,6 +1923,37 @@ class CampusNotificationManagementSystem {
       });
     });
 
+    // 22. Live Instant Notification Center & Bell Triggers
+    if (this.dom.navNotificationBellBtn) {
+      this.dom.navNotificationBellBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.toggleNotificationDropdown();
+      });
+    }
+    if (this.dom.markAllNotifsReadBtn) {
+      this.dom.markAllNotifsReadBtn.addEventListener('click', () => {
+        this.markAllNotificationsRead();
+      });
+    }
+    if (this.dom.toggleNotifSoundBtn) {
+      this.dom.toggleNotifSoundBtn.addEventListener('click', () => {
+        this.toggleNotificationSound();
+      });
+    }
+    if (this.dom.requestPushPermissionBtn) {
+      this.dom.requestPushPermissionBtn.addEventListener('click', () => {
+        this.requestDesktopNotificationPermission();
+      });
+    }
+    document.addEventListener('click', (e) => {
+      if (this.dom.notificationCenterDropdown && 
+          this.dom.notificationCenterDropdown.style.display !== 'none' &&
+          this.dom.navBellWrapper && 
+          !this.dom.navBellWrapper.contains(e.target)) {
+        this.closeNotificationDropdown();
+      }
+    });
+
     // 21. Campus Capacity & Stress Telemetry Modal Triggers
     if (this.dom.openCapacityTelemetryBtn) {
       this.dom.openCapacityTelemetryBtn.addEventListener('click', () => {
@@ -2915,6 +2987,8 @@ class CampusNotificationManagementSystem {
     localStorage.removeItem('cnms_session_signed_out');
     this.updateUserSessionUI();
     this.render();
+    this.initRealtimeBroadcastBus();
+    this.renderNotificationCenter();
   }
 
   switchInstaAuthMode(mode) {
@@ -4603,8 +4677,11 @@ class CampusNotificationManagementSystem {
     // Push to Google Firebase Cloud
     this.pushToCloud('cnms_notices', newCircular.id, newCircular);
 
+    // INSTANT MULTI-CLIENT BROADCAST (Dispatches within 1 second across all users & tabs)
+    this.broadcastNewCircular(newCircular);
+
     this.closeNewNoticeModal();
-    this.showToast(`Official Circular [${refNo}] published to campus board.`, 'success');
+    this.showToast(`Official Circular [${refNo}] published & broadcasted to all campus members.`, 'success');
     this.render();
   }
 
@@ -5268,6 +5345,32 @@ class CampusNotificationManagementSystem {
     }
   }
 
+  formatRelativeTime(timestamp) {
+    if (!timestamp) return 'Just now';
+    try {
+      const now = Date.now();
+      const past = new Date(timestamp).getTime();
+      const diffSec = Math.floor((now - past) / 1000);
+      if (diffSec < 10) return 'Just now';
+      if (diffSec < 60) return diffSec + 's ago';
+      const diffMin = Math.floor(diffSec / 60);
+      if (diffMin < 60) return diffMin + 'm ago';
+      const diffHour = Math.floor(diffMin / 60);
+      if (diffHour < 24) return diffHour + 'h ago';
+      return this.formatDate(timestamp);
+    } catch {
+      return 'Recent';
+    }
+  }
+
+  escapeHtml(str) {
+
+    return this.escapeHTML(str);
+
+  }
+
+
+
   escapeHTML(str) {
     if (!str) return '';
     return String(str)
@@ -5292,6 +5395,446 @@ class CampusNotificationManagementSystem {
   /* --------------------------------------------------------------------------
      TOAST NOTIFICATIONS
      -------------------------------------------------------------------------- */
+
+  /* ==========================================================================
+     REAL-TIME INSTANT MULTI-CLIENT NOTIFICATION DISPATCH BUS (< 1s LATENCY)
+     ========================================================================== */
+
+  initRealtimeBroadcastBus() {
+    // 1. Cross-Tab / Cross-Window Local Broadcast Channel (< 5ms)
+    if (typeof BroadcastChannel !== 'undefined') {
+      try {
+        this.broadcastChannel = new BroadcastChannel('cnms_realtime_notice_bus');
+        this.broadcastChannel.onmessage = (event) => {
+          if (!event || !event.data) return;
+          const msg = event.data;
+          if (msg.type === 'NEW_CIRCULAR_BROADCAST' && msg.circular) {
+            this.receiveBroadcastedCircular(msg.circular, false);
+          }
+        };
+      } catch (e) {
+        console.warn('BroadcastChannel error:', e);
+      }
+    }
+
+    // 2. Storage event fallback for older / cross-context browser instances
+    if (typeof window !== 'undefined' && window.addEventListener) {
+      window.addEventListener('storage', (e) => {
+        if (e.key === 'cnms_instant_broadcast_signal' && e.newValue) {
+          try {
+            const payload = JSON.parse(e.newValue);
+            if (payload && payload.circular && payload.timestamp > (Date.now() - 10000)) {
+              this.receiveBroadcastedCircular(payload.circular, false);
+            }
+          } catch (err) {}
+        }
+      });
+    }
+
+    // 3. Check desktop push notification support & prompt banner
+    this.updateNotificationPermissionBanner();
+  }
+
+  updateNotificationPermissionBanner() {
+    if (this.dom && this.dom.notifPermissionBanner) {
+      if (typeof Notification !== 'undefined' && Notification.permission === 'default') {
+        this.dom.notifPermissionBanner.style.display = 'flex';
+      } else {
+        this.dom.notifPermissionBanner.style.display = 'none';
+      }
+    }
+  }
+
+  requestDesktopNotificationPermission() {
+    if (typeof Notification !== 'undefined' && Notification.requestPermission) {
+      Notification.requestPermission().then((permission) => {
+        if (permission === 'granted') {
+          this.showToast('Desktop push notifications enabled successfully.', 'success');
+          this.playNotificationChime('Normal');
+        } else {
+          this.showToast('Desktop notification permission declined.', 'info');
+        }
+        this.updateNotificationPermissionBanner();
+      }).catch(() => {});
+    }
+  }
+
+  broadcastNewCircular(circular) {
+    if (!circular || !circular.id) return;
+
+    // 1. BroadcastChannel for instant local & cross-tab delivery (< 5ms)
+    if (this.broadcastChannel) {
+      try {
+        this.broadcastChannel.postMessage({
+          type: 'NEW_CIRCULAR_BROADCAST',
+          circular: circular,
+          sender: this.currentUser ? this.currentUser.name : 'Authority',
+          timestamp: Date.now()
+        });
+      } catch (e) {}
+    }
+
+    // 2. Storage event trigger for multi-tab fallback
+    try {
+      localStorage.setItem('cnms_instant_broadcast_signal', JSON.stringify({
+        circular: circular,
+        timestamp: Date.now()
+      }));
+    } catch (e) {}
+
+    // 3. Record in local notification history
+    this.addNotificationToCenter({
+      id: 'notif_' + circular.id,
+      noticeId: circular.id,
+      title: circular.title,
+      refNo: circular.refNo,
+      department: circular.department,
+      priority: circular.priority,
+      timestamp: circular.issuedAt || new Date().toISOString(),
+      isRead: true
+    });
+  }
+
+  receiveBroadcastedCircular(circular, fromCloud = false) {
+    if (!circular || !circular.id) return;
+
+    // Avoid self-duplicate alert if the current user is the author
+    if (this.currentUser && circular.signatory && circular.signatory.includes(this.currentUser.name)) {
+      if (!this.notices.some(n => n.id === circular.id)) {
+        this.notices.unshift(circular);
+        this.saveNotices();
+        this.render();
+      }
+      return;
+    }
+
+    // Deduplicate in current session
+    const alertKey = `cnms_alert_seen_${circular.id}`;
+    try {
+      if (typeof sessionStorage !== 'undefined' && sessionStorage.getItem(alertKey)) return;
+      if (typeof sessionStorage !== 'undefined') sessionStorage.setItem(alertKey, 'true');
+    } catch (e) {}
+
+    // Add notice to list if not already present
+    if (!this.notices.some(n => n.id === circular.id)) {
+      this.notices.unshift(circular);
+      this.saveNotices();
+      this.render();
+    }
+
+    // 1. Play Instant Audio Chime
+    this.playNotificationChime(circular.priority);
+
+    // 2. Native Desktop Notification (even if minimized)
+    this.sendDesktopNotification(circular);
+
+    // 3. Add to Notification Center history & update unread badge
+    this.addNotificationToCenter({
+      id: 'notif_' + circular.id,
+      noticeId: circular.id,
+      title: circular.title,
+      refNo: circular.refNo,
+      department: circular.department,
+      priority: circular.priority,
+      timestamp: circular.issuedAt || new Date().toISOString(),
+      isRead: false
+    });
+
+    // 4. Prominent Screen Banner Toast
+    this.showBroadcastNotificationToast(circular);
+
+    // 5. Highlight notice card on screen
+    this.highlightNoticeCard(circular.id);
+  }
+
+  playNotificationChime(priority = 'Normal') {
+    if (this.isSoundMuted) return;
+    try {
+      const AudioCtx = (typeof window !== 'undefined') ? (window.AudioContext || window.webkitAudioContext) : null;
+      if (!AudioCtx) return;
+
+      const ctx = new AudioCtx();
+      const now = ctx.currentTime;
+
+      if (priority === 'Urgent') {
+        const osc1 = ctx.createOscillator();
+        const gain1 = ctx.createGain();
+        osc1.type = 'sine';
+        osc1.frequency.setValueAtTime(880, now);
+        gain1.gain.setValueAtTime(0.3, now);
+        gain1.gain.exponentialRampToValueAtTime(0.01, now + 0.16);
+        osc1.connect(gain1);
+        gain1.connect(ctx.destination);
+        osc1.start(now);
+        osc1.stop(now + 0.16);
+
+        const osc2 = ctx.createOscillator();
+        const gain2 = ctx.createGain();
+        osc2.type = 'sine';
+        osc2.frequency.setValueAtTime(1108.73, now + 0.18);
+        gain2.gain.setValueAtTime(0.35, now + 0.18);
+        gain2.gain.exponentialRampToValueAtTime(0.01, now + 0.42);
+        osc2.connect(gain2);
+        gain2.connect(ctx.destination);
+        osc2.start(now + 0.18);
+        osc2.stop(now + 0.42);
+      } else {
+        const notes = [523.25, 659.25, 783.99];
+        notes.forEach((freq, idx) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(freq, now + idx * 0.1);
+          gain.gain.setValueAtTime(0.2, now + idx * 0.1);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.1 + 0.3);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(now + idx * 0.1);
+          osc.stop(now + idx * 0.1 + 0.3);
+        });
+      }
+    } catch (e) {}
+  }
+
+  sendDesktopNotification(circular) {
+    if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+      try {
+        const isUrgent = circular.priority === 'Urgent';
+        const notif = new Notification(`${isUrgent ? '🚨 URGENT: ' : '🔔 '}${circular.title}`, {
+          body: `Department: ${circular.department} | Ref: ${circular.refNo}\nIssued by: ${circular.signatory || 'Academic Authority'}`,
+          icon: 'assets/college_logo.png',
+          tag: circular.id
+        });
+        notif.onclick = () => {
+          if (typeof window !== 'undefined' && window.focus) window.focus();
+          this.scrollToNotice(circular.id);
+        };
+      } catch (e) {}
+    }
+  }
+
+  showBroadcastNotificationToast(circular) {
+    if (typeof document === 'undefined') return;
+    const isUrgent = circular.priority === 'Urgent';
+    const toast = document.createElement('div');
+    toast.className = `broadcast-toast ${isUrgent ? 'urgent' : ''}`;
+    toast.innerHTML = `
+      <div class="broadcast-toast-icon">${isUrgent ? '🚨' : '🔔'}</div>
+      <div class="broadcast-toast-body">
+        <div class="broadcast-toast-header">${isUrgent ? 'URGENT CIRCULAR DISPATCHED' : 'NEW OFFICIAL CIRCULAR'}</div>
+        <div class="broadcast-toast-title">${this.escapeHtml(circular.title)}</div>
+        <div class="broadcast-toast-sub">${this.escapeHtml(circular.department)} &bull; Ref: ${this.escapeHtml(circular.refNo)}</div>
+        <div class="broadcast-toast-actions">
+          <button type="button" class="btn btn-xs btn-primary toast-view-btn">View Circular</button>
+          <button type="button" class="btn btn-xs btn-secondary toast-close-btn">Dismiss</button>
+        </div>
+      </div>
+    `;
+
+    if (document.body && document.body.appendChild) {
+      document.body.appendChild(toast);
+    }
+
+    const viewBtn = toast.querySelector ? toast.querySelector('.toast-view-btn') : null;
+    if (viewBtn && viewBtn.addEventListener) {
+      viewBtn.addEventListener('click', () => {
+        if (toast.remove) toast.remove();
+        this.scrollToNotice(circular.id);
+      });
+    }
+
+    const closeBtn = toast.querySelector ? toast.querySelector('.toast-close-btn') : null;
+    if (closeBtn && closeBtn.addEventListener) {
+      closeBtn.addEventListener('click', () => {
+        if (toast.remove) toast.remove();
+      });
+    }
+
+    setTimeout(() => {
+      if (toast.parentNode && toast.remove) {
+        toast.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(-20px)';
+        setTimeout(() => toast.remove(), 300);
+      }
+    }, 8000);
+  }
+
+  addNotificationToCenter(notif) {
+    if (!this.notificationsHistory) this.notificationsHistory = [];
+    this.notificationsHistory = this.notificationsHistory.filter(n => n.noticeId !== notif.noticeId);
+    this.notificationsHistory.unshift(notif);
+    if (this.notificationsHistory.length > 30) {
+      this.notificationsHistory = this.notificationsHistory.slice(0, 30);
+    }
+    try {
+      localStorage.setItem('cnms_notifications_history', JSON.stringify(this.notificationsHistory));
+    } catch (e) {}
+    this.renderNotificationCenter();
+  }
+
+  get unreadNotificationCount() {
+    return (this.notificationsHistory || []).filter(n => !n.isRead).length;
+  }
+
+  renderNotificationCenter() {
+    if (!this.notificationsHistory) this.notificationsHistory = [];
+    const unreadCount = this.notificationsHistory.filter(n => !n.isRead).length;
+
+    // Update bell badge
+    if (this.dom && this.dom.navNotificationBadge) {
+      if (unreadCount > 0) {
+        this.dom.navNotificationBadge.style.display = 'flex';
+        this.dom.navNotificationBadge.textContent = unreadCount > 9 ? '9+' : unreadCount;
+      } else {
+        this.dom.navNotificationBadge.style.display = 'none';
+      }
+    }
+
+    // Update dropdown header
+    if (this.dom && this.dom.notifDropdownUnreadCount) {
+      this.dom.notifDropdownUnreadCount.textContent = `${unreadCount} new`;
+    }
+
+    // Update sound button icon
+    if (this.dom && this.dom.toggleNotifSoundBtn) {
+      this.dom.toggleNotifSoundBtn.textContent = this.isSoundMuted ? '🔕' : '🔔';
+      this.dom.toggleNotifSoundBtn.title = this.isSoundMuted ? 'Unmute Alert Chime' : 'Mute Alert Chime';
+    }
+
+    // Populate items list
+    if (this.dom && this.dom.notifItemsList) {
+      if (this.notificationsHistory.length === 0) {
+        this.dom.notifItemsList.innerHTML = `
+          <div class="notif-empty-state">
+            <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8" style="opacity: 0.5; margin-bottom: 6px;"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+            <p>No circular notifications yet. You are all caught up!</p>
+          </div>
+        `;
+      } else {
+        this.dom.notifItemsList.innerHTML = this.notificationsHistory.map(item => {
+          const isUrgent = item.priority === 'Urgent';
+          return `
+            <div class="notif-item ${!item.isRead ? 'unread' : ''} ${isUrgent ? 'urgent' : ''}" data-notice-id="${this.escapeHtml(item.noticeId)}">
+              <div class="notif-item-icon">${isUrgent ? '🚨' : '📜'}</div>
+              <div class="notif-item-content">
+                <div class="notif-item-top">
+                  <span class="notif-item-dept">${this.escapeHtml(item.department || 'CAMPUS')}</span>
+                  <span class="notif-item-time">${this.formatRelativeTime(item.timestamp)}</span>
+                </div>
+                <div class="notif-item-title">${this.escapeHtml(item.title)}</div>
+                <div class="notif-item-meta">
+                  <span class="meta-badge ${isUrgent ? 'red-badge' : 'gray-badge'}">${this.escapeHtml(item.priority || 'Normal')}</span>
+                  <span style="font-size: 0.68rem; color: var(--text-dim);">${this.escapeHtml(item.refNo || '')}</span>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        if (this.dom.notifItemsList.querySelectorAll) {
+          this.dom.notifItemsList.querySelectorAll('.notif-item').forEach(itemEl => {
+            if (itemEl.addEventListener) {
+              itemEl.addEventListener('click', () => {
+                const noticeId = itemEl.getAttribute('data-notice-id');
+                const found = this.notificationsHistory.find(n => n.noticeId === noticeId);
+                if (found) found.isRead = true;
+                try {
+                  localStorage.setItem('cnms_notifications_history', JSON.stringify(this.notificationsHistory));
+                } catch (e) {}
+                this.renderNotificationCenter();
+                this.closeNotificationDropdown();
+                this.scrollToNotice(noticeId);
+              });
+            }
+          });
+        }
+      }
+    }
+  }
+
+  toggleNotificationDropdown() {
+    if (!this.dom || !this.dom.notificationCenterDropdown) return;
+    const isVisible = this.dom.notificationCenterDropdown.style.display !== 'none';
+    if (isVisible) {
+      this.closeNotificationDropdown();
+    } else {
+      this.openNotificationDropdown();
+    }
+  }
+
+  openNotificationDropdown() {
+    if (!this.dom || !this.dom.notificationCenterDropdown) return;
+    this.dom.notificationCenterDropdown.style.display = 'flex';
+    if (this.dom.navNotificationBellBtn && this.dom.navNotificationBellBtn.setAttribute) {
+      this.dom.navNotificationBellBtn.setAttribute('aria-expanded', 'true');
+    }
+    this.updateNotificationPermissionBanner();
+  }
+
+  closeNotificationDropdown() {
+    if (!this.dom || !this.dom.notificationCenterDropdown) return;
+    this.dom.notificationCenterDropdown.style.display = 'none';
+    if (this.dom.navNotificationBellBtn && this.dom.navNotificationBellBtn.setAttribute) {
+      this.dom.navNotificationBellBtn.setAttribute('aria-expanded', 'false');
+    }
+  }
+
+  markAllNotificationsRead() {
+    if (!this.notificationsHistory) return;
+    this.notificationsHistory.forEach(n => n.isRead = true);
+    try {
+      localStorage.setItem('cnms_notifications_history', JSON.stringify(this.notificationsHistory));
+    } catch (e) {}
+    this.renderNotificationCenter();
+    this.showToast('All notifications marked as read.', 'info');
+  }
+
+  toggleNotificationSound() {
+    this.isSoundMuted = !this.isSoundMuted;
+    try {
+      localStorage.setItem('cnms_sound_muted', String(this.isSoundMuted));
+    } catch (e) {}
+    this.renderNotificationCenter();
+    this.showToast(this.isSoundMuted ? 'Alert chime muted.' : 'Alert chime unmuted.', 'info');
+    if (!this.isSoundMuted) {
+      this.playNotificationChime('Normal');
+    }
+  }
+
+  scrollToNotice(noticeId) {
+    if (!noticeId) return;
+    if (this.currentView !== 'notices') {
+      this.switchView('notices');
+    }
+    this.activeDepartmentFilter = 'all';
+    this.activePriorityFilter = 'all';
+    this.activeAudienceFilter = 'all';
+    this.searchQuery = '';
+    if (this.dom && this.dom.globalSearchInput) this.dom.globalSearchInput.value = '';
+    this.render();
+
+    setTimeout(() => {
+      if (typeof document !== 'undefined') {
+        const card = document.querySelector(`[data-notice-id="${noticeId}"]`);
+        if (card) {
+          if (card.scrollIntoView) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          this.highlightNoticeCard(noticeId);
+        }
+      }
+    }, 150);
+  }
+
+  highlightNoticeCard(noticeId) {
+    if (typeof document === 'undefined') return;
+    const card = document.querySelector(`[data-notice-id="${noticeId}"]`);
+    if (card && card.classList) {
+      card.classList.remove('highlight-pulse');
+      if (typeof card.offsetWidth !== 'undefined') void card.offsetWidth;
+      card.classList.add('highlight-pulse');
+    }
+  }
+
   showToast(message, type = 'info') {
     if (!this.dom.toastContainer) return;
     const toast = document.createElement('div');

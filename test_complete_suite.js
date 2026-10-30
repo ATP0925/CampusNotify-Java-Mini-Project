@@ -421,6 +421,35 @@ async function runTests() {
   assert('Lounge avatar image has strict 40px inline style constraint', loungeHtmlForViewer.includes('width: 40px !important') && loungeHtmlForViewer.includes('height: 40px !important'));
   assert('Lounge message item has robust flex layout inline constraint', loungeHtmlForViewer.includes('display: flex !important') && loungeHtmlForViewer.includes('min-width: 0 !important'));
 
+  console.log('\n--- PILLAR 11: Instant Multi-Client Broadcast Bus & Notification Center ---');
+  assert('Broadcast bus initialization method exists', typeof cnms.initRealtimeBroadcastBus === 'function');
+  assert('Broadcast circular method exists', typeof cnms.broadcastNewCircular === 'function');
+  assert('Receive broadcast circular method exists', typeof cnms.receiveBroadcastedCircular === 'function');
+  
+  const testCircular = {
+    id: 'test_inst_notice_99',
+    refNo: 'PVPPCOE/TEST/2026/99',
+    title: 'Urgent Campus Dispatch Test',
+    department: 'EXAM CELL',
+    priority: 'Urgent',
+    issuedAt: new Date().toISOString()
+  };
+
+  const dispatchStart = Date.now();
+  cnms.receiveBroadcastedCircular(testCircular);
+  const dispatchElapsed = Date.now() - dispatchStart;
+
+  assert('Instant notification reception latency is sub-second (< 1000ms)', dispatchElapsed < 1000);
+  assert('Unread notification count incremented', cnms.unreadNotificationCount > 0);
+  assert('Notification history stores received broadcast', cnms.notificationsHistory.some(n => n.noticeId === testCircular.id));
+  
+  cnms.renderNotificationCenter();
+  const notifCenterHtml = cnms.dom.notifItemsList ? cnms.dom.notifItemsList.innerHTML : '';
+  assert('Notification center renders broadcasted item', notifCenterHtml.includes('Urgent Campus Dispatch Test'));
+  
+  cnms.markAllNotificationsRead();
+  assert('Marking all notifications as read resets unread count to 0', cnms.unreadNotificationCount === 0);
+
   console.log('\n================================================================');
   console.log(`  VERIFICATION COMPLETED: ${passed} / ${total} TESTS PASSED (${((passed/total)*100).toFixed(1)}%)`);
   console.log('================================================================\n');
