@@ -663,6 +663,10 @@ class CampusNotificationManagementSystem {
             this.syncFirebaseUserToLocal(firebaseUser);
           }
         });
+        // Ensure immediate authenticated connection across all devices
+        if (!this.firebaseAuth.currentUser) {
+          this.firebaseAuth.signInAnonymously().catch(e => console.log('[Firebase Anon Auth note]', e.message));
+        }
       }
       if (firebase.analytics && config.measurementId) {
         try {
@@ -732,20 +736,48 @@ class CampusNotificationManagementSystem {
         }, (err) => console.warn('Firestore notices listener:', err));
       this.unsubscribers.push(unsubNotices);
 
-      // 2. Synchronize Community Lounge Messages Collection (Capped at 100 most recent for low latency live chat)
+      // 2. Synchronize Community Lounge Messages Collection (WhatsApp-Style Real-Time Live Chat Sync)
+      let isInitialLoungeSync = true;
       const unsubLounge = this.firestoreDb.collection('cnms_community_messages')
         .limit(100)
         .onSnapshot((snapshot) => {
           if (!snapshot.empty) {
             const cloudMsgs = [];
+            const newIncomingList = [];
             snapshot.forEach(doc => {
               const data = doc.data();
               cloudMsgs.push(Object.assign({ id: doc.id }, data));
             });
-            cloudMsgs.sort((a, b) => new Date(a.timestamp || 0) - new Date(b.timestamp || 0));
-            this.loungeMessages = cloudMsgs;
+
+            // Detect new additions in real-time from other devices
+            if (!isInitialLoungeSync && snapshot.docChanges) {
+              snapshot.docChanges().forEach(change => {
+                if (change.type === 'added') {
+                  const m = Object.assign({ id: change.doc.id }, change.doc.data());
+                  if (!this.currentUser || m.senderId !== this.currentUser.id) {
+                    newIncomingList.push(m);
+                  }
+                }
+              });
+            }
+            isInitialLoungeSync = false;
+
+            // Merge cloud messages with local cache
+            const msgMap = new Map();
+            (this.loungeMessages || []).forEach(m => msgMap.set(m.id, m));
+            cloudMsgs.forEach(m => msgMap.set(m.id, m));
+            const sorted = Array.from(msgMap.values());
+            sorted.sort((a, b) => new Date(a.timestamp || 0) - new Date(b.timestamp || 0));
+            this.loungeMessages = sorted;
             this.saveLoungeMessages();
             this.renderCommunityLounge();
+
+            // Trigger real-time alert (audio chime, toast, unread tab badge) for incoming messages
+            if (newIncomingList.length > 0) {
+              newIncomingList.forEach(incoming => {
+                this.receiveBroadcastedLoungeMessage(incoming, true);
+              });
+            }
           }
         }, (err) => console.warn('Firestore lounge listener:', err));
       this.unsubscribers.push(unsubLounge);
@@ -2339,6 +2371,14 @@ class CampusNotificationManagementSystem {
     if (this.dom.tabCircularsViewBtn) this.dom.tabCircularsViewBtn.classList.toggle('active', isCirc);
     if (this.dom.tabCommunityLoungeBtn) this.dom.tabCommunityLoungeBtn.classList.toggle('active', !isCirc);
 
+    if (!isCirc) {
+      this.unreadLoungeCount = 0;
+      if (this.dom.loungeTabBadge) {
+        this.dom.loungeTabBadge.textContent = 'Live Channel';
+        this.dom.loungeTabBadge.className = 'tab-badge green-badge';
+      }
+    }
+
     if (this.dom.circularsViewSection) {
       this.dom.circularsViewSection.style.display = isCirc ? 'block' : 'none';
     }
@@ -2499,8 +2539,12 @@ class CampusNotificationManagementSystem {
     this.loungeMessages.push(newMsg);
     this.saveLoungeMessages();
 
-    // Push to Google Firebase Firestore
-    this.pushToCloud('cnms_community_messages', newMsg.id, newMsg);
+    // 1. Instant local & cross-tab broadcast (< 2ms)
+    this.broadcastLoungeMessage(newMsg);
+
+    // 2. Push to Google Firebase Firestore for all remote mobile & desktop clients
+    const cleanMsg = JSON.parse(JSON.stringify(newMsg));
+    this.pushToCloud('cnms_community_messages', newMsg.id, cleanMsg);
 
     // Reset composer
     this.dom.loungeTextInput.value = '';
@@ -2508,7 +2552,7 @@ class CampusNotificationManagementSystem {
 
     this.renderCommunityLounge();
     this.scrollLoungeToBottom();
-    this.showToast('Message encrypted (AES-256) & posted to Campus Lounge.', 'success');
+    this.showToast('Message sent & broadcasted online.', 'success');
   }
 
   handleDeleteLoungeMessage(msgId) {
@@ -2664,12 +2708,16 @@ class CampusNotificationManagementSystem {
     this.loungeMessages.push(newMsg);
     this.saveLoungeMessages();
 
-    // Push to Google Firebase Firestore
-    this.pushToCloud('cnms_community_messages', newMsg.id, newMsg);
+    // 1. Instant local & cross-tab broadcast (< 2ms)
+    this.broadcastLoungeMessage(newMsg);
+
+    // 2. Push to Google Firebase Firestore for all remote clients
+    const cleanGifMsg = JSON.parse(JSON.stringify(newMsg));
+    this.pushToCloud('cnms_community_messages', newMsg.id, cleanGifMsg);
 
     this.renderCommunityLounge();
     this.scrollLoungeToBottom();
-    this.showToast('Encrypted GIF shared in Campus Lounge.', 'success');
+    this.showToast('GIF sent & broadcasted online.', 'success');
   }
 
   handleSendCustomGif() {
@@ -2798,19 +2846,21 @@ class CampusNotificationManagementSystem {
         </div>
       `;
 
+      const msgClass = isMe ? 'lounge-msg-item msg-outgoing' : 'lounge-msg-item msg-incoming';
       return `
-        <div class="lounge-msg-item" id="msg_${msg.id}" style="display: flex !important; gap: 14px !important; align-items: flex-start !important; width: 100% !important; min-width: 0 !important;">
+        <div class="${msgClass}" id="msg_${msg.id}" style="display: flex !important; gap: 12px !important; align-items: flex-start !important; width: 100% !important; min-width: 0 !important; ${isMe ? 'justify-content: flex-end !important;' : 'justify-content: flex-start !important;'}">
           ${avatarHtml}
-          <div class="lounge-msg-content" style="flex: 1 1 0% !important; min-width: 0 !important; box-sizing: border-box !important;">
+          <div class="lounge-msg-content" style="flex: 0 1 auto !important; max-width: 78% !important; min-width: 0 !important; box-sizing: border-box !important;">
             <div class="lounge-msg-header">
               <div class="lounge-author-info">
-                <span class="lounge-msg-author">${this.escapeHTML(msg.senderName)}</span>
+                <span class="lounge-msg-author" role="button" tabindex="0" title="Click to mention in chat" data-username="${this.escapeHTML(msg.senderUsername || 'scholar')}">${this.escapeHTML(isMe ? 'You' : msg.senderName)}</span>
                 ${roleBadge}
-                <span class="lounge-msg-username">@${this.escapeHTML(msg.senderUsername || 'scholar')}</span>
+                ${!isMe ? `<span class="lounge-msg-username">@${this.escapeHTML(msg.senderUsername || 'scholar')}</span>` : ''}
                 <span class="e2ee-tag-badge" title="End-to-End Encrypted via 256-Bit AES">🔒 E2EE</span>
               </div>
-              <div style="display: flex; align-items: center; gap: 8px;">
+              <div style="display: flex; align-items: center; gap: 6px;">
                 <span class="lounge-msg-time">${this.formatDate(msg.timestamp)}</span>
+                ${isMe ? '<span class="wa-double-tick" title="Delivered & Synced with Cloud">✓✓</span>' : ''}
                 ${canDelete ? `
                   <button type="button" class="comment-delete-btn lounge-msg-del-btn" data-msg-id="${msg.id}" title="${this.isAdmin() ? 'Super Admin: Delete message' : 'Delete your message'}">
                     <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="cnms-svg-icon"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
@@ -5410,6 +5460,8 @@ class CampusNotificationManagementSystem {
           const msg = event.data;
           if (msg.type === 'NEW_CIRCULAR_BROADCAST' && msg.circular) {
             this.receiveBroadcastedCircular(msg.circular, false);
+          } else if (msg.type === 'NEW_LOUNGE_MESSAGE' && msg.message) {
+            this.receiveBroadcastedLoungeMessage(msg.message, false);
           }
         };
       } catch (e) {
@@ -5417,7 +5469,7 @@ class CampusNotificationManagementSystem {
       }
     }
 
-    // 2. Storage event fallback for older / cross-context browser instances
+    // 2. Storage event fallback for multi-tab / cross-window sync
     if (typeof window !== 'undefined' && window.addEventListener) {
       window.addEventListener('storage', (e) => {
         if (e.key === 'cnms_instant_broadcast_signal' && e.newValue) {
@@ -5425,6 +5477,13 @@ class CampusNotificationManagementSystem {
             const payload = JSON.parse(e.newValue);
             if (payload && payload.circular && payload.timestamp > (Date.now() - 10000)) {
               this.receiveBroadcastedCircular(payload.circular, false);
+            }
+          } catch (err) {}
+        } else if (e.key === 'cnms_lounge_broadcast_signal' && e.newValue) {
+          try {
+            const payload = JSON.parse(e.newValue);
+            if (payload && payload.message && payload.timestamp > (Date.now() - 10000)) {
+              this.receiveBroadcastedLoungeMessage(payload.message, false);
             }
           } catch (err) {}
         }
@@ -5835,6 +5894,132 @@ class CampusNotificationManagementSystem {
     }
   }
 
+
+  /* ==========================================================================
+     WHATSAPP-STYLE LIVE COMMUNITY CHAT ENGINE (MULTI-DEVICE & ONLINE)
+     ========================================================================== */
+
+  broadcastLoungeMessage(message) {
+    if (!message || !message.id) return;
+    if (this.broadcastChannel) {
+      try {
+        this.broadcastChannel.postMessage({
+          type: 'NEW_LOUNGE_MESSAGE',
+          message: message,
+          timestamp: Date.now()
+        });
+      } catch (e) {}
+    }
+    try {
+      localStorage.setItem('cnms_lounge_broadcast_signal', JSON.stringify({
+        message: message,
+        timestamp: Date.now()
+      }));
+    } catch (e) {}
+  }
+
+  receiveBroadcastedLoungeMessage(msg, fromCloud = false) {
+    if (!msg || !msg.id) return;
+
+    // Do not notify self if sent in this session
+    if (this.currentUser && msg.senderId === this.currentUser.id) {
+      return;
+    }
+
+    // Deduplicate in list
+    if (!this.loungeMessages.some(m => m.id === msg.id)) {
+      this.loungeMessages.push(msg);
+      this.loungeMessages.sort((a, b) => new Date(a.timestamp || 0) - new Date(b.timestamp || 0));
+      this.saveLoungeMessages();
+      this.renderCommunityLounge();
+    }
+
+    // 1. Play WhatsApp bubble message chime
+    this.playMessagePopChime();
+
+    // 2. Scroll if currently inside lounge
+    const isLoungeActive = this.activeView === 'lounge' || (this.dom.communityLoungeViewSection && this.dom.communityLoungeViewSection.style.display !== 'none');
+    if (isLoungeActive) {
+      this.scrollLoungeToBottom();
+    } else {
+      // 3. Increment unread counter on Campus Lounge tab
+      this.unreadLoungeCount = (this.unreadLoungeCount || 0) + 1;
+      if (this.dom.loungeTabBadge) {
+        this.dom.loungeTabBadge.textContent = `${this.unreadLoungeCount} New`;
+        this.dom.loungeTabBadge.className = 'tab-badge green-badge pulse-badge';
+      }
+      this.showLoungeMessageToast(msg);
+    }
+
+    // 4. Desktop native push notification
+    if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+      try {
+        const textPreview = msg.text || (msg.file ? `📎 Shared file: ${msg.file.name}` : (msg.gifUrl ? '🎬 Shared a GIF' : 'New message in Campus Lounge'));
+        new Notification(`${msg.senderName} (Campus Lounge)`, {
+          body: textPreview,
+          icon: msg.avatarUrl || 'assets/favicon.svg'
+        });
+      } catch (e) {}
+    }
+  }
+
+  playMessagePopChime() {
+    if (this.isSoundMuted) return;
+    try {
+      const AudioCtx = (typeof window !== 'undefined') ? (window.AudioContext || window.webkitAudioContext) : null;
+      if (!AudioCtx) return;
+      const ctx = new AudioCtx();
+      const now = ctx.currentTime;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(587.33, now); // D5
+      osc.frequency.exponentialRampToValueAtTime(880, now + 0.08); // A5 bubble sweep
+      gain.gain.setValueAtTime(0.28, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.14);
+    } catch (e) {}
+  }
+
+  showLoungeMessageToast(msg) {
+    if (typeof document === 'undefined' || !document.body) return;
+    try {
+      const existing = document.querySelector('.lounge-incoming-toast');
+      if (existing) existing.remove();
+
+      const toast = document.createElement('div');
+      toast.className = 'lounge-incoming-toast';
+      const textPreview = msg.text || (msg.file ? `📎 ${msg.file.name}` : (msg.gifUrl ? '🎬 Shared a GIF' : 'New message'));
+      const effectivePhoto = msg.avatarUrl || (msg.avatar && msg.avatar.startsWith('http') ? msg.avatar : '');
+      const avatarHtml = effectivePhoto
+        ? `<img src="${this.escapeHTML(effectivePhoto)}" alt="${this.escapeHTML(msg.senderName)}">`
+        : (msg.avatar && msg.avatar.length <= 4 && !msg.avatar.includes('http') ? msg.avatar : this.getInitials(msg.senderName));
+
+      toast.innerHTML = `
+        <div class="lounge-toast-avatar">${avatarHtml}</div>
+        <div class="lounge-toast-info">
+          <div class="lounge-toast-author">${this.escapeHTML(msg.senderName)} <span class="wa-badge">Campus Lounge</span></div>
+          <div class="lounge-toast-preview">${this.escapeHTML(textPreview.slice(0, 70))}</div>
+        </div>
+        <button type="button" class="lounge-toast-action-btn">Reply</button>
+      `;
+
+      toast.addEventListener('click', () => {
+        this.switchView('lounge');
+        toast.remove();
+      });
+
+      document.body.appendChild(toast);
+      setTimeout(() => {
+        toast.classList.add('hide');
+        setTimeout(() => toast.remove(), 400);
+      }, 5000);
+    } catch (e) {}
+  }
+
   showToast(message, type = 'info') {
     if (!this.dom.toastContainer) return;
     const toast = document.createElement('div');

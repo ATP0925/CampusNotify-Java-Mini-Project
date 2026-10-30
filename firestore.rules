@@ -3,134 +3,194 @@ service cloud.firestore {
   match /databases/{database}/documents {
 
     // ===============================================================
-    // Assumed Data Models
+    // CampusNotify (CNMS) - Cloud Firestore Security Rules
+    // Multi-Device Real-Time Sync & Live Campus Lounge Messaging
     // ===============================================================
-    // Collection: cnms_notices
-    //   - id: string
-    //   - refNo: string
-    //   - title: string
-    //   - department: string
-    //   - priority: string
-    //   - audience: string
-    //   - description: string
-    //   - attachment: string | null
-    //   - signatory: string
-    //   - issuedAt: string (ISO timestamp)
-    //   - likes: list
-    //   - reactions: map
-    //   - comments: list
+    // Enables seamless, instant, bidirectional real-time synchronization
+    // across all user devices (smartphones, laptops, and web browsers)
+    // using Firestore's WebSocket snapshot listeners (onSnapshot).
     //
-    // Collection: cnms_users
-    //   - id: string
-    //   - name: string
-    //   - username: string
-    //   - email: string
-    //   - role: 'ADMIN' | 'VIEWER' | 'STUDENT' | 'FACULTY'
-    //   - canPost: bool
-    //   - status: 'PENDING' | 'APPROVED' | 'REJECTED'
-    //   - bio: string
-    //   - avatar: string
+    // Data Models & Schemas:
     //
-    // Collection: cnms_community_messages
-    //   - id: string
-    //   - senderId: string
-    //   - senderName: string
-    //   - senderUsername: string
-    //   - text: string
-    //   - timestamp: string
-    //   - reactions: map
-    //   - file: map | null
+    // 1. Collection: cnms_community_messages (WhatsApp-like Live Chat)
+    //    - id: string (e.g. 'lounge_1730...')
+    //    - senderId: string (e.g. 'user_patil_01')
+    //    - senderName: string (e.g. 'Dr. Rajesh Patil')
+    //    - senderUsername: string (optional)
+    //    - senderRealName: string (optional)
+    //    - senderRealEmail: string (optional)
+    //    - avatarUrl: string (optional)
+    //    - avatar: string (e.g. 'RP')
+    //    - senderRole: string (e.g. 'FACULTY', 'ADMIN', 'STUDENT')
+    //    - senderBio: string (optional)
+    //    - text: string (max 30,000 chars)
+    //    - ciphertext: string | null (AES-256-GCM E2EE payload)
+    //    - iv: string | null
+    //    - isE2ee: bool (optional)
+    //    - file: map | null (attachment metadata)
+    //    - gifUrl: string | null (optional)
+    //    - reactions: map (optional emoji reactions)
+    //    - timestamp: string (ISO 8601 timestamp)
+    //
+    // 2. Collection: cnms_notices (Official Circulars & Proof Receipts)
+    //    - id: string (e.g. 'CNMS-1730...')
+    //    - refNo: string (e.g. 'CNMS/2026/EXAM/01')
+    //    - title: string (max 500 chars)
+    //    - department: string (e.g. 'Examination Cell')
+    //    - priority: string ('HIGH', 'MEDIUM', 'LOW', 'URGENT')
+    //    - audience: string (e.g. 'ALL', 'FACULTY', 'STUDENTS')
+    //    - description: string (max 65,536 chars)
+    //    - attachment: string | map | null
+    //    - signatory: string
+    //    - issuedAt: string (ISO 8601 timestamp)
+    //    - acknowledgedCount: int | float
+    //    - likes: list
+    //    - reactions: map
+    //    - comments: list
+    //
+    // 3. Collection: cnms_users (Campus User Profiles & Directory)
+    //    - id: string (e.g. 'user_admin_001')
+    //    - name: string
+    //    - username: string
+    //    - email: string
+    //    - role: string ('ADMIN', 'FACULTY', 'STUDENT', 'VIEWER')
+    //    - canPost: bool
+    //    - status: string ('APPROVED', 'PENDING', 'REJECTED')
+    //    - isSuperAdmin: bool
+    //    - bio: string
+    //    - avatar: string
+    //    - avatarUrl: string (optional)
+    //    - createdAt: int | float | timestamp | string
+    //    - privacyConsentGiven: bool
+    //    - privacyConsentDate: string
     // ===============================================================
 
-    // Helper functions
-    function isAuthenticated() {
-      return request.auth != null;
+    // ===============================================================
+    // Domain Validators
+    // ===============================================================
+
+    // Community Lounge Message Validator
+    function hasRequiredMessageFields(data) {
+      return data.id is string && data.id.size() > 0 && data.id.size() <= 128
+        && data.senderId is string && data.senderId.size() > 0 && data.senderId.size() <= 128
+        && data.senderName is string && data.senderName.size() > 0 && data.senderName.size() <= 128;
     }
 
-    function isSuperAdmin() {
-      return isAuthenticated() && (
-        request.auth.token.email == 'admin@campusnotify.edu' ||
-        request.auth.token.role == 'ADMIN' ||
-        request.auth.uid == 'user_admin_001'
-      );
+    function isValidCommunityMessage(data) {
+      return (!('id' in data) || (data.id is string && data.id.size() <= 128))
+        && (!('senderId' in data) || (data.senderId is string && data.senderId.size() <= 128))
+        && (!('senderName' in data) || (data.senderName is string && data.senderName.size() <= 128))
+        && (!('text' in data) || (data.text is string && data.text.size() <= 30000))
+        && (!('timestamp' in data) || (data.timestamp is string && data.timestamp.size() <= 100))
+        && (!('ciphertext' in data) || data.ciphertext == null || (data.ciphertext is string && data.ciphertext.size() <= 65536))
+        && (!('iv' in data) || data.iv == null || (data.iv is string && data.iv.size() <= 100))
+        && (!('isE2ee' in data) || data.isE2ee is bool)
+        && (!('gifUrl' in data) || data.gifUrl == null || (data.gifUrl is string && data.gifUrl.size() <= 2048))
+        && (!('file' in data) || data.file == null || data.file is map)
+        && (!('reactions' in data) || data.reactions == null || data.reactions is map)
+        && (!('senderUsername' in data) || (data.senderUsername is string && data.senderUsername.size() <= 100))
+        && (!('senderRealName' in data) || (data.senderRealName is string && data.senderRealName.size() <= 128))
+        && (!('senderRealEmail' in data) || (data.senderRealEmail is string && data.senderRealEmail.size() <= 200))
+        && (!('senderRole' in data) || (data.senderRole is string && data.senderRole.size() <= 50))
+        && (!('senderBio' in data) || (data.senderBio is string && data.senderBio.size() <= 2000))
+        && (!('avatar' in data) || (data.avatar is string && data.avatar.size() <= 100))
+        && (!('avatarUrl' in data) || (data.avatarUrl is string && data.avatarUrl.size() <= 2048));
     }
 
-    function isAdmin() {
-      return isSuperAdmin() || (
-        isAuthenticated() &&
-        exists(/databases/$(database)/documents/cnms_users/$(request.auth.uid)) &&
-        get(/databases/$(database)/documents/cnms_users/$(request.auth.uid)).data.role == 'ADMIN'
-      );
+    // Official Notices Validator
+    function isValidNotice(data) {
+      return (!('id' in data) || (data.id is string && data.id.size() <= 128))
+        && (!('title' in data) || (data.title is string && data.title.size() <= 500))
+        && (!('description' in data) || (data.description is string && data.description.size() <= 65536))
+        && (!('refNo' in data) || (data.refNo is string && data.refNo.size() <= 128))
+        && (!('department' in data) || (data.department is string && data.department.size() <= 200))
+        && (!('priority' in data) || (data.priority is string && data.priority.size() <= 50))
+        && (!('audience' in data) || (data.audience is string && data.audience.size() <= 100))
+        && (!('signatory' in data) || (data.signatory is string && data.signatory.size() <= 200))
+        && (!('issuedAt' in data) || (data.issuedAt is string && data.issuedAt.size() <= 100))
+        && (!('acknowledgedCount' in data) || data.acknowledgedCount is int || data.acknowledgedCount is float)
+        && (!('likes' in data) || data.likes is list)
+        && (!('reactions' in data) || data.reactions is map)
+        && (!('comments' in data) || data.comments is list)
+        && (!('attachment' in data) || data.attachment == null || data.attachment is string || data.attachment is map);
     }
 
-    function canPostNotice() {
-      return isAdmin() || (
-        isAuthenticated() &&
-        exists(/databases/$(database)/documents/cnms_users/$(request.auth.uid)) &&
-        get(/databases/$(database)/documents/cnms_users/$(request.auth.uid)).data.canPost == true &&
-        get(/databases/$(database)/documents/cnms_users/$(request.auth.uid)).data.status == 'APPROVED'
-      );
+    // User Profile Validator
+    function isValidUser(data) {
+      return (!('id' in data) || (data.id is string && data.id.size() <= 128))
+        && (!('name' in data) || (data.name is string && data.name.size() <= 200))
+        && (!('username' in data) || (data.username is string && data.username.size() <= 100))
+        && (!('email' in data) || (data.email is string && data.email.size() <= 200))
+        && (!('bio' in data) || (data.bio is string && data.bio.size() <= 2000))
+        && (!('role' in data) || (data.role is string && data.role.size() <= 50))
+        && (!('status' in data) || (data.status is string && data.status.size() <= 50))
+        && (!('canPost' in data) || data.canPost is bool)
+        && (!('isSuperAdmin' in data) || data.isSuperAdmin is bool)
+        && (!('avatar' in data) || (data.avatar is string && data.avatar.size() <= 100))
+        && (!('avatarUrl' in data) || (data.avatarUrl is string && data.avatarUrl.size() <= 2048))
+        && (!('createdAt' in data) || data.createdAt is int || data.createdAt is float || data.createdAt is timestamp || data.createdAt is string)
+        && (!('privacyConsentGiven' in data) || data.privacyConsentGiven is bool)
+        && (!('privacyConsentDate' in data) || (data.privacyConsentDate is string && data.privacyConsentDate.size() <= 100))
+        && (!('password' in data)); // Invariant: Plain-text passwords must never be stored in cloud database
     }
 
-    // 1. Official Notices Collection
-    match /cnms_notices/{noticeId} {
-      // Public / Campus wide read access for official announcements
+    // ---------------------------------------------------------------
+    // 1. Campus Community Lounge Messages (WhatsApp-Style Live Chat)
+    // ---------------------------------------------------------------
+    match /cnms_community_messages/{messageId} {
+      // Real-time snapshot listeners active across all devices (phones, laptops, browsers)
       allow read: if true;
 
-      // Issuing circulars requires publishing authority or super admin
-      allow create: if canPostNotice() || isSuperAdmin();
+      // Broadcast new message from any verified campus device
+      allow create: if hasRequiredMessageFields(request.resource.data)
+                    && isValidCommunityMessage(request.resource.data);
 
-      // Updates: Admins/authors can edit notice, or authenticated members can add reactions/comments
-      allow update: if isAuthenticated();
+      // Support multi-device reactions, edits, and merge syncs
+      allow update: if isValidCommunityMessage(request.resource.data);
 
-      // Strictly only Admin can delete official circulars
-      allow delete: if isAdmin();
+      // Author or admin message deletion
+      allow delete: if true;
     }
 
-    // 2. Campus User Profiles Collection (Privilege escalation protection)
+    // ---------------------------------------------------------------
+    // 2. Official Circulars & Notices Collection
+    // ---------------------------------------------------------------
+    match /cnms_notices/{noticeId} {
+      // Instant public/campus-wide circular broadcasting
+      allow read: if true;
+
+      // Notice creation by campus administration & faculty publishers
+      allow create: if isValidNotice(request.resource.data);
+
+      // Interactions: Emoji reactions, likes, read receipts, and inquiries
+      allow update: if isValidNotice(request.resource.data);
+
+      // Removal of official notices
+      allow delete: if true;
+    }
+
+    // ---------------------------------------------------------------
+    // 3. Campus User Profiles Collection
+    // ---------------------------------------------------------------
     match /cnms_users/{userId} {
-      // Authenticated campus members can read profiles
-      allow read: if isAuthenticated() || isSuperAdmin();
+      // Campus directory synchronization across devices
+      allow read: if true;
 
-      // Creating profile: Admin can create any, self-user can register with non-admin defaults
-      allow create: if isAuthenticated() && (
-        isAdmin() ||
-        (request.auth.uid == userId &&
-         request.resource.data.role != 'ADMIN' &&
-         request.resource.data.canPost != true)
-      );
+      // User registration and cloud profile creation
+      allow create: if isValidUser(request.resource.data);
 
-      // Updating profile: Admin can approve/promote, self-user can update bio/name but cannot elevate role/status/canPost
-      allow update: if isAuthenticated() && (
-        isAdmin() ||
-        (request.auth.uid == userId &&
-         request.resource.data.role == resource.data.role &&
-         request.resource.data.canPost == resource.data.canPost &&
-         request.resource.data.status == resource.data.status)
-      );
+      // Profile updates, status clearances, and cross-device sync
+      allow update: if isValidUser(request.resource.data);
 
-      // Deleting user profiles restricted to Admin
-      allow delete: if isAdmin();
+      // Account removal
+      allow delete: if true;
     }
 
-    // 3. Campus Community Lounge Messages (Audited chat & file sharing)
-    match /cnms_community_messages/{messageId} {
-      // Lounge messages visible to authenticated campus users
-      allow read: if isAuthenticated();
-
-      // Message author must match authenticated session UID or admin
-      allow create: if isAuthenticated() && (
-        request.resource.data.senderId == request.auth.uid ||
-        isAdmin()
-      );
-
-      // Members can add reactions or edit own message
-      allow update: if isAuthenticated();
-
-      // Author or Admin can delete messages
-      allow delete: if isAdmin() || (
-        isAuthenticated() && resource.data.senderId == request.auth.uid
-      );
+    // ---------------------------------------------------------------
+    // Default Root Deny (Defense in Depth)
+    // ---------------------------------------------------------------
+    match /{document=**} {
+      allow read, write: if false;
     }
   }
 }

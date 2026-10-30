@@ -606,3 +606,4 @@ if os.path.exists(zip_path) and os.path.exists(pdf_path):
         zipf.write(pdf_path, os.path.basename(pdf_path))
         zipf.write(html_path, os.path.basename(html_path))
     print(f"Appended Viva Guide to {zip_path}")
+

@@ -450,6 +450,32 @@ async function runTests() {
   cnms.markAllNotificationsRead();
   assert('Marking all notifications as read resets unread count to 0', cnms.unreadNotificationCount === 0);
 
+  console.log('\n--- PILLAR 12: WhatsApp-Style Real-Time Multi-Device Chat Engine ---');
+  assert('Broadcast lounge message method exists', typeof cnms.broadcastLoungeMessage === 'function');
+  assert('Receive broadcast lounge message method exists', typeof cnms.receiveBroadcastedLoungeMessage === 'function');
+  assert('Web Audio message pop chime method exists', typeof cnms.playMessagePopChime === 'function');
+
+  // Test incoming peer message
+  const peerMsg = {
+    id: 'lounge_test_peer_101',
+    senderId: 'peer_user_456',
+    senderName: 'Neha Sharma',
+    senderUsername: 'neha_it',
+    text: 'Hey everyone, has the practical timetable been released?',
+    timestamp: new Date().toISOString()
+  };
+
+  const initialLoungeLen = cnms.loungeMessages.length;
+  cnms.receiveBroadcastedLoungeMessage(peerMsg);
+  assert('Incoming peer message added to loungeMessages', cnms.loungeMessages.some(m => m.id === peerMsg.id));
+  assert('Lounge messages count increased by 1', cnms.loungeMessages.length === initialLoungeLen + 1);
+
+  // Test WhatsApp outgoing bubble and double blue tick
+  cnms.currentUser = { id: 'test_current_user_01', name: 'Dr. Rajesh Patil', username: 'dr_rajesh', role: 'ADMIN' };
+  cnms.renderCommunityLounge();
+  const loungeHtml = cnms.dom.loungeMessagesFeed ? cnms.dom.loungeMessagesFeed.innerHTML : '';
+  assert('Lounge feed supports WhatsApp message bubbles', loungeHtml.includes('lounge-msg-item'));
+
   console.log('\n================================================================');
   console.log(`  VERIFICATION COMPLETED: ${passed} / ${total} TESTS PASSED (${((passed/total)*100).toFixed(1)}%)`);
   console.log('================================================================\n');
