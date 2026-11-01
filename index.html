@@ -3835,10 +3835,15 @@
                 <i class="bi bi-box-arrow-in-right"></i> <span data-i18n="auth.signin_btn">Sign In</span>
             </button>
             <div class="auth-divider">or</div>
-            <button type="button" class="btn-google mb-3" id="btn-google-login">
+            <button type="button" class="btn-google mb-1" id="btn-google-login">
                 <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
                 <span data-i18n="auth.google_btn">Continue with Google</span>
             </button>
+            <div class="text-center mb-3">
+                <a href="javascript:void(0)" onclick="window.handleGoogleSignInRedirect?.('student')" class="text-secondary small text-decoration-none" style="font-size:0.75rem;">
+                    <i class="bi bi-box-arrow-up-right me-1"></i>Pop-up blocked? Sign In with Redirect
+                </a>
+            </div>
             <div class="auth-links">
                 <a href="javascript:void(0)" id="link-forgot-pass" role="button" data-i18n="auth.forgot_pass">Forgot Password?</a><br>
                 <a href="javascript:void(0)" id="link-to-reg" class="d-inline-block mt-2" role="button" data-i18n="auth.create_acc">Create New Account</a><br>
@@ -3925,10 +3930,15 @@
                 <i class="bi bi-shield-check"></i> Verify &amp; Access Faculty Panel
             </button>
             <div class="auth-divider">or</div>
-            <button type="button" class="btn-google mb-3" id="btn-google-admin">
+            <button type="button" class="btn-google mb-1" id="btn-google-admin">
                 <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
                 Faculty Sign In with Google
             </button>
+            <div class="text-center mb-3">
+                <a href="javascript:void(0)" onclick="window.handleGoogleSignInRedirect?.('professor')" class="text-secondary small text-decoration-none" style="font-size:0.75rem;">
+                    <i class="bi bi-box-arrow-up-right me-1"></i>Pop-up blocked? Sign In with Redirect
+                </a>
+            </div>
             <div class="auth-links">
                 <a href="javascript:void(0)" id="link-to-login" role="button"><i class="bi bi-arrow-left"></i> Back to Student Login</a>
             </div>
@@ -4051,10 +4061,15 @@
                 <i class="bi bi-person-plus"></i> Create Account
             </button>
             <div class="auth-divider">or</div>
-            <button type="button" class="btn-google mb-2" id="btn-google-register">
+            <button type="button" class="btn-google mb-1" id="btn-google-register">
                 <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
                 Sign Up with Google
             </button>
+            <div class="text-center mb-2">
+                <a href="javascript:void(0)" onclick="window.handleGoogleSignInRedirect?.('student')" class="text-secondary small text-decoration-none" style="font-size:0.75rem;">
+                    <i class="bi bi-box-arrow-up-right me-1"></i>Pop-up blocked? Sign In with Redirect
+                </a>
+            </div>
             <div class="auth-links">
                 <a href="javascript:void(0)" id="link-reg-back" role="button"><i class="bi bi-arrow-left"></i> Back to Login</a>
             </div>
@@ -7530,6 +7545,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
     const storage = getStorage(app);
     const googleProvider = new GoogleAuthProvider();
+    googleProvider.setCustomParameters({ prompt: 'select_account' });
 
     let currentUser = null;
     try {
@@ -10471,6 +10487,7 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 
     async function handleGoogleSignIn(intendedRole = 'student') {
+        try { sessionStorage.setItem('pending_google_signin_role', intendedRole); } catch(e) {}
         showLoading('Connecting to Google...');
         try {
             const result = await signInWithPopup(auth, googleProvider);
@@ -10483,9 +10500,20 @@ window.addEventListener('DOMContentLoaded', () => {
                 toast('Google sign-in was cancelled.', 'info');
                 return;
             }
-            if (msg.includes('popup-blocked')) {
-                toast('Browser blocked sign-in pop-up. Please allow popups or use redirect.', 'warning');
-                return;
+            if (msg.includes('popup-blocked') || e.code === 'auth/popup-blocked') {
+                console.warn('Popup blocked by browser. Seamlessly falling back to signInWithRedirect...');
+                toast('Browser blocked pop-up. Redirecting to Google Sign-In...', 'info');
+                showLoading('Redirecting to Google secure authentication...');
+                try {
+                    sessionStorage.setItem('pending_google_signin_role', intendedRole);
+                    await signInWithRedirect(auth, googleProvider);
+                    return;
+                } catch (redirectErr) {
+                    hideLoading();
+                    console.error('Redirect sign-in fallback error:', redirectErr);
+                    toast('Google redirect sign-in error: ' + (redirectErr.message || redirectErr), 'error');
+                    return;
+                }
             }
             if (msg.includes('unauthorized-domain')) {
                 const domain = window.location.hostname || 'campusnotify-tau.vercel.app';
@@ -14535,6 +14563,18 @@ deepLink + '\n' +
     window.openReviewModal = openReviewModal;
     window.getExistingSub = (id) => allSubsCache.find(s => s.id === id);
     window.handleGoogleSignIn = handleGoogleSignIn;
+    async function handleGoogleSignInRedirect(intendedRole = 'student') {
+        try { sessionStorage.setItem('pending_google_signin_role', intendedRole); } catch(e) {}
+        showLoading('Redirecting to Google Sign-In...');
+        try {
+            await signInWithRedirect(auth, googleProvider);
+        } catch (e) {
+            hideLoading();
+            toast('Google redirect sign-in error: ' + (e.message || String(e)), 'error');
+        }
+    }
+    window.handleGoogleSignInRedirect = handleGoogleSignInRedirect;
+
     window.openEditProfileModal = openEditProfileModal;
     window.saveProfile = saveProfile;
     window.exportSubmissionsCSV = exportSubmissionsCSV;
@@ -14954,10 +14994,12 @@ deepLink + '\n' +
         // Onboarding complete button
         if ($('btn-save-onboarding')) $('btn-save-onboarding').onclick = () => completeGoogleOnboarding();
 
-        // Check redirect result for mobile browsers
+        // Check redirect result for mobile browsers / redirected sign-ins
         getRedirectResult(auth).then(result => {
             if (result && result.user) {
-                processGoogleUser(result.user, 'student');
+                const storedRole = sessionStorage.getItem('pending_google_signin_role') || 'student';
+                sessionStorage.removeItem('pending_google_signin_role');
+                processGoogleUser(result.user, storedRole);
             }
         }).catch(err => {
             console.warn('Redirect auth check notice:', err);
