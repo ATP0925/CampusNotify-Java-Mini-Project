@@ -3839,9 +3839,7 @@
                 <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
                 <span data-i18n="auth.google_btn">Continue with Google</span>
             </button>
-            <button type="button" class="btn btn-outline-warning w-100 mb-1 py-2 fw-bold" onclick="window.loginPratikSession?.()" style="border-radius:10px; font-size:0.84rem; border-width:1.5px; background: rgba(234, 179, 8, 0.08);">
-                <i class="bi bi-person-workspace text-warning me-1"></i> ⚡ Instant Sign In: Pratik Atpadkar (Lead Architect)
-            </button>
+
             <div class="text-center mb-3">
                 <a href="javascript:void(0)" onclick="window.handleGoogleSignInRedirect?.('student')" class="text-secondary small text-decoration-none" style="font-size:0.75rem;">
                     <i class="bi bi-box-arrow-up-right me-1"></i>Pop-up blocked? Sign In with Redirect
@@ -3937,9 +3935,7 @@
                 <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
                 Faculty Sign In with Google
             </button>
-            <button type="button" class="btn btn-outline-warning w-100 mb-1 py-2 fw-bold" onclick="window.loginPratikSession?.()" style="border-radius:10px; font-size:0.84rem; border-width:1.5px; background: rgba(234, 179, 8, 0.08);">
-                <i class="bi bi-shield-check text-warning me-1"></i> ⚡ Instant Super Admin Entry (Pratik Atpadkar)
-            </button>
+
             <div class="text-center mb-3">
                 <a href="javascript:void(0)" onclick="window.handleGoogleSignInRedirect?.('professor')" class="text-secondary small text-decoration-none" style="font-size:0.75rem;">
                     <i class="bi bi-box-arrow-up-right me-1"></i>Pop-up blocked? Sign In with Redirect
@@ -5669,15 +5665,8 @@
                     <p class="text-muted mb-2" style="font-size: 0.86rem;">
                         You can continue immediately with a verified Google profile simulation without waiting for Firebase Console configuration.
                     </p>
-                    <button type="button" class="btn btn-warning btn-sm w-100 fw-bold mb-2 text-dark" onclick="window.loginPratikSession?.()" style="border-radius: 8px; padding: 10px;">
-                        <i class="bi bi-person-workspace me-1"></i> ⚡ Continue as Pratik Atpadkar (Lead Architect)
-                    </button>
-                    <div class="input-group input-group-sm mb-2">
-                        <input type="email" id="customGoogleEmailInput" class="form-control" placeholder="Or enter your Google Email (e.g. vu4f...)" style="border-radius: 8px 0 0 8px;">
-                        <button class="btn btn-primary fw-bold" type="button" onclick="window.loginWithCustomEmail?.()" style="border-radius: 0 8px 8px 0;">Sign In</button>
-                    </div>
-                    <button type="button" class="btn btn-outline-primary btn-sm w-100 fw-bold" id="btn-demo-google-continue" style="border-radius: 8px; padding: 6px;">
-                        <i class="bi bi-person-circle me-1"></i> Continue with Generic Demo Account
+                    <button type="button" class="btn btn-primary btn-sm w-100 fw-bold" id="btn-demo-google-continue" style="border-radius: 8px; padding: 8px;">
+                        <i class="bi bi-google me-1"></i> Continue with Google Demo Account
                     </button>
                 </div>
             </div>
@@ -10588,21 +10577,27 @@ window.addEventListener('DOMContentLoaded', () => {
 
     async function handleGoogleSignIn(intendedRole = 'student') {
         try { sessionStorage.setItem('pending_google_signin_role', intendedRole); } catch(e) {}
-        showLoading('Connecting to Google...');
+        
+        // CRITICAL: Call signInWithPopup IMMEDIATELY inside user-activation stack.
+        // DO NOT show loading overlay beforehand, as DOM mutations cause Chrome to block popup!
         try {
             const result = await signInWithPopup(auth, googleProvider);
-            const user = result.user;
-            await processGoogleUser(user, intendedRole);
+            showLoading('Connecting to institutional workspace...');
+            await processGoogleUser(result.user, intendedRole);
         } catch (e) {
             hideLoading();
-            let msg = e.message || String(e);
-            if (msg.includes('popup-closed')) {
+            const code = e.code || '';
+            const msg = e.message || String(e);
+            console.warn('[Google Auth]', code, msg);
+
+            if (msg.includes('popup-closed') || code === 'auth/popup-closed-by-user') {
                 toast('Google sign-in was cancelled.', 'info');
                 return;
             }
-            if (msg.includes('popup-blocked') || e.code === 'auth/popup-blocked') {
-                console.warn('Popup blocked by browser. Seamlessly falling back to signInWithRedirect...');
-                toast('Browser blocked pop-up. Redirecting to Google Sign-In...', 'info');
+
+            if (msg.includes('popup-blocked') || code === 'auth/popup-blocked') {
+                console.warn('Browser blocked popup. Seamlessly falling back to official signInWithRedirect...');
+                toast('Browser blocked popup. Redirecting to Google Sign-In...', 'info');
                 showLoading('Redirecting to Google secure authentication...');
                 try {
                     sessionStorage.setItem('pending_google_signin_role', intendedRole);
@@ -10610,12 +10605,13 @@ window.addEventListener('DOMContentLoaded', () => {
                     return;
                 } catch (redirectErr) {
                     hideLoading();
-                    console.error('Redirect sign-in fallback error:', redirectErr);
-                    toast('Google redirect sign-in error: ' + (redirectErr.message || redirectErr), 'error');
+                    console.error('Redirect error:', redirectErr);
+                    toast('Google redirect error: ' + (redirectErr.message || redirectErr), 'error');
                     return;
                 }
             }
-            if (msg.includes('unauthorized-domain')) {
+
+            if (msg.includes('unauthorized-domain') || code === 'auth/unauthorized-domain') {
                 const domain = window.location.hostname || 'campusnotify-tau.vercel.app';
                 if ($('currentDomainDisplay')) $('currentDomainDisplay').textContent = domain;
                 if ($('domainToPaste')) $('domainToPaste').textContent = domain;
@@ -10629,9 +10625,11 @@ window.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            if (msg.includes('network-request-failed')) msg = 'Network error. Check your internet connection.';
-            else if (msg.includes('account-exists-with-different-credential')) msg = 'Account exists with another login method.';
-            toast('Google Sign-In: ' + msg, 'error');
+            if (msg.includes('network-request-failed')) {
+                toast('Network error. Please check your internet connection.', 'error');
+            } else {
+                toast('Google Sign-In: ' + msg, 'error');
+            }
         }
     }
 
@@ -15094,157 +15092,32 @@ deepLink + '\n' +
         // Onboarding complete button
         if ($('btn-save-onboarding')) $('btn-save-onboarding').onclick = () => completeGoogleOnboarding();
 
-        // Check redirect result for mobile browsers / redirected sign-ins
-        getRedirectResult(auth).then(result => {
-            if (result && result.user) {
-                const storedRole = sessionStorage.getItem('pending_google_signin_role') || 'student';
-                sessionStorage.removeItem('pending_google_signin_role');
-                processGoogleUser(result.user, storedRole);
-            }
-        }).catch(err => {
-            console.warn('Redirect auth check notice:', err);
-        });
     });
 
-    // ===== AUTH STATE OBSERVER =====
-    onAuthStateChanged(auth, (user) => {
+    // Check redirect result immediately on page load
+    getRedirectResult(auth).then(async (result) => {
+        if (result && result.user) {
+            console.log('[Auth] Google Redirect result detected:', result.user.email);
+            showLoading('Logging in with Google credentials...');
+            const storedRole = sessionStorage.getItem('pending_google_signin_role') || 'student';
+            sessionStorage.removeItem('pending_google_signin_role');
+            await processGoogleUser(result.user, storedRole);
+        }
+    }).catch(err => {
+        console.warn('Redirect auth check notice:', err);
+    });
+
+    // ===== AUTH STATE OBSERVER (CANONICAL SINGLE SOURCE OF TRUTH) =====
+    onAuthStateChanged(auth, async (user) => {
         if (isDemoMode) return;
         if (user) {
             if (currentUser && currentUser.uid === user.uid) {
                 return;
             }
-
             const cleanEmail = (user.email || '').toLowerCase().trim();
-
-            // 1. Immediate Super Admin bypass
-            if (isSuperAdminUser(cleanEmail)) {
-                localStorage.setItem('campus_super_admin_bypass', 'true');
-                const savedPerspective = localStorage.getItem('campus_god_role_' + user.uid);
-                const activeRole = (savedPerspective && ['admin', 'hod', 'professor', 'student'].includes(savedPerspective)) ? savedPerspective : 'admin';
-                currentUser = {
-                    name: user.displayName || 'System Administrator',
-                    email: cleanEmail,
-                    role: activeRole === 'admin' ? 'admin' : (activeRole === 'student' ? 'student' : 'professor'),
-                    activeRole: activeRole,
-                    isSuperAdmin: true,
-                    isHOD: activeRole === 'admin' || activeRole === 'hod',
-                    college: 'Vasantdada Patil College of Engineering, Arts and Commerce, Mumbai',
-                    branch: 'Information Technology',
-                    batch: 'Super Administrator',
-                    rollNo: 'ROOT-01',
-                    designation: 'System Architect & Super Admin',
-                    phone: '',
-                    uid: user.uid,
-                    photoURL: user.photoURL || '',
-                    authProvider: 'google',
-                    createdAt: new Date().toISOString()
-                };
-                localStorage.setItem('campus_profile_' + user.uid, JSON.stringify(currentUser));
-                localStorage.setItem('last_user_role_' + user.uid, currentUser.role);
-                setDoc(doc(db, "users", user.uid), currentUser, { merge: true }).catch(() => {});
-                showMainApp();
-                return;
-            }
-
-            // 2. Immediate HOD bypass
-            if (cleanEmail === 'hod.it@pvppcoe.ac.in' || cleanEmail === 'pradip.mane@pvppcoe.ac.in') {
-                currentUser = {
-                    name: user.displayName || 'Dr. Pradip Mane',
-                    email: cleanEmail,
-                    role: 'professor',
-                    activeRole: 'hod',
-                    isHOD: true,
-                    college: 'Vasantdada Patil College of Engineering, Arts and Commerce, Mumbai',
-                    branch: 'Information Technology',
-                    batch: 'Faculty ID: PVPP-HOD-IT',
-                    rollNo: 'HOD-IT-01',
-                    designation: 'Head of Department - IT',
-                    phone: '',
-                    uid: user.uid,
-                    photoURL: user.photoURL || '',
-                    authProvider: 'google',
-                    createdAt: new Date().toISOString()
-                };
-                localStorage.setItem('campus_profile_' + user.uid, JSON.stringify(currentUser));
-                localStorage.setItem('last_user_role_' + user.uid, 'professor');
-                setDoc(doc(db, "users", user.uid), currentUser, { merge: true }).catch(() => {});
-                showMainApp();
-                return;
-            }
-
-            // 3. Check local cache first for instant resilient load
-            const cachedStr = localStorage.getItem('campus_profile_' + user.uid);
-            if (cachedStr) {
-                try {
-                    currentUser = JSON.parse(cachedStr);
-                } catch(e) {}
-            }
-
-            if (currentUser) {
-                showMainApp();
-            } else {
-                showLoading('Loading your profile...');
-            }
-
-            getDoc(doc(db, "users", user.uid)).then(docSnap => {
-                hideLoading();
-                if (docSnap.exists()) {
-                    currentUser = docSnap.data();
-                    localStorage.setItem('campus_profile_' + user.uid, JSON.stringify(currentUser));
-                    showMainApp();
-                } else {
-                    // Profile doc doesn't exist in Firestore - auto-provision and enter instantly
-                    if (!currentUser) {
-                        const parsedAcc = PvppcoeAccountEngine.classify(cleanEmail);
-                        const role = (parsedAcc && parsedAcc.role) ? parsedAcc.role : 'student';
-                        let rollNo = (parsedAcc && parsedAcc.rollNo) ? parsedAcc.rollNo : '';
-                        if (!rollNo && role === 'student') {
-                            const cleanName = (user.displayName || cleanEmail.split('@')[0]).replace(/\s+/g, '');
-                            rollNo = 'PVPP-' + (user.uid.slice(0, 4).toUpperCase()) + '-' + (cleanName.slice(0, 4).toUpperCase());
-                        }
-                        currentUser = {
-                            name: user.displayName || (parsedAcc && parsedAcc.studentName) || cleanEmail.split('@')[0],
-                            email: cleanEmail,
-                            role: role,
-                            college: "Padmabhushan Vasantdada Patil Pratishthan's College of Engineering (PVPPCOE), Sion, Mumbai",
-                            branch: (parsedAcc && parsedAcc.branch) || 'Department of Information Technology',
-                            batch: (role === 'professor') ? ((parsedAcc && parsedAcc.cabin) || 'Faculty ID: PVPP-IT') : ((parsedAcc && parsedAcc.batch) || 'Div A / 2024-28'),
-                            rollNo: rollNo,
-                            phone: user.phoneNumber || '',
-                            uid: user.uid,
-                            photoURL: user.photoURL || '',
-                            authProvider: 'google',
-                            createdAt: new Date().toISOString()
-                        };
-                        localStorage.setItem('campus_profile_' + user.uid, JSON.stringify(currentUser));
-                        setDoc(doc(db, "users", user.uid), currentUser, { merge: true }).catch(() => {});
-                    }
-                    showMainApp();
-                }
-            }).catch((err) => {
-                hideLoading();
-                console.warn('Firestore offline or connection delay, using resilient offline profile:', err);
-                if (!currentUser) {
-                    const parsedAcc = PvppcoeAccountEngine.classify(cleanEmail);
-                    const role = (parsedAcc && parsedAcc.role) ? parsedAcc.role : 'student';
-                    currentUser = {
-                        name: user.displayName || cleanEmail.split('@')[0],
-                        email: cleanEmail,
-                        role: role,
-                        college: "Padmabhushan Vasantdada Patil Pratishthan's College of Engineering (PVPPCOE), Sion, Mumbai",
-                        branch: 'Department of Information Technology',
-                        batch: 'Div A / 2024-28',
-                        rollNo: 'PVPP-' + user.uid.slice(0, 6).toUpperCase(),
-                        phone: '',
-                        uid: user.uid,
-                        photoURL: user.photoURL || '',
-                        authProvider: 'google',
-                        createdAt: new Date().toISOString()
-                    };
-                    localStorage.setItem('campus_profile_' + user.uid, JSON.stringify(currentUser));
-                }
-                showMainApp();
-            });
+            console.log('[Auth] Active authenticated user detected:', cleanEmail);
+            const storedRole = sessionStorage.getItem('pending_google_signin_role') || 'student';
+            await processGoogleUser(user, storedRole);
         } else {
             showView('loginView');
         }
