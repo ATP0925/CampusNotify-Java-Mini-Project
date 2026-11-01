@@ -40,3 +40,10 @@ Thumbs.db
 # Python cache
 __pycache__/
 *.pyc
+
+# Maven & Node dependencies
+**/target/
+**/node_modules/
+**/dist/
+.agents/
+*.log

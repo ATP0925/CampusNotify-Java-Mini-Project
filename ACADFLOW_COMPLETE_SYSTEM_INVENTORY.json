@@ -1,0 +1,416 @@
+{
+  "started_at": "2026-10-31 23:57:09",
+  "pages_explored": [
+    {
+      "route": "Dashboard",
+      "url": "https://acadflow.dpdns.org/dashboard",
+      "interactive_count": 15,
+      "elements": []
+    },
+    {
+      "route": "Attendance Portal",
+      "url": "https://acadflow.dpdns.org/attendance-portal",
+      "interactive_count": 6,
+      "elements": []
+    },
+    {
+      "route": "Batches & Classrooms",
+      "url": "https://acadflow.dpdns.org/batches",
+      "interactive_count": 26,
+      "elements": []
+    },
+    {
+      "route": "Assignments & Quizzes",
+      "url": "https://acadflow.dpdns.org/assignments",
+      "interactive_count": 15,
+      "elements": []
+    },
+    {
+      "route": "Mentorship Hub",
+      "url": "https://acadflow.dpdns.org/mentorship",
+      "interactive_count": 6,
+      "elements": []
+    },
+    {
+      "route": "Notice Board",
+      "url": "https://acadflow.dpdns.org/notices",
+      "interactive_count": 15,
+      "elements": []
+    },
+    {
+      "route": "Feedback System",
+      "url": "https://acadflow.dpdns.org/feedback",
+      "interactive_count": 0,
+      "elements": []
+    },
+    {
+      "route": "Settings & Integrations",
+      "url": "https://acadflow.dpdns.org/settings",
+      "interactive_count": 21,
+      "elements": []
+    },
+    {
+      "route": "Support & Helpdesk",
+      "url": "https://acadflow.dpdns.org/support",
+      "interactive_count": 10,
+      "elements": []
+    },
+    {
+      "route": "Practical Detail",
+      "url": "https://acadflow.dpdns.org/practical/49798ded-38e7-442e-ad2e-bda7607ba955?tab=report&section=conclusion",
+      "interactive_count": 3,
+      "elements": []
+    }
+  ],
+  "total_clicks": 58,
+  "elements_audited": [
+    {
+      "action": "click",
+      "description": "Button #1 on Dashboard",
+      "text": "Search...\n\u2318\nK",
+      "time": "23:57:11"
+    },
+    {
+      "action": "click",
+      "description": "Button #2 on Dashboard",
+      "text": "9+",
+      "time": "23:57:15"
+    },
+    {
+      "action": "click",
+      "description": "Button #3 on Dashboard",
+      "text": "MASTER REPORT",
+      "time": "23:57:19"
+    },
+    {
+      "action": "click",
+      "description": "Button #4 on Dashboard",
+      "text": "Give Feedback",
+      "time": "23:57:24"
+    },
+    {
+      "action": "click",
+      "description": "Button #5 on Dashboard",
+      "text": "Dashboard\nHome",
+      "time": "23:57:28"
+    },
+    {
+      "action": "click",
+      "description": "Button #6 on Dashboard",
+      "text": "Download Master Report",
+      "time": "23:57:32"
+    },
+    {
+      "action": "click",
+      "description": "Button #7 on Dashboard",
+      "text": "Dashboard",
+      "time": "23:57:33"
+    },
+    {
+      "action": "click",
+      "description": "Button #8 on Dashboard",
+      "text": "Download Now \u2192",
+      "time": "23:57:35"
+    },
+    {
+      "action": "click",
+      "description": "Button #9 on Dashboard",
+      "text": "MASTER REPORT",
+      "time": "23:57:37"
+    },
+    {
+      "action": "click",
+      "description": "Button #1 on Attendance Portal",
+      "text": "My Attendance",
+      "time": "23:57:44"
+    },
+    {
+      "action": "click",
+      "description": "Button #2 on Attendance Portal",
+      "text": "My Class",
+      "time": "23:57:46"
+    },
+    {
+      "action": "click",
+      "description": "Button #3 on Attendance Portal",
+      "text": "College Timetable",
+      "time": "23:57:47"
+    },
+    {
+      "action": "click",
+      "description": "Button #4 on Attendance Portal",
+      "text": "Enable App Sounds",
+      "time": "23:57:49"
+    },
+    {
+      "action": "click",
+      "description": "Button #5 on Attendance Portal",
+      "text": "9+",
+      "time": "23:57:51"
+    },
+    {
+      "action": "click",
+      "description": "Button #6 on Attendance Portal",
+      "text": "Scan QR Attendance",
+      "time": "23:57:55"
+    },
+    {
+      "action": "click",
+      "description": "Button #1 on Batches & Classrooms",
+      "text": "Search...\n\u2318\nK",
+      "time": "23:58:02"
+    },
+    {
+      "action": "click",
+      "description": "Button #2 on Batches & Classrooms",
+      "text": "Join New Batch",
+      "time": "23:58:06"
+    },
+    {
+      "action": "click",
+      "description": "Button #3 on Batches & Classrooms",
+      "text": "Enter Workspace",
+      "time": "23:58:10"
+    },
+    {
+      "action": "click",
+      "description": "Button #4 on Batches & Classrooms",
+      "text": "Experiments",
+      "time": "23:58:14"
+    },
+    {
+      "action": "click",
+      "description": "Button #5 on Batches & Classrooms",
+      "text": "Experiments",
+      "time": "23:58:18"
+    },
+    {
+      "action": "click",
+      "description": "Button #6 on Batches & Classrooms",
+      "text": "Edit",
+      "time": "23:58:22"
+    },
+    {
+      "action": "click",
+      "description": "Button #7 on Batches & Classrooms",
+      "text": "Edit",
+      "time": "23:58:26"
+    },
+    {
+      "action": "click",
+      "description": "Button #8 on Batches & Classrooms",
+      "text": "Edit",
+      "time": "23:58:30"
+    },
+    {
+      "action": "click",
+      "description": "Button #9 on Batches & Classrooms",
+      "text": "Edit",
+      "time": "23:58:34"
+    },
+    {
+      "action": "click",
+      "description": "Button #10 on Batches & Classrooms",
+      "text": "Edit",
+      "time": "23:58:38"
+    },
+    {
+      "action": "click",
+      "description": "Button #11 on Batches & Classrooms",
+      "text": "Edit",
+      "time": "23:58:42"
+    },
+    {
+      "action": "click",
+      "description": "Button #12 on Batches & Classrooms",
+      "text": "Edit",
+      "time": "23:58:46"
+    },
+    {
+      "action": "click",
+      "description": "Button #1 on Assignments & Quizzes",
+      "text": "Search...\n\u2318\nK",
+      "time": "23:58:53"
+    },
+    {
+      "action": "click",
+      "description": "Button #2 on Assignments & Quizzes",
+      "text": "DOWNLOAD TOKEN",
+      "time": "23:58:57"
+    },
+    {
+      "action": "click",
+      "description": "Button #3 on Assignments & Quizzes",
+      "text": "SE Year",
+      "time": "23:59:01"
+    },
+    {
+      "action": "click",
+      "description": "Button #4 on Assignments & Quizzes",
+      "text": "All Subjects",
+      "time": "23:59:05"
+    },
+    {
+      "action": "click",
+      "description": "Button #5 on Assignments & Quizzes",
+      "text": "EXPORT",
+      "time": "23:59:09"
+    },
+    {
+      "action": "click",
+      "description": "Button #6 on Assignments & Quizzes",
+      "text": "Dashboard\nHome",
+      "time": "23:59:13"
+    },
+    {
+      "action": "click",
+      "description": "Button #7 on Assignments & Quizzes",
+      "text": "Dashboard",
+      "time": "23:59:15"
+    },
+    {
+      "action": "click",
+      "description": "Button #8 on Assignments & Quizzes",
+      "text": "Download Now \u2192",
+      "time": "23:59:17"
+    },
+    {
+      "action": "click",
+      "description": "Button #9 on Assignments & Quizzes",
+      "text": "Give Feedback",
+      "time": "23:59:18"
+    },
+    {
+      "action": "click",
+      "description": "Button #1 on Mentorship Hub",
+      "text": "Mentorship Logs",
+      "time": "23:59:23"
+    },
+    {
+      "action": "click",
+      "description": "Button #2 on Mentorship Hub",
+      "text": "Activity & XP",
+      "time": "23:59:25"
+    },
+    {
+      "action": "click",
+      "description": "Button #3 on Mentorship Hub",
+      "text": "Document Requests",
+      "time": "23:59:27"
+    },
+    {
+      "action": "click",
+      "description": "Button #4 on Mentorship Hub",
+      "text": "Mentorship Card",
+      "time": "23:59:28"
+    },
+    {
+      "action": "click",
+      "description": "Button #5 on Mentorship Hub",
+      "text": "Message Mentor",
+      "time": "23:59:30"
+    },
+    {
+      "action": "click",
+      "description": "Button #6 on Mentorship Hub",
+      "text": "Request Meeting",
+      "time": "23:59:34"
+    },
+    {
+      "action": "click",
+      "description": "Button #1 on Notice Board",
+      "text": "Search...\n\u2318\nK",
+      "time": "23:59:41"
+    },
+    {
+      "action": "click",
+      "description": "Button #1 on Settings & Integrations",
+      "text": "Search...\n\u2318\nK",
+      "time": "23:59:50"
+    },
+    {
+      "action": "click",
+      "description": "Button #2 on Settings & Integrations",
+      "text": "Profile Information\n\nManage your personal identity, academic",
+      "time": "23:59:54"
+    },
+    {
+      "action": "click",
+      "description": "Button #3 on Settings & Integrations",
+      "text": "Account Security\n\nUpdate your credentials to keep your accou",
+      "time": "23:59:58"
+    },
+    {
+      "action": "click",
+      "description": "Button #4 on Settings & Integrations",
+      "text": "Update Credentials",
+      "time": "00:00:02"
+    },
+    {
+      "action": "click",
+      "description": "Button #5 on Settings & Integrations",
+      "text": "Alert Settings\n\nConfigure how you receive institutional noti",
+      "time": "00:00:06"
+    },
+    {
+      "action": "click",
+      "description": "Button #6 on Settings & Integrations",
+      "text": "Dashboard\nHome",
+      "time": "00:00:10"
+    },
+    {
+      "action": "click",
+      "description": "Button #7 on Settings & Integrations",
+      "text": "Dashboard",
+      "time": "00:00:12"
+    },
+    {
+      "action": "click",
+      "description": "Button #8 on Settings & Integrations",
+      "text": "Download Now \u2192",
+      "time": "00:00:14"
+    },
+    {
+      "action": "click",
+      "description": "Button #9 on Settings & Integrations",
+      "text": "Give Feedback",
+      "time": "00:00:16"
+    },
+    {
+      "action": "click",
+      "description": "Button #1 on Support & Helpdesk",
+      "text": "Dashboard",
+      "time": "00:00:20"
+    },
+    {
+      "action": "click",
+      "description": "Button #2 on Support & Helpdesk",
+      "text": "Download Now \u2192",
+      "time": "00:00:22"
+    },
+    {
+      "action": "click",
+      "description": "Button #3 on Support & Helpdesk",
+      "text": "Give Feedback",
+      "time": "00:00:24"
+    },
+    {
+      "action": "click",
+      "description": "Button #1 on Practical Detail",
+      "text": "Back",
+      "time": "00:00:29"
+    },
+    {
+      "action": "click",
+      "description": "Button #2 on Practical Detail",
+      "text": "Download Now \u2192",
+      "time": "00:00:30"
+    },
+    {
+      "action": "click",
+      "description": "Button #3 on Practical Detail",
+      "text": "Give Feedback",
+      "time": "00:00:32"
+    }
+  ]
+}

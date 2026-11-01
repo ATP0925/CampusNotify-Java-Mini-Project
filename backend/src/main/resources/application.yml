@@ -1,0 +1,44 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /
+
+spring:
+  application:
+    name: campusnotify-backend
+  datasource:
+    url: jdbc:h2:mem:campusnotify_db;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;MODE=PostgreSQL
+    driverClassName: org.h2.Driver
+    username: sa
+    password: 
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      timeout: 2000ms
+
+campusnotify:
+  security:
+    jwt:
+      secret: campusnotify-super-secret-key-that-is-at-least-256-bits-long-for-hmac-sha256-compliance
+      access-token-expiration-ms: 3600000
+      refresh-token-expiration-ms: 604800000
+      sliding-renewal-threshold-ms: 900000
+    crypto:
+      aes-master-key-base64: k8Z7wF1m3N9xQ2vL5tY8uI0oP4aS7dF1g3H5j7K9l1M=
+    totp:
+      time-step-seconds: 15
+      window-steps: 1
+    spatial:
+      max-velocity-meters-per-sec: 35.0
+      mule-scan-threshold-seconds: 2.5
+    replica-lag:
+      ttl-seconds: 5
