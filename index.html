@@ -7651,7 +7651,10 @@ window.addEventListener('DOMContentLoaded', () => {
     // ===== SUPER ADMIN & HOD AUTHORITIES =====
     const SUPER_ADMIN_EMAILS = [
         'admin@campusnotify.edu',
-        'admin@pvppcoe.ac.in'
+        'admin@pvppcoe.ac.in',
+        'atpadkarmaruti@gmail.com',
+        'vu4f2526072@pvppcoe.ac.in',
+        'atp0925@gmail.com'
     ];
 
     function isSuperAdminUser(email) {
@@ -10481,9 +10484,41 @@ window.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // 4. NEW USER: TRIGGER 1-STEP ONBOARDING MODAL
+        // 4. INSTANT AUTO-PROVISIONING & DIRECT DASHBOARD ENTRY (ZERO REDIRECT LOOP)
+        const parsedAcc = PvppcoeAccountEngine.classify(email);
+        const role = intendedRole || (parsedAcc ? parsedAcc.role : 'student');
+        let rollNo = (parsedAcc && parsedAcc.rollNo) ? parsedAcc.rollNo : '';
+        if (!rollNo && role === 'student') {
+            const cleanName = (user.displayName || email.split('@')[0]).replace(/\s+/g, '');
+            rollNo = 'PVPP-' + (user.uid.slice(0, 4).toUpperCase()) + '-' + (cleanName.slice(0, 4).toUpperCase());
+        }
+
+        const autoProfile = {
+            name: user.displayName || (parsedAcc && parsedAcc.studentName) || email.split('@')[0],
+            email: email,
+            role: role,
+            college: "Padmabhushan Vasantdada Patil Pratishthan's College of Engineering (PVPPCOE), Sion, Mumbai",
+            branch: (parsedAcc && parsedAcc.branch) || 'Department of Information Technology',
+            batch: (role === 'professor') ? ((parsedAcc && parsedAcc.cabin) || 'Faculty ID: PVPP-IT') : ((parsedAcc && parsedAcc.batch) || 'Div A / 2024-28'),
+            rollNo: rollNo,
+            phone: user.phoneNumber || '',
+            uid: user.uid,
+            photoURL: user.photoURL || '',
+            authProvider: 'google',
+            createdAt: new Date().toISOString()
+        };
+
+        currentUser = autoProfile;
+        localStorage.setItem('campus_profile_' + user.uid, JSON.stringify(currentUser));
+        localStorage.setItem('last_user_role_' + user.uid, currentUser.role);
+        setDoc(doc(db, "users", user.uid), currentUser, { merge: true }).catch(err => {
+            console.warn('Firestore autoProfile save notice:', err);
+        });
+
         hideLoading();
-        openGoogleOnboardingModal(user, intendedRole);
+        showMainApp();
+        toast(`Welcome to CampusNotify, ${esc(currentUser.name)}!`, 'success');
+        return;
     }
 
     async function handleGoogleSignIn(intendedRole = 'student') {
@@ -15093,23 +15128,57 @@ deepLink + '\n' +
                     localStorage.setItem('campus_profile_' + user.uid, JSON.stringify(currentUser));
                     showMainApp();
                 } else {
-                    // Profile doc doesn't exist in Firestore
+                    // Profile doc doesn't exist in Firestore - auto-provision and enter instantly
                     if (!currentUser) {
-                        pendingGoogleAuthUser = user;
-                        openGoogleOnboardingModal(user);
-                    } else {
-                        showMainApp();
+                        const parsedAcc = PvppcoeAccountEngine.classify(cleanEmail);
+                        const role = (parsedAcc && parsedAcc.role) ? parsedAcc.role : 'student';
+                        let rollNo = (parsedAcc && parsedAcc.rollNo) ? parsedAcc.rollNo : '';
+                        if (!rollNo && role === 'student') {
+                            const cleanName = (user.displayName || cleanEmail.split('@')[0]).replace(/\s+/g, '');
+                            rollNo = 'PVPP-' + (user.uid.slice(0, 4).toUpperCase()) + '-' + (cleanName.slice(0, 4).toUpperCase());
+                        }
+                        currentUser = {
+                            name: user.displayName || (parsedAcc && parsedAcc.studentName) || cleanEmail.split('@')[0],
+                            email: cleanEmail,
+                            role: role,
+                            college: "Padmabhushan Vasantdada Patil Pratishthan's College of Engineering (PVPPCOE), Sion, Mumbai",
+                            branch: (parsedAcc && parsedAcc.branch) || 'Department of Information Technology',
+                            batch: (role === 'professor') ? ((parsedAcc && parsedAcc.cabin) || 'Faculty ID: PVPP-IT') : ((parsedAcc && parsedAcc.batch) || 'Div A / 2024-28'),
+                            rollNo: rollNo,
+                            phone: user.phoneNumber || '',
+                            uid: user.uid,
+                            photoURL: user.photoURL || '',
+                            authProvider: 'google',
+                            createdAt: new Date().toISOString()
+                        };
+                        localStorage.setItem('campus_profile_' + user.uid, JSON.stringify(currentUser));
+                        setDoc(doc(db, "users", user.uid), currentUser, { merge: true }).catch(() => {});
                     }
+                    showMainApp();
                 }
             }).catch((err) => {
                 hideLoading();
                 console.warn('Firestore offline or connection delay, using resilient offline profile:', err);
-                if (currentUser) {
-                    showMainApp();
-                } else {
-                    pendingGoogleAuthUser = user;
-                    openGoogleOnboardingModal(user);
+                if (!currentUser) {
+                    const parsedAcc = PvppcoeAccountEngine.classify(cleanEmail);
+                    const role = (parsedAcc && parsedAcc.role) ? parsedAcc.role : 'student';
+                    currentUser = {
+                        name: user.displayName || cleanEmail.split('@')[0],
+                        email: cleanEmail,
+                        role: role,
+                        college: "Padmabhushan Vasantdada Patil Pratishthan's College of Engineering (PVPPCOE), Sion, Mumbai",
+                        branch: 'Department of Information Technology',
+                        batch: 'Div A / 2024-28',
+                        rollNo: 'PVPP-' + user.uid.slice(0, 6).toUpperCase(),
+                        phone: '',
+                        uid: user.uid,
+                        photoURL: user.photoURL || '',
+                        authProvider: 'google',
+                        createdAt: new Date().toISOString()
+                    };
+                    localStorage.setItem('campus_profile_' + user.uid, JSON.stringify(currentUser));
                 }
+                showMainApp();
             });
         } else {
             showView('loginView');
