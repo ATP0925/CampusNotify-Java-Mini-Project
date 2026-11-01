@@ -1057,6 +1057,366 @@ class ContractSimulator {
       vramFreed: true
     };
   }
+
+  // ==========================================
+  // FEATURE 36: Exam Standing & ATKT Progression
+  // ==========================================
+  validateExamEligibility({ studentRollNo, targetSemester, backlogs = [] }) {
+    let sem1Kts = 0;
+    let sem2Kts = 0;
+    let sem3Kts = 0;
+    let sem4Kts = 0;
+    const blocking = [];
+
+    backlogs.forEach((b) => {
+      if (b.semester === 1) { sem1Kts++; blocking.push(`Sem 1: ${b.subjectCode}`); }
+      else if (b.semester === 2) { sem2Kts++; blocking.push(`Sem 2: ${b.subjectCode}`); }
+      else if (b.semester === 3) { sem3Kts++; blocking.push(`Sem 3: ${b.subjectCode}`); }
+      else if (b.semester === 4) { sem4Kts++; blocking.push(`Sem 4: ${b.subjectCode}`); }
+    });
+
+    let eligible = true;
+    let admissionStatus = 'PROMOTED';
+    let denialReason = null;
+
+    if (targetSemester === 3) {
+      if ((sem1Kts + sem2Kts) > 5) {
+        eligible = false;
+        admissionStatus = 'YEAR_DOWN_DROP';
+        denialReason = `Exceeded max 5 allowable backlogs for SE entry (Active: ${sem1Kts + sem2Kts})`;
+      } else if ((sem1Kts + sem2Kts) > 0) {
+        admissionStatus = 'PROVISIONALLY_PROMOTED';
+      }
+    } else if (targetSemester === 5) {
+      if ((sem1Kts + sem2Kts) > 0) {
+        eligible = false;
+        admissionStatus = 'YEAR_DOWN_DROP';
+        denialReason = `MU Ordinance: Sem 1 & Sem 2 must be 100% cleared for Sem 5 entry. Active: ${sem1Kts + sem2Kts}`;
+      }
+    } else if (targetSemester === 7) {
+      if ((sem1Kts + sem2Kts + sem3Kts + sem4Kts) > 0) {
+        eligible = false;
+        admissionStatus = 'YEAR_DOWN_DROP';
+        denialReason = `MU Ordinance: Sem 1-4 must be 100% cleared for Sem 7 entry. Active: ${sem1Kts + sem2Kts + sem3Kts + sem4Kts}`;
+      }
+    }
+
+    return {
+      studentRollNo,
+      targetSemester,
+      eligible,
+      admissionStatus,
+      denialReason,
+      sem1Backlogs: sem1Kts,
+      sem2Backlogs: sem2Kts,
+      totalDeadKts: backlogs.length,
+      blockingSubjects: blocking
+    };
+  }
+
+  // ==========================================
+  // FEATURE 37: Reval Fee & Hall Ticket Auto-Reconciler
+  // ==========================================
+  reconcileRevalMarks({ studentRollNo, subjectCode, originalMarks, revisedMarks, passingThreshold = 32, ktExamFeePaid = 1050, ktHallTicketId }) {
+    const passed = revisedMarks >= passingThreshold;
+    const outcome = passed ? 'CLEARED_PASSED' : (revisedMarks > originalMarks ? 'MARKS_IMPROVED_STILL_FAILED' : 'UNCHANGED_FAILED');
+    const ktTicketRevoked = passed && !!ktHallTicketId;
+    const feeRefundCredit = passed ? ktExamFeePaid : 0;
+    const transcriptSha256 = sha256(`${studentRollNo}|${subjectCode}|${revisedMarks}|${outcome}`);
+
+    return {
+      studentRollNo,
+      subjectCode,
+      outcome,
+      ktTicketRevoked,
+      feeRefundCredit,
+      transcriptUpdated: passed,
+      transcriptIntegritySha256: transcriptSha256,
+      auditMessage: passed ? 'Reval passed. KT hall ticket revoked and fee credited.' : 'Reval failed to meet threshold.'
+    };
+  }
+
+  // ==========================================
+  // FEATURE 38: Mumbai University Ordinance 0.5045 NSS Grace Marks
+  // ==========================================
+  allocateNssGraceMarks({ studentRollNo, completedNssHours = 0, specialCampAttended = false, sportsGraceAlreadyClaimed = false, failingSubjects = {} }) {
+    if (completedNssHours < 120) {
+      return {
+        studentRollNo,
+        eligible: false,
+        ineligibilityReason: 'Incomplete NSS hours. Minimum 120 hours required.',
+        totalGraceMarksGranted: 0
+      };
+    }
+    if (!specialCampAttended) {
+      return {
+        studentRollNo,
+        eligible: false,
+        ineligibilityReason: '7-day residential camp mandatory.',
+        totalGraceMarksGranted: 0
+      };
+    }
+    if (sportsGraceAlreadyClaimed) {
+      return {
+        studentRollNo,
+        eligible: false,
+        ineligibilityReason: 'Dual grace claim prohibited.',
+        totalGraceMarksGranted: 0
+      };
+    }
+
+    const sortedEntries = Object.entries(failingSubjects).sort((a, b) => {
+      const defA = a[1].passingMarks - a[1].currentMarks;
+      const defB = b[1].passingMarks - b[1].currentMarks;
+      return defA - defB;
+    });
+
+    let availableGrace = 10;
+    let totalGranted = 0;
+    const allocated = {};
+    const finalMarks = {};
+    let allCleared = true;
+
+    sortedEntries.forEach(([code, def]) => {
+      const gap = Math.max(0, def.passingMarks - def.currentMarks);
+      if (gap <= availableGrace && gap > 0) {
+        allocated[code] = gap;
+        finalMarks[code] = def.currentMarks + gap;
+        availableGrace -= gap;
+        totalGranted += gap;
+      } else if (gap > availableGrace) {
+        allocated[code] = 0;
+        finalMarks[code] = def.currentMarks;
+        allCleared = false;
+      } else {
+        allocated[code] = 0;
+        finalMarks[code] = def.currentMarks;
+      }
+    });
+
+    return {
+      studentRollNo,
+      eligible: true,
+      totalGraceMarksGranted: totalGranted,
+      allocatedGraceBySubject: allocated,
+      finalSubjectMarks: finalMarks,
+      allClearedWithGrace: allCleared,
+      ordinanceCitation: 'MU Ordinance 0.5045'
+    };
+  }
+
+  // ==========================================
+  // FEATURE 39: Cryptographic Fee Receipt QR Seal & Verification
+  // ==========================================
+  generateReceiptQr({ receiptNumber, studentRollNo, amount, feeHead, utrNumber, paymentGateway = 'HDFC_SMART_HUB' }) {
+    const rawData = `${receiptNumber}|${studentRollNo}|${amount}|${feeHead}|${utrNumber}|${paymentGateway}`;
+    const secret = 'PVPPCOE_FINANCE_DIGITAL_SEAL_SECRET_KEY_2026_ENTERPRISE';
+    const signature = hmacSha256(rawData, secret);
+    const qrPayload = Buffer.from(`${rawData}|${signature}`).toString('base64url');
+
+    return {
+      receiptNumber,
+      studentRollNo,
+      amount,
+      feeHead,
+      utrNumber,
+      hmacSignature: signature,
+      qrEncryptedPayload: qrPayload,
+      valid: true,
+      timestamp: Date.now()
+    };
+  }
+
+  verifyReceiptPayload(qrPayload) {
+    if (!qrPayload) return false;
+    try {
+      const decoded = Buffer.from(qrPayload, 'base64url').toString('utf8');
+      const lastPipe = decoded.lastIndexOf('|');
+      if (lastPipe === -1) return false;
+      const data = decoded.substring(0, lastPipe);
+      const expected = decoded.substring(lastPipe + 1);
+      const secret = 'PVPPCOE_FINANCE_DIGITAL_SEAL_SECRET_KEY_2026_ENTERPRISE';
+      const actual = hmacSha256(data, secret);
+      return actual === expected;
+    } catch {
+      return false;
+    }
+  }
+
+  // ==========================================
+  // FEATURE 40: TPO Dream Policy & Discipline Gate
+  // ==========================================
+  evaluateTpoEligibility({ studentRollNo, currentOfferLpa = 0, drivePackageLpa = 0, unexcusedDriveAbsences = 0, activeDeadKts = 0 }) {
+    if (activeDeadKts > 0) {
+      return {
+        studentRollNo,
+        eligible: false,
+        statusCategory: 'BLOCKED_KT_POLICY',
+        reason: `Ineligible: ${activeDeadKts} active backlogs.`
+      };
+    }
+    if (unexcusedDriveAbsences >= 2) {
+      return {
+        studentRollNo,
+        eligible: false,
+        statusCategory: 'BLOCKED_ABSENTEE_DISCIPLINE',
+        reason: 'Debarred: 2 or more unexcused absences.',
+        suspensionDaysRemaining: 365
+      };
+    }
+    if (unexcusedDriveAbsences === 1) {
+      return {
+        studentRollNo,
+        eligible: false,
+        statusCategory: 'BLOCKED_ABSENTEE_DISCIPLINE',
+        reason: 'Suspended: 15-day cooldown in effect.',
+        suspensionDaysRemaining: 15
+      };
+    }
+    if (currentOfferLpa > 0) {
+      const minRequired = currentOfferLpa * 1.5;
+      const isDream = drivePackageLpa >= 8.5;
+      const meetsMultiplier = drivePackageLpa >= minRequired;
+      if (!isDream && !meetsMultiplier) {
+        return {
+          studentRollNo,
+          eligible: false,
+          statusCategory: 'BLOCKED_PACKAGE_THRESHOLD',
+          reason: `Requires min 1.5x (${minRequired} LPA) or Dream tier (8.5 LPA).`
+        };
+      }
+      return {
+        studentRollNo,
+        eligible: true,
+        statusCategory: 'ELIGIBLE_DREAM',
+        reason: 'Approved under Dream Offer policy.'
+      };
+    }
+    return {
+      studentRollNo,
+      eligible: true,
+      statusCategory: 'ELIGIBLE_OPEN',
+      reason: 'Open candidate eligible for drive.'
+    };
+  }
+
+  // ==========================================
+  // FEATURE 41: Anti-Plagiarism AST Fingerprint & Injection Defense
+  // ==========================================
+  analyzePlagiarismAst({ submissionId, studentRollNo, sourceCode = '', peerSubmissions = [] }) {
+    const injectionPatterns = [
+      /ignore\s+previous\s+instructions/i,
+      /\[SYSTEM\s*:\s*/i,
+      /award\s+(full|25)\s+marks/i,
+      /override\s+(grading|rubric|evaluation)/i
+    ];
+
+    let promptInjectionDetected = false;
+    let detectedMaliciousPattern = null;
+
+    for (const p of injectionPatterns) {
+      const match = sourceCode.match(p);
+      if (match) {
+        promptInjectionDetected = true;
+        detectedMaliciousPattern = match[0];
+        break;
+      }
+    }
+
+    const tokenize = (code) => {
+      const cleaned = code.replace(/\/\/.*|\/\*[\s\S]*?\*\/|#.*/g, ' ')
+        .replace(/"[^"]*"|'[^']*'/g, ' STR ')
+        .replace(/\b\d+\b/g, ' NUM ');
+      const keywords = new Set(['if','else','for','while','return','class','public','private','void','int','float','new','def','function']);
+      const tokens = cleaned.split(/[\s+;,.(){}\[\]=><!&|%*\-/]+/).filter(Boolean);
+      return tokens.map(t => keywords.has(t.toLowerCase()) ? t.toLowerCase() : 'VAR');
+    };
+
+    const queryTokens = tokenize(sourceCode);
+    const queryGrams = new Set();
+    for (let i = 0; i <= queryTokens.length - 4; i++) {
+      queryGrams.add(queryTokens.slice(i, i + 4).join('_'));
+    }
+
+    let highestSimilarity = 0;
+    let highestPeer = null;
+
+    peerSubmissions.forEach((peer) => {
+      if (peer.peerRollNo === studentRollNo) return;
+      const peerTokens = tokenize(peer.sourceCode || '');
+      const peerGrams = new Set();
+      for (let i = 0; i <= peerTokens.length - 4; i++) {
+        peerGrams.add(peerTokens.slice(i, i + 4).join('_'));
+      }
+
+      let intersection = 0;
+      queryGrams.forEach((g) => { if (peerGrams.has(g)) intersection++; });
+      const union = queryGrams.size + peerGrams.size - intersection;
+      const sim = union === 0 ? 0 : (intersection / union);
+      if (sim > highestSimilarity) {
+        highestSimilarity = sim;
+        highestPeer = peer.peerRollNo;
+      }
+    });
+
+    const highestPercent = Math.round(highestSimilarity * 1000) / 10;
+    return {
+      submissionId,
+      highestSimilarityPercent: highestPercent,
+      highestMatchPeerRollNo: highestPeer,
+      crossBatchCollusion: highestPercent > 70.0,
+      promptInjectionDetected,
+      detectedMaliciousPattern,
+      astNormalizedFingerprint: sha256([...queryGrams].sort().join(','))
+    };
+  }
+
+  // ==========================================
+  // FEATURE 42: AICTE/UGC Grievance SGRC SLA Escalation
+  // ==========================================
+  fileGrievanceSgrc({ studentRollNo, category, title, encryptedStatement = '', anonymousWhistleblower = false }) {
+    const ticketId = `GRV-${crypto.randomUUID().substring(0, 8).toUpperCase()}`;
+    const masked = anonymousWhistleblower && studentRollNo.length >= 6
+      ? studentRollNo.substring(0, 4) + '******' + studentRollNo.substring(studentRollNo.length - 2)
+      : studentRollNo;
+
+    return {
+      grievanceTicketId: ticketId,
+      studentMaskedRollNo: masked,
+      currentEscalationLevel: 'LEVEL_1_MENTOR',
+      slaDeadline: Date.now() + (72 * 3600 * 1000),
+      slaBreached: false,
+      status: 'LOGGED',
+      assignedOfficerRole: 'FACULTY_MENTOR',
+      encryptedLockerHash: sha256(encryptedStatement || ticketId)
+    };
+  }
+
+  evaluateGrievanceSla(ticket, currentTime = Date.now()) {
+    if (currentTime < ticket.slaDeadline) return ticket;
+    let nextLevel = ticket.currentEscalationLevel;
+    let nextRole = ticket.assignedOfficerRole;
+    let nextDeadline = ticket.slaDeadline;
+
+    if (ticket.currentEscalationLevel === 'LEVEL_1_MENTOR') {
+      nextLevel = 'LEVEL_2_HOD';
+      nextRole = 'HEAD_OF_DEPARTMENT';
+      nextDeadline = currentTime + (120 * 3600 * 1000);
+    } else if (ticket.currentEscalationLevel === 'LEVEL_2_HOD') {
+      nextLevel = 'LEVEL_3_PRINCIPAL_OMBUDSMAN';
+      nextRole = 'CAMPUS_OMBUDSMAN';
+      nextDeadline = currentTime + (168 * 3600 * 1000);
+    }
+
+    return {
+      ...ticket,
+      currentEscalationLevel: nextLevel,
+      slaDeadline: nextDeadline,
+      slaBreached: true,
+      status: 'ESCALATED_DUE_TO_SLA',
+      assignedOfficerRole: nextRole
+    };
+  }
 }
 
 module.exports = {

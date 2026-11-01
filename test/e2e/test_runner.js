@@ -101,18 +101,19 @@ async function run() {
   const suites = [
     {
       tier: 1,
-      name: 'Tier 1: Feature Coverage (35 Features)',
+      name: 'Tier 1: Feature Coverage (42 Features)',
       modules: [
         require('./tier1_features/tier1_core_security'),
         require('./tier1_features/tier1_academic_erp'),
         require('./tier1_features/tier1_submission_viva'),
         require('./tier1_features/tier1_frontend_3d'),
-        require('./tier1_features/tier1_e2e_hardening')
+        require('./tier1_features/tier1_e2e_hardening'),
+        require('./tier1_features/tier1_advanced_engines')
       ]
     },
     {
       tier: 2,
-      name: 'Tier 2: Boundary & Corner Cases (35 Features)',
+      name: 'Tier 2: Boundary & Corner Cases (42 Features)',
       modules: [
         require('./tier2_boundaries/tier2_boundaries')
       ]

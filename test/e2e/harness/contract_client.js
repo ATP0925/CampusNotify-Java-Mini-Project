@@ -199,6 +199,43 @@ class ContractClient {
     return this.simulator.simulateThreeSceneDisposal(sceneObjects);
   }
 
+  // --- Features 36-42: Advanced Academic Engines ---
+  async validateExamEligibility(dto) {
+    return this.simulator.validateExamEligibility(dto);
+  }
+
+  async reconcileRevalMarks(dto) {
+    return this.simulator.reconcileRevalMarks(dto);
+  }
+
+  async allocateNssGraceMarks(dto) {
+    return this.simulator.allocateNssGraceMarks(dto);
+  }
+
+  async generateReceiptQr(dto) {
+    return this.simulator.generateReceiptQr(dto);
+  }
+
+  async verifyReceiptPayload(qrPayload) {
+    return this.simulator.verifyReceiptPayload(qrPayload);
+  }
+
+  async evaluateTpoEligibility(dto) {
+    return this.simulator.evaluateTpoEligibility(dto);
+  }
+
+  async analyzePlagiarismAst(dto) {
+    return this.simulator.analyzePlagiarismAst(dto);
+  }
+
+  async fileGrievanceSgrc(dto) {
+    return this.simulator.fileGrievanceSgrc(dto);
+  }
+
+  async evaluateGrievanceSla(ticket, currentTime) {
+    return this.simulator.evaluateGrievanceSla(ticket, currentTime);
+  }
+
   reset() {
     this.simulator.resetState();
   }

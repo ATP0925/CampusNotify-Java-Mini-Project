@@ -3,6 +3,7 @@ import { AttendanceGauge } from '../erp/AttendanceGauge';
 import { TermWorkSimulator } from '../erp/TermWorkSimulator';
 import { NoDuesDagVisualizer } from '../erp/NoDuesDagVisualizer';
 import { GuideAllocationRanker } from '../erp/GuideAllocationRanker';
+import { EnterpriseExamAndFinanceDesk } from '../erp/EnterpriseExamAndFinanceDesk';
 import { useAuthStore } from '../../stores/useAuthStore';
 import { User, GraduationCap, Building2, BookOpen } from 'lucide-react';
 
@@ -53,6 +54,9 @@ export const StudentDashboard: React.FC = () => {
 
       {/* Full Width: Gale-Shapley Major Project Guide Allocation */}
       <GuideAllocationRanker />
+
+      {/* Full Width: Enterprise Exam Standing, Reval & Zero-Loophole Finance Desk */}
+      <EnterpriseExamAndFinanceDesk />
     </div>
   );
 };
