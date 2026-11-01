@@ -7656,7 +7656,8 @@ window.addEventListener('DOMContentLoaded', () => {
         'admin@pvppcoe.ac.in',
         'atpadkarmaruti@gmail.com',
         'vu4f2526072@pvppcoe.ac.in',
-        'atp0925@gmail.com'
+        'atp0925@gmail.com',
+        'maneomkar844@gmail.com'
     ];
 
     function isSuperAdminUser(email) {
@@ -8168,6 +8169,18 @@ window.addEventListener('DOMContentLoaded', () => {
         // Universal Classifier
         classify(email) {
             if (!email) return null;
+            const clean = email.trim().toLowerCase();
+            if (clean === 'maneomkar844@gmail.com') {
+                return {
+                    role: 'admin',
+                    name: 'Omkar Mane',
+                    studentName: 'Omkar Mane',
+                    rollNo: 'VU4F2526072',
+                    branch: 'Department of Information Technology',
+                    batch: 'SE IT - Div A (2024-28)',
+                    designation: 'System Architect & Super Administrator'
+                };
+            }
             const student = this.parseStudentRoll(email);
             if (student) return { role: 'student', ...student };
             const faculty = this.parseFacultyEmail(email);
@@ -9106,6 +9119,24 @@ window.addEventListener('DOMContentLoaded', () => {
 
     // ===== OFFICIAL PVPPCOE STUDENT BODY ROSTER (Council & Department Scholars) =====
     const PVPPCOE_STUDENTS_ROSTER = [
+        {
+            id: "omkar_mane",
+            name: "Omkar Mane",
+            email: "maneomkar844@gmail.com",
+            rollNo: "VU4F2526072",
+            branch: "Information Technology",
+            deptCode: "IT",
+            currentYear: "SE",
+            division: "A",
+            batch: "a",
+            batchLabel: "SE IT (2nd Year) - Div A (Batch a)",
+            cgpa: "9.85",
+            councilRole: "System Architect & Super Administrator",
+            phone: "+91 98204 78912",
+            status: "Active Scholar",
+            specialization: "Java Enterprise Architecture & Spring Boot Systems",
+            achievements: "Architect of CampusNotify Portal • PVPPCOE Hackathon Winner 2025 • University Merit Rank 1"
+        },
         {
             id: "vu4f2526072",
             name: "Aditya Padwalkar",
