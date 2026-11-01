@@ -1,4 +1,10 @@
 {
+  "rewrites": [
+    {
+      "source": "/__/auth/:match*",
+      "destination": "https://campusnotify-5d4bd.firebaseapp.com/__/auth/:match*"
+    }
+  ],
   "headers": [
     {
       "source": "/(.*)",

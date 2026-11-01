@@ -10501,6 +10501,8 @@ window.addEventListener('DOMContentLoaded', () => {
             }
 
             currentUser = adminProfile;
+            localStorage.setItem('campus_active_uid', user.uid);
+            localStorage.setItem('campus_active_email', email);
             localStorage.setItem('campus_profile_' + user.uid, JSON.stringify(currentUser));
             localStorage.setItem('last_user_role_' + user.uid, 'admin');
 
@@ -10531,6 +10533,8 @@ window.addEventListener('DOMContentLoaded', () => {
                 createdAt: new Date().toISOString()
             };
             currentUser = hodProfile;
+            localStorage.setItem('campus_active_uid', user.uid);
+            localStorage.setItem('campus_active_email', email);
             localStorage.setItem('campus_profile_' + user.uid, JSON.stringify(currentUser));
             localStorage.setItem('last_user_role_' + user.uid, 'professor');
             setDoc(doc(db, "users", user.uid), currentUser, { merge: true }).catch(() => {});
@@ -10561,6 +10565,8 @@ window.addEventListener('DOMContentLoaded', () => {
         // If existing user already has a configured profile, sign in instantly!
         if (existingUser && existingUser.role) {
             currentUser = existingUser;
+            localStorage.setItem('campus_active_uid', user.uid);
+            localStorage.setItem('campus_active_email', email);
             localStorage.setItem('campus_profile_' + user.uid, JSON.stringify(currentUser));
             localStorage.setItem('last_user_role_' + user.uid, currentUser.role);
             hideLoading();
@@ -10594,6 +10600,8 @@ window.addEventListener('DOMContentLoaded', () => {
         };
 
         currentUser = autoProfile;
+        localStorage.setItem('campus_active_uid', user.uid);
+        localStorage.setItem('campus_active_email', email);
         localStorage.setItem('campus_profile_' + user.uid, JSON.stringify(currentUser));
         localStorage.setItem('last_user_role_' + user.uid, currentUser.role);
         setDoc(doc(db, "users", user.uid), currentUser, { merge: true }).catch(err => {
@@ -10724,12 +10732,27 @@ window.addEventListener('DOMContentLoaded', () => {
             location.reload();
             return;
         }
+        try {
+            localStorage.removeItem('campus_active_uid');
+            localStorage.removeItem('campus_active_email');
+            localStorage.removeItem('campus_super_admin_bypass');
+        } catch(e) {}
         await signOut(auth);
         location.reload();
     }
 
     // ===== MAIN APP CONTROLLER =====
     function showMainApp() {
+        if (!currentUser) {
+            try {
+                const activeUid = localStorage.getItem('campus_active_uid') || (auth && auth.currentUser ? auth.currentUser.uid : null);
+                if (activeUid) {
+                    const cached = localStorage.getItem('campus_profile_' + activeUid);
+                    if (cached) currentUser = JSON.parse(cached);
+                }
+            } catch(e) {}
+        }
+        if (!currentUser) return;
         $('authSection').classList.add('hidden');
         $('mainApp').classList.remove('hidden');
         window.dispatchEvent(new CustomEvent('campus_user_updated'));
@@ -14703,6 +14726,10 @@ deepLink + '\n' +
         }
     }
     window.handleGoogleSignInRedirect = handleGoogleSignInRedirect;
+    window.processGoogleUser = processGoogleUser;
+    window.showMainApp = showMainApp;
+    window.isSuperAdminUser = isSuperAdminUser;
+    window.isHODUser = isHODUser;
 
     window.openEditProfileModal = openEditProfileModal;
     window.saveProfile = saveProfile;
@@ -15150,7 +15177,9 @@ deepLink + '\n' +
             const storedRole = sessionStorage.getItem('pending_google_signin_role') || 'student';
             await processGoogleUser(user, storedRole);
         } else {
-            showView('loginView');
+            if (!currentUser && !localStorage.getItem('campus_active_uid')) {
+                showView('loginView');
+            }
         }
     });
 
