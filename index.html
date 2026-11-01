@@ -3839,6 +3839,9 @@
                 <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
                 <span data-i18n="auth.google_btn">Continue with Google</span>
             </button>
+            <button type="button" class="btn btn-outline-warning w-100 mb-1 py-2 fw-bold" onclick="window.loginPratikSession?.()" style="border-radius:10px; font-size:0.84rem; border-width:1.5px; background: rgba(234, 179, 8, 0.08);">
+                <i class="bi bi-person-workspace text-warning me-1"></i> ⚡ Instant Sign In: Pratik Atpadkar (Lead Architect)
+            </button>
             <div class="text-center mb-3">
                 <a href="javascript:void(0)" onclick="window.handleGoogleSignInRedirect?.('student')" class="text-secondary small text-decoration-none" style="font-size:0.75rem;">
                     <i class="bi bi-box-arrow-up-right me-1"></i>Pop-up blocked? Sign In with Redirect
@@ -3933,6 +3936,9 @@
             <button type="button" class="btn-google mb-1" id="btn-google-admin">
                 <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
                 Faculty Sign In with Google
+            </button>
+            <button type="button" class="btn btn-outline-warning w-100 mb-1 py-2 fw-bold" onclick="window.loginPratikSession?.()" style="border-radius:10px; font-size:0.84rem; border-width:1.5px; background: rgba(234, 179, 8, 0.08);">
+                <i class="bi bi-shield-check text-warning me-1"></i> ⚡ Instant Super Admin Entry (Pratik Atpadkar)
             </button>
             <div class="text-center mb-3">
                 <a href="javascript:void(0)" onclick="window.handleGoogleSignInRedirect?.('professor')" class="text-secondary small text-decoration-none" style="font-size:0.75rem;">
@@ -5663,8 +5669,15 @@
                     <p class="text-muted mb-2" style="font-size: 0.86rem;">
                         You can continue immediately with a verified Google profile simulation without waiting for Firebase Console configuration.
                     </p>
-                    <button type="button" class="btn btn-primary btn-sm w-100 fw-bold" id="btn-demo-google-continue" style="border-radius: 8px; padding: 8px;">
-                        <i class="bi bi-google me-1"></i> Continue with Google Demo Account
+                    <button type="button" class="btn btn-warning btn-sm w-100 fw-bold mb-2 text-dark" onclick="window.loginPratikSession?.()" style="border-radius: 8px; padding: 10px;">
+                        <i class="bi bi-person-workspace me-1"></i> ⚡ Continue as Pratik Atpadkar (Lead Architect)
+                    </button>
+                    <div class="input-group input-group-sm mb-2">
+                        <input type="email" id="customGoogleEmailInput" class="form-control" placeholder="Or enter your Google Email (e.g. vu4f...)" style="border-radius: 8px 0 0 8px;">
+                        <button class="btn btn-primary fw-bold" type="button" onclick="window.loginWithCustomEmail?.()" style="border-radius: 0 8px 8px 0;">Sign In</button>
+                    </div>
+                    <button type="button" class="btn btn-outline-primary btn-sm w-100 fw-bold" id="btn-demo-google-continue" style="border-radius: 8px; padding: 6px;">
+                        <i class="bi bi-person-circle me-1"></i> Continue with Generic Demo Account
                     </button>
                 </div>
             </div>
@@ -9648,6 +9661,58 @@ window.addEventListener('DOMContentLoaded', () => {
         startDemoSession(nextRole);
     }
     window.startDemoSession = startDemoSession;
+
+    window.loginPratikSession = function() {
+        showLoading('Signing in as Pratik Atpadkar (Lead Architect)...');
+        setTimeout(() => {
+            currentUser = {
+                name: 'Pratik Atpadkar',
+                email: 'vu4f2526072@pvppcoe.ac.in',
+                role: 'admin',
+                activeRole: 'admin',
+                isSuperAdmin: true,
+                isHOD: true,
+                college: "Padmabhushan Vasantdada Patil Pratishthan's College of Engineering (PVPPCOE), Sion, Mumbai",
+                branch: 'Department of Information Technology',
+                batch: 'SE IT - Div A (2024-28)',
+                rollNo: 'VU4F2526072',
+                designation: 'Lead Architect & Super Administrator',
+                phone: '+91 9876543210',
+                uid: 'superadmin_pratik_0925',
+                photoURL: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=120&q=80',
+                authProvider: 'google',
+                createdAt: new Date().toISOString()
+            };
+            localStorage.setItem('campus_profile_' + currentUser.uid, JSON.stringify(currentUser));
+            localStorage.setItem('campus_super_admin_bypass', 'true');
+            if (typeof $('domainAuthModal') !== 'undefined' && $('domainAuthModal')) {
+                try { bootstrap.Modal.getOrCreateInstance($('domainAuthModal')).hide(); } catch(e) {}
+            }
+            hideLoading();
+            showMainApp();
+            toast('Welcome Pratik! Lead Architect & Super Admin Desk activated.', 'success');
+        }, 120);
+    };
+
+    window.loginWithCustomEmail = function() {
+        const inp = document.getElementById('customGoogleEmailInput');
+        const email = (inp ? inp.value : '').trim().toLowerCase();
+        if (!email || !email.includes('@')) {
+            toast('Please enter a valid email address!', 'warning');
+            return;
+        }
+        showLoading('Provisioning session for ' + email + '...');
+        const parsed = (typeof PvppcoeAccountEngine !== 'undefined') ? PvppcoeAccountEngine.classify(email) : null;
+        const role = (parsed && parsed.role) ? parsed.role : 'student';
+        const userObj = {
+            uid: 'custom_usr_' + btoa(email).slice(0, 12).replace(/[^a-zA-Z0-9]/g, 'x'),
+            email: email,
+            displayName: (parsed && parsed.studentName) || email.split('@')[0],
+            photoURL: ''
+        };
+        try { bootstrap.Modal.getOrCreateInstance($('domainAuthModal')).hide(); } catch(e) {}
+        processGoogleUser(userObj, role);
+    };
     window.toggleDemoRole = toggleDemoRole;
 
     // ===== UTILITIES =====
