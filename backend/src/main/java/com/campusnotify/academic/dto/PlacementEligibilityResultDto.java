@@ -20,3 +20,4 @@ public class PlacementEligibilityResultDto {
     private BigDecimal drivePackageLpa;
     private int suspensionDaysRemaining;
 }
+

@@ -20,3 +20,4 @@ public class RevalReconciliationRequestDto {
     private BigDecimal ktExamFeePaid; // e.g. 1050.00
     private String ktHallTicketId;
 }
+

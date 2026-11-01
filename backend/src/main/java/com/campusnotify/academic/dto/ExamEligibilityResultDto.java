@@ -22,3 +22,4 @@ public class ExamEligibilityResultDto {
     private int totalDeadKts;
     private List<String> blockingSubjects;
 }
+

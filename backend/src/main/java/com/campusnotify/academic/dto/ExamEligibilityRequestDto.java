@@ -28,3 +28,4 @@ public class ExamEligibilityRequestDto {
         private boolean isExternalKt;
     }
 }
+

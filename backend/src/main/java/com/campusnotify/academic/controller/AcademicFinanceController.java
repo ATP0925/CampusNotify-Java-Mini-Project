@@ -39,3 +39,4 @@ public class AcademicFinanceController {
         return ResponseEntity.ok(Map.of("daysOverdue", daysOverdue, "fineAmount", fine));
     }
 }
+

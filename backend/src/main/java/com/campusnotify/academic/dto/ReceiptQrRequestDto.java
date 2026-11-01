@@ -19,3 +19,4 @@ public class ReceiptQrRequestDto {
     private String utrNumber;
     private String paymentGateway;
 }
+

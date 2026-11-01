@@ -21,3 +21,4 @@ public class AcademicAntiPlagiarismController {
         return ResponseEntity.ok(plagiarismEngineService.analyzePlagiarism(request));
     }
 }
+

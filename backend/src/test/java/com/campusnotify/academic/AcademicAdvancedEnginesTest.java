@@ -338,3 +338,4 @@ class AcademicAdvancedEnginesTest {
         assertEquals("ESCALATED_DUE_TO_SLA", escalatedTicket.getStatus());
     }
 }
+

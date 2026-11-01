@@ -21,3 +21,4 @@ public class NssGraceMarksResultDto {
     private boolean allClearedWithGrace;
     private String ordinanceCitation; // "MU Ordinance 0.5045"
 }
+

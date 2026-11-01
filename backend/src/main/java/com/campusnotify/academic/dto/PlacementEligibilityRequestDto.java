@@ -19,3 +19,4 @@ public class PlacementEligibilityRequestDto {
     private int unexcusedDriveAbsences;
     private int activeDeadKts;
 }
+

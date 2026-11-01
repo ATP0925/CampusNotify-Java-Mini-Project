@@ -32,3 +32,4 @@ public class AcademicExaminationController {
         return ResponseEntity.ok(examCellService.allocateNssGraceMarks(request));
     }
 }
+

@@ -21,3 +21,4 @@ public class AcademicPlacementController {
         return ResponseEntity.ok(placementService.evaluateDriveEligibility(request));
     }
 }
+

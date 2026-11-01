@@ -21,3 +21,4 @@ public class RevalReconciliationResultDto {
     private String transcriptIntegritySha256;
     private String auditMessage;
 }
+

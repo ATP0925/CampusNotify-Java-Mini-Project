@@ -21,3 +21,4 @@ public class GrievanceResultDto {
     private String assignedOfficerRole;
     private String encryptedLockerHash;
 }
+

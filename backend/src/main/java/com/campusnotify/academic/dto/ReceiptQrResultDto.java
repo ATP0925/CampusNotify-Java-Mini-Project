@@ -23,3 +23,4 @@ public class ReceiptQrResultDto {
     private boolean valid;
     private Instant timestamp;
 }
+

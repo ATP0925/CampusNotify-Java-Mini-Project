@@ -28,3 +28,4 @@ public class NssGraceMarksRequestDto {
         private int maxHeadMarks;
     }
 }
+
